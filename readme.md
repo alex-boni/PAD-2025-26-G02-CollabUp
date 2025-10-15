@@ -34,6 +34,13 @@ CollabUp/
 │   ├── src/
 │   │   ├── main/
 │   │   │   ├── java/com/collabup/      # Código fuente principal (Java)
+│   │   │   │             ├── view      <-- V (Vistas/UI)
+│   │   │   │             ├── viewmodel <-- VM (Lógica de la Presentación)
+│   │   │   │             ├── model     M (Datos/Lógica de Negocio)
+│   │   │   │                   ├── data
+│   │   │   │                   ├── repository
+│   │   │   │                   ├── source 
+│   │   │   │             
 │   │   │   ├── res/                     # Recursos (layouts, drawables, strings)
 │   │   │   └── AndroidManifest.xml
 │   └── build.gradle
