@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".controlador.MainActivity"
+    android:background="#FFFFFF"> <TextView
+    android:id="@+id/txtBienvenido"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:layout_marginLeft="15dp"
+    android:textColor="#000000" android:text="Bienvenido" />
+
+    <TextView
+        android:id="@+id/txtOurLeagues"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txtBienvenido"
+        android:layout_marginTop="70dp"
+        android:layout_marginLeft="15dp"
+        android:layout_centerHorizontal="true"
+        android:textSize="50sp" android:textColor="#000000" android:text="OurLeagues" />
+
+    <ImageView
+        android:id="@+id/imgIcono"
+        android:layout_width="wrap_content"
+        android:layout_height="170dp"
+        android:layout_below="@id/txtOurLeagues"
+        android:layout_marginTop="35dp"
+        android:src="@android:drawable/ic_dialog_info" /> <Button
+        android:id="@+id/btnIrLogin"
+        android:layout_width="200dp"
+        android:layout_height="80dp"
+        android:layout_below="@id/imgIcono"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:textSize="30sp" android:text="Login" />
+
+    <Button
+        android:id="@+id/btnIrSingup"
+        android:layout_width="200dp"
+        android:layout_height="80dp"
+        android:layout_below="@id/btnIrLogin"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:textSize="30sp" android:text="SIGNUP" />
+
+</RelativeLayout>

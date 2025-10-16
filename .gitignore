@@ -1,0 +1,25 @@
+# Archivos de dependencias y compilaciones generados por Gradle
+.gradle/
+build/
+
+# Archivos de configuración local (contienen rutas específicas de tu equipo)
+local.properties
+
+# Archivos y carpetas del IDE (Android Studio)
+*.iml
+.idea/
+.DS_Store
+
+# Archivos de empaquetado de la aplicación
+*.apk
+*.aab
+*.ap_
+
+# Archivos de registro y caché
+captures/
+.cxx/
+*.log
+
+# Archivos generados por el sistema operativo
+*~
+*.swp
