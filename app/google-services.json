@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "788128503639",
+    "project_id": "collabup-fe3ea",
+    "storage_bucket": "collabup-fe3ea.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:788128503639:android:8eaeb1fe4c1a15c4db1012",
+        "android_client_info": {
+          "package_name": "es.ucm.fdi.pad.collabup"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKhRmYB9Sp_NBCLX8YirS2bao6bcbGVqY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
