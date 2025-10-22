@@ -20,7 +20,7 @@ public class AppController extends AppCompatActivity {
 
     // Variables que controlarán a los fragmentos
     private final HomeFragment homeFragment = new HomeFragment();
-    private final CollabsFragment colabsFragment = new CollabsFragment();
+    private final CollabsFragment collabsFragment = new CollabsFragment();
     private final CalendarioFragment amigosFragment = new CalendarioFragment();
     private final AjustesFragment ajustesFragment = new AjustesFragment();
 
@@ -42,7 +42,7 @@ public class AppController extends AppCompatActivity {
             if (itemId == R.id.nav_home) {
                 replaceFragment(homeFragment);
             } else if (itemId == R.id.nav_colabs) {
-                replaceFragment(colabsFragment);
+                replaceFragment(collabsFragment);
                 // Toast.makeText(this, "Collabs (próximamente)", Toast.LENGTH_SHORT).show();
             } else if (itemId == R.id.nav_calendar) {
                 replaceFragment(amigosFragment);
