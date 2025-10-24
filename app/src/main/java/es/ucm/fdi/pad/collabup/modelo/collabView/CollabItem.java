@@ -1,11 +1,15 @@
 package es.ucm.fdi.pad.collabup.modelo.collabView;
 
 import java.security.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import es.ucm.fdi.pad.collabup.modelo.Etiqueta;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.DAO;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
-public class CollabItem {
+public class CollabItem implements DAO<CollabItem> {
 
     private String idI;
     private String nombre;
@@ -74,6 +78,31 @@ public class CollabItem {
         this.etiquetasItem = etiquetasItem;
     }
 
+    //---------------- FUNCIONES BASE DE DATOS
+    @Override
+    public void obtener(String identificador, OnDataLoadedCallback<CollabItem> callback) {
 
-    //
+    }
+
+    @Override
+    public void crear(OnOperationCallback callback) {
+
+    }
+
+    @Override
+    public void modificar(CollabItem reemplazo, OnOperationCallback callback) {
+
+    }
+
+    @Override
+    public void eliminar(OnOperationCallback callback) {
+
+    }
+
+    @Override
+    public void obtenerListado(OnDataLoadedCallback<ArrayList<CollabItem>> callback) {
+
+    }
+
+
 }
