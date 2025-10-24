@@ -1,15 +1,13 @@
 package es.ucm.fdi.pad.collabup.modelo.collabView;
 
-import java.security.Timestamp;
-import java.util.ArrayList;
+import com.google.firebase.Timestamp;
+
 import java.util.List;
 
 import es.ucm.fdi.pad.collabup.modelo.Etiqueta;
-import es.ucm.fdi.pad.collabup.modelo.interfaz.DAO;
-import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
-import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
-public class CollabItem implements DAO<CollabItem> {
+public class CollabItem {
+
 
     private String idI;
     private String nombre;
@@ -17,18 +15,30 @@ public class CollabItem implements DAO<CollabItem> {
     private Timestamp fecha;
     private List<String> usuariosAsignados;
     private List<Etiqueta> etiquetasItem; //lista de etiquetas asignadas al item
+    private String idC;
 
-    //Métodos básicos
-    public CollabItem(String idI, String nombre, String descripcion, Timestamp fecha,
-                      List<String> usuariosAsignados, List<Etiqueta> etiquetasItem) {
-        this.idI = idI;
+
+    //todo asignar id cuando se cree
+    //----------------------MÉTODOS---------------------------
+    //--------------------- Métodos básicos
+
+    public CollabItem(String nombre, String descripcion, Timestamp fecha,
+                      List<String> usuariosAsignados, List<Etiqueta> etiquetasItem, String idC) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.fecha = fecha;
         this.usuariosAsignados = usuariosAsignados;
         this.etiquetasItem = etiquetasItem;
+        this.idC = idC;
     }
 
+    public String getIdC() {
+        return idC;
+    }
+
+    public void setIdC(String idC) {
+        this.idC = idC;
+    }
 
     public String getIdI() {
         return idI;
@@ -76,32 +86,6 @@ public class CollabItem implements DAO<CollabItem> {
 
     public void setEtiquetasItem(List<Etiqueta> etiquetasItem) {
         this.etiquetasItem = etiquetasItem;
-    }
-
-    //---------------- FUNCIONES BASE DE DATOS
-    @Override
-    public void obtener(String identificador, OnDataLoadedCallback<CollabItem> callback) {
-
-    }
-
-    @Override
-    public void crear(OnOperationCallback callback) {
-
-    }
-
-    @Override
-    public void modificar(CollabItem reemplazo, OnOperationCallback callback) {
-
-    }
-
-    @Override
-    public void eliminar(OnOperationCallback callback) {
-
-    }
-
-    @Override
-    public void obtenerListado(OnDataLoadedCallback<ArrayList<CollabItem>> callback) {
-
     }
 
 
