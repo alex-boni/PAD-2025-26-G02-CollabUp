@@ -1,5 +1,6 @@
 package es.ucm.fdi.pad.collabup.modelo.adapters;
 
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +13,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import es.ucm.fdi.pad.collabup.R;
-import es.ucm.fdi.pad.collabup.modelo.CollabItem;
+import es.ucm.fdi.pad.collabup.modelo.Collab;
 
 public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder> {
 
-    private List<CollabItem> items;
+    private List<Collab> items;
 
-    public CardAdapter(List<CollabItem> items) {
+    public CardAdapter(List<Collab> items) {
         this.items = items;
     }
 
@@ -45,14 +46,26 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull CardViewHolder holder, int position) {
-        CollabItem item = items.get(position);
-        holder.image.setImageResource(item.getImageResId());
-        holder.title.setText(item.getTitle());
-        holder.description.setText(item.getDescription());
+        Collab item = items.get(position);
+        
+        if (item.getImageUri() != null && !item.getImageUri().isEmpty()) {
+            holder.image.setImageURI(Uri.parse(item.getImageUri()));
+        } else {
+            holder.image.setImageResource(R.drawable.ic_launcher_foreground);
+        }
+        
+        holder.title.setText(item.getNombre());
+        holder.description.setText(item.getDescripcion());
     }
 
     @Override
     public int getItemCount() {
         return items.size();
     }
+
+    public void addItem(Collab item) {
+        items.add(0, item);
+        notifyItemInserted(0);
+    }
 }
+
