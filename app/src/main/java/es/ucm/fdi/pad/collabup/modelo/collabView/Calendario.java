@@ -19,4 +19,9 @@ public class Calendario extends AbstractCollabView {
     protected Fragment getPrevisualizacion() {
         return null;
     }
+
+    @Override
+    protected Fragment getFragmentAjustes() {
+        return null;
+    }
 }

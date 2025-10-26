@@ -8,8 +8,6 @@ import es.ucm.fdi.pad.collabup.modelo.Etiqueta;
 
 public class CollabItem {
 
-
-    private String idI;
     private String nombre;
     private String descripcion;
     private Timestamp fecha;
@@ -38,14 +36,6 @@ public class CollabItem {
 
     public void setIdC(String idC) {
         this.idC = idC;
-    }
-
-    public String getIdI() {
-        return idI;
-    }
-
-    public void setIdI(String idI) {
-        this.idI = idI;
     }
 
     public String getNombre() {

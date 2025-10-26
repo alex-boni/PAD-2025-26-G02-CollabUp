@@ -25,7 +25,7 @@ import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 
 //Llamado cuando vayamos a añadir evento
-public class CollabItemActivity extends AppCompatActivity {
+public class CreateCollabItemActivity extends AppCompatActivity {
 
     //Atributos base de datos
     private FirebaseFirestore db;
@@ -51,6 +51,7 @@ public class CollabItemActivity extends AppCompatActivity {
         eTxtNombreCollabItem = findViewById(R.id.eTxtNombreCollabItem);
         eTxtDescripcionCollabItem = findViewById(R.id.eTxtDescripcionCollabItem);
         btnCrearCollabItem = findViewById(R.id.btnCrearCollabItem);
+        eTxtFechaCollabItem = findViewById(R.id.eTxtFechaCollabItem);
 
         idC = getIntent().getStringExtra("idC"); //llega de arriba
         if (idC == "") {
@@ -87,7 +88,6 @@ public class CollabItemActivity extends AppCompatActivity {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
-        Timestamp timestamp = new Timestamp(date);
         Timestamp fecha = new Timestamp(date);
 
         List<String> uasig = null;
@@ -101,13 +101,16 @@ public class CollabItemActivity extends AppCompatActivity {
             eTxtNombreCollabItem.setError("El nombre es requerido");
             return;
         }
+        /*
         if (currentUser == null) {
             Toast.makeText(this, "Error: Usuario no autenticado", Toast.LENGTH_SHORT).show();
             return;
         }
 
+         */
+
         // Crear el objeto CollabItem
-        String uidCreador = currentUser.getUid();
+        //String uidCreador = currentUser.getUid();
         CollabItem nuevoCollabItem = new CollabItem(nombre, descripcion, fecha, uasig, easig, idC);
 
         // Guardar en Firestore en la colección "collabItem" dentro de su "collabs"
@@ -117,10 +120,10 @@ public class CollabItemActivity extends AppCompatActivity {
                 .collection("collabItem")
                 .add(nuevoCollabItem)
                 .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(CollabItemActivity.this, "CollabItem creado con éxito", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CreateCollabItemActivity.this, "CollabItem creado con éxito", Toast.LENGTH_SHORT).show();
                     finish(); // Cierra la actividad y vuelve al fragmento
                 })
-                .addOnFailureListener(e -> Toast.makeText(CollabItemActivity.this, "Error al crear: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                .addOnFailureListener(e -> Toast.makeText(CreateCollabItemActivity.this, "Error al crear: " + e.getMessage(), Toast.LENGTH_LONG).show());
     }
 
     public void modificar() {
