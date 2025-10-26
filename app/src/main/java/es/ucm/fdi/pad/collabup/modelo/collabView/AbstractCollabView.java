@@ -60,6 +60,13 @@ public abstract class AbstractCollabView implements CollabView, DAO<AbstractColl
         return null;
     }
 
+    //Vista para modificar los ajustes de un CollabView ya creado
+    public Activity getVistaAjustes(){
+        //usar getFragment ajustes
+        return null;
+    }
+    protected abstract Fragment getFragmentAjustes();
+
 
     //----------------- MÉTODOS DEL DAO, ACCESO A BASE DE DATOS
     @Override
