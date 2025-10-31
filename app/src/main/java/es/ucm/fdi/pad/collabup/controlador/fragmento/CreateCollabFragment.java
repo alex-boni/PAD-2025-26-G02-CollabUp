@@ -54,11 +54,20 @@ public class CreateCollabFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         mAuth = FirebaseAuth.getInstance();
-        
+
         pickMedia = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
             if (uri != null) {
+                try {
+                    requireContext().getContentResolver().takePersistableUriPermission(
+                            uri,
+                            android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    );
+                } catch (SecurityException e) {
+                    // No se pueden tomar permisos persistentes, la URI será temporal
+                }
+
                 selectedImageUri = uri;
                 ivCollabImage.setImageURI(uri);
                 Toast.makeText(getContext(), "Imagen seleccionada", Toast.LENGTH_SHORT).show();

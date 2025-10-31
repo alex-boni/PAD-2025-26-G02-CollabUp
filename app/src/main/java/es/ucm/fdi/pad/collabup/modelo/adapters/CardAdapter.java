@@ -47,13 +47,17 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
     @Override
     public void onBindViewHolder(@NonNull CardViewHolder holder, int position) {
         Collab item = items.get(position);
-        
+
         if (item.getImageUri() != null && !item.getImageUri().isEmpty()) {
-            holder.image.setImageURI(Uri.parse(item.getImageUri()));
+            try {
+                holder.image.setImageURI(Uri.parse(item.getImageUri()));
+            } catch (SecurityException e) {
+                holder.image.setImageResource(R.drawable.ic_launcher_foreground);
+            }
         } else {
             holder.image.setImageResource(R.drawable.ic_launcher_foreground);
         }
-        
+
         holder.title.setText(item.getNombre());
         holder.description.setText(item.getDescripcion());
     }
