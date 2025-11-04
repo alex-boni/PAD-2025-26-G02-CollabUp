@@ -2,4 +2,14 @@
     <string name="app_name">CollabUp</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="filter">Filtro</string>
+    <string name="settings">Configuración</string>
+    <string name="create_new_collab">Crear nuevo Collab</string>
+    <string name="title_collabs">Collabs</string>
+    <string name="hint_search_collab">Buscar Colaboración</string>
+    <string name="chip_all">Todos</string>
+    <string name="chip_favorites">Favoritos</string>
+    <string name="chip_archived">Archivados</string>    
+    <string name="no_collabs_found">No se encontraron colaboraciones.</string>
+    <string name="chip_deleted">Eliminados</string>
 </resources>
