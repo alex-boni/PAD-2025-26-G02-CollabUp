@@ -33,7 +33,7 @@ public class AppController extends AppCompatActivity {
         bottomNavigationViewApp = findViewById(R.id.bottomNavigationViewApp);
 
         // Carga el fragmento inicial (Home)
-        replaceFragment(collabListFragment);
+        replaceFragment(homeFragment);
 
         // Listener para la barra de navegación inferior
         bottomNavigationViewApp.setOnItemSelectedListener(item -> {
