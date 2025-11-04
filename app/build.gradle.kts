@@ -55,4 +55,7 @@ dependencies {
     // Para Analytics (recomendado)
     implementation("com.google.firebase:firebase-analytics")
 
+    // Para agregar MUI
+    implementation("com.google.android.material:material:1.12.0")
+
 }
