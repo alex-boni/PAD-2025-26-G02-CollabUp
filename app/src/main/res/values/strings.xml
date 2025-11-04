@@ -6,10 +6,10 @@
     <string name="settings">Configuración</string>
     <string name="create_new_collab">Crear nuevo Collab</string>
     <string name="title_collabs">Collabs</string>
-    <string name="hint_search_collab">Buscar Colaboración</string>
+    <string name="hint_search_collab">Buscar Collabs</string>
     <string name="chip_all">Todos</string>
     <string name="chip_favorites">Favoritos</string>
     <string name="chip_archived">Archivados</string>    
-    <string name="no_collabs_found">No se encontraron colaboraciones.</string>
+    <string name="no_collabs_found">No se encontraron collabs.</string>
     <string name="chip_deleted">Eliminados</string>
 </resources>
