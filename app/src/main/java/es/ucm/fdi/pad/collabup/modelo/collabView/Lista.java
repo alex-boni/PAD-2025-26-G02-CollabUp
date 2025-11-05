@@ -57,9 +57,5 @@ public class Lista extends AbstractCollabView {
     public List<CollabViewSetting> getCreationSettings() {
         return null;
     }
-
-    @Override
-    protected Fragment getFragmentAjustes() {
-        return null;
-    }
+    
 }
