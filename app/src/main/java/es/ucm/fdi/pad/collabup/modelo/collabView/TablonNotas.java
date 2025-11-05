@@ -13,10 +13,10 @@ import java.util.Map;
 
 import es.ucm.fdi.pad.collabup.R;
 
-public class Lista extends AbstractCollabView {
+public class TablonNotas extends AbstractCollabView {
 
-    public Lista() {
-        this.nombre = "Lista";
+    public TablonNotas() {
+        this.nombre = "Tablón de Notas";
     }
 
     @Override
@@ -28,8 +28,7 @@ public class Lista extends AbstractCollabView {
     protected View getPrevisualizacion(Context context) {
         ImageView iv = new ImageView(context);
 
-        // Forma correcta de cargar una imagen desde la carpeta 'drawable'
-        Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.lista_no_border_collabview);
+        Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.tablon_no_border_collabview);
 
         iv.setImageBitmap(bmp);
         iv.setAdjustViewBounds(true);
@@ -37,6 +36,7 @@ public class Lista extends AbstractCollabView {
 
         return iv;
     }
+
 
     @Override
     protected Fragment getFragmentAjustes() {
@@ -55,11 +55,6 @@ public class Lista extends AbstractCollabView {
 
     @Override
     public List<CollabViewSetting> getCreationSettings() {
-        return null;
-    }
-
-    @Override
-    protected Fragment getFragmentAjustes() {
         return null;
     }
 }

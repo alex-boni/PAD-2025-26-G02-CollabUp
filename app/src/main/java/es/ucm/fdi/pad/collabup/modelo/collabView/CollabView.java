@@ -1,14 +1,75 @@
 package es.ucm.fdi.pad.collabup.modelo.collabView;
 
 import android.app.Activity;
+import android.content.Context;
+import android.view.View;
 
 import androidx.fragment.app.Fragment;
 
+import java.util.List;
+import java.util.Map;
+
 //Interfaz collabViews
 public interface CollabView {
-    Activity getVistaCollabView();
-    Fragment getFragmentEnCollab();
-    Activity getVistaAjustes();
-    AbstractCollabView construir();
-    //TODO Añadir getMiniatura
+    /**
+     * Obtiene el nombre del CollabView.
+     *
+     * @return el nombre del CollabView
+     */
+    String getName();
+
+    /**
+     * Construye una instancia de CollabView a partir de un mapa de configuraciones.
+     *
+     * @param settings especificas para cada CollabView.
+     * @return una nueva instancia de CollabView configurada.
+     */
+    CollabView build(Map<String, Object> settings);
+
+    /**
+     * Popula la CollabView con el CollabItem proporcionado.
+     *
+     * @param item el CollabItem que contiene los datos para poblar la vista
+     */
+    void populate(CollabItem item);
+
+    /**
+     * Obtiene la actividad que muestra la vista completa de la CollabView.
+     *
+     * @return la actividad de vista completa
+     */
+    Activity getFullViewActivity();
+
+    /**
+     * Obtiene la vista a añadir a la lista de CollabViews cuando se quiere agregar
+     * una nueva CollabView a un Collab
+     *
+     * @param context el contexto para crear la vista
+     * @return la vista para añadir en la lista de CollabViews disponibles
+     */
+    View getStaticAddCollabViewInListEntry(Context context);
+
+    /**
+     * Obtiene el fragmento que se utiliza para mostrar la CollabView dentro la activity
+     * de un Collab.
+     *
+     * @return el fragmento de la CollabView en el Collab
+     */
+    Fragment getInCollabFragment();
+
+    /**
+     * Obtiene la actividad que permite editar los ajustes de una instancia de CollabView.
+     *
+     * @return la actividad de edición de ajustes
+     */
+    Activity getEditSettingsActivity();
+
+    /**
+     * Obtiene los ajustes disponibles para la creación de una nueva instancia de CollabView.
+     * Boolean indica si el ajuste es obligatorio (true) o opcional (false).
+     * List<String> contiene las posibles opciones para ajustes que requieran selección.
+     *
+     * @return un conjunto de pares clave-obligatoriedad que representan los ajustes de creación
+     */
+    List<CollabViewSetting> getCreationSettings();
 }
