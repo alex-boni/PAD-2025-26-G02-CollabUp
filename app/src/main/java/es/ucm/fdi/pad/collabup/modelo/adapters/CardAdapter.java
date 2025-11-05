@@ -14,12 +14,15 @@ import java.util.List;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Collab;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnCollabClickListener;
 
 public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder> {
 
     private List<Collab> items;
+    private final OnCollabClickListener listener;
 
-    public CardAdapter(List<Collab> items) {
+    public CardAdapter(List<Collab> items, OnCollabClickListener listener) {
+        this.listener = listener;
         this.items = items;
     }
 
@@ -60,6 +63,15 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
 
         holder.title.setText(item.getNombre());
         holder.description.setText(item.getDescripcion());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    // Llamar al listener y pasar el objeto 'item' (el Collab actual)
+                    listener.onCollabClick(item);
+                }
+            }
+        });
     }
 
     @Override

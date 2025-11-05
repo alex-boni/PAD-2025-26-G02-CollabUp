@@ -20,9 +20,10 @@ import java.util.List;
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Collab;
 import es.ucm.fdi.pad.collabup.modelo.adapters.CardAdapter;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnCollabClickListener;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 
-public class CollabListFragment extends Fragment {
+public class CollabListFragment extends Fragment implements OnCollabClickListener {
 
     private static final String RESULT_KEY = "collab_created";
 
@@ -54,7 +55,7 @@ public class CollabListFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         items = new ArrayList<>();
-        adapter = new CardAdapter(items);
+        adapter = new CardAdapter(items, this);
         recyclerView.setAdapter(adapter);
 
         cargarCollabsDesdeFirestore();
@@ -109,6 +110,21 @@ public class CollabListFragment extends Fragment {
                 cargarCollabsDesdeFirestore();
             }
         });
+    }
+
+    @Override
+    public void onCollabClick(Collab collab) {
+        Bundle args = new Bundle();
+        args.putString("collab_id", collab.getId());
+
+        CollabDetailFragment detailFragment = new CollabDetailFragment();
+        detailFragment.setArguments(args);
+
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragmentApp, detailFragment)
+                .addToBackStack("collab_list")
+                .commit();
+        Toast.makeText(getContext(), "Abriendo Collab: " + collab.getNombre(), Toast.LENGTH_SHORT).show();
     }
 }
 
