@@ -1,3 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">CollabUp</string>
+    <string name="back_description">Ir atrás</string>
+    <string name="add_collabview_title">Añadir CollabView</string>
+    <string name="configure_new_collabview_title">Configurar Nuevo CollabView</string>
+    <string name="label_nombre">Nombre</string>
+    <string name="label_ajustes">Ajustes</string>
+    <string name="setting_label">%1$s %2$s</string>
+    <string name="button_create">Guardar</string>
 </resources>
