@@ -1,13 +1,18 @@
 package es.ucm.fdi.pad.collabup.modelo.collabView;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import es.ucm.fdi.pad.collabup.modelo.Etiqueta;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.DAO;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
-public class CollabItem implements Serializable {
+public class CollabItem implements Serializable, DAO<CollabItem> {
 
     private String nombre;
     private String descripcion;
@@ -16,8 +21,9 @@ public class CollabItem implements Serializable {
     private List<Etiqueta> etiquetasItem; //lista de etiquetas asignadas al item
     private String idC;
 
+    private String idI;
+    private FirebaseFirestore db;
 
-    //todo asignar id cuando se cree
     //----------------------MÉTODOS---------------------------
     //--------------------- Métodos básicos
 
@@ -29,14 +35,23 @@ public class CollabItem implements Serializable {
         this.usuariosAsignados = usuariosAsignados;
         this.etiquetasItem = etiquetasItem;
         this.idC = idC;
+        db = FirebaseFirestore.getInstance();
     }
 
     public String getIdC() {
         return idC;
     }
 
-    public void setIdC(String idC) {
+    public void setId(String idC) {
         this.idC = idC;
+    }
+
+    public String getIdI() {
+        return idI;
+    }
+
+    public void setIdI(String idI) {
+        this.idI = idI;
     }
 
 
@@ -78,6 +93,62 @@ public class CollabItem implements Serializable {
 
     public void setEtiquetasItem(List<Etiqueta> etiquetasItem) {
         this.etiquetasItem = etiquetasItem;
+    }
+
+
+    @Override
+    public void obtener(String identificador, OnDataLoadedCallback<CollabItem> callback) {
+
+    }
+
+    @Override
+    public void crear(OnOperationCallback callback) {
+        db.collection("collabs")
+                .document(this.getIdC())
+                .collection("collabItem")
+                .add(this)
+                .addOnSuccessListener(documentReference -> {
+                    this.idI = documentReference.getId();
+                    callback.onSuccess();
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+
+    public void cargarDatosCollabItem(OnDataLoadedCallback<CollabItem> callback) {
+        db.collection("collabs")
+                .document(this.getIdC())
+                .collection("collabItem")
+                .document(this.idI)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        this.setDescripcion(documentSnapshot.getString("descripcion"));
+                        this.setEtiquetasItem((List<Etiqueta>) documentSnapshot.get("etiquetas"));
+                        this.setFecha(documentSnapshot.getTimestamp("fecha"));
+                        this.setNombre(documentSnapshot.getString("nombre"));
+                        this.setUsuariosAsignados((List<String>) documentSnapshot.get("usuarios"));
+                        callback.onSuccess(this); // Llama al callback con el objeto cargado
+                    } else {
+                        callback.onSuccess(null); // No existe el documento
+                    }
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    @Override
+    public void modificar(CollabItem reemplazo, OnOperationCallback callback) {
+
+    }
+
+    @Override
+    public void eliminar(OnOperationCallback callback) {
+
+    }
+
+    @Override
+    public void obtenerListado(OnDataLoadedCallback<ArrayList<CollabItem>> callback) {
+
     }
 
 

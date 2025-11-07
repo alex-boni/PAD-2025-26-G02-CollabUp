@@ -41,7 +41,8 @@
         <activity
             android:name=".controlador.CreateCollabItemActivity"
             android:exported="false" />
-        
+
+
         <activity
             android:name=".controlador.CollabItemActivity"
             android:exported="true">
@@ -50,6 +51,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
 
     </application>
 

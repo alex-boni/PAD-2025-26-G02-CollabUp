@@ -19,7 +19,6 @@ import java.util.Locale;
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Etiqueta;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
-import es.ucm.fdi.pad.collabup.modelo.collabView.DAOCollabItemImp;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
 //Llamado cuando vayamos a añadir evento
@@ -31,15 +30,12 @@ public class CreateCollabItemActivity extends AppCompatActivity {
 
     //---------- Atributos necesarios
     private String idC; //id del collab en el que estamos
-    DAOCollabItemImp daoci;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_collabitem);
-
-        daoci = new DAOCollabItemImp();
 
         // Inicializar vistas
         eTxtNombreCollabItem = findViewById(R.id.eTxtNombreCollabItem);
@@ -81,7 +77,7 @@ public class CreateCollabItemActivity extends AppCompatActivity {
 
         List<String> uasig = null; //todo MODULO COLLAB NECESITO ESTOS PARÁMETROS
         List<Etiqueta> easig = null;
-        String idC = "G1rScmUcdWhg4T0D7HfA";
+        String idC = "Bt8zGlf5fevw4Tqej0Kn";
 
         // Validaciones
         if (nombre.isEmpty()) {
@@ -91,9 +87,8 @@ public class CreateCollabItemActivity extends AppCompatActivity {
 
         // Creamos el objeto CollabItem
         CollabItem nuevoCollabItem = new CollabItem(nombre, descripcion, fecha, uasig, easig, idC);
-
         //Lo añadimos a la base de datos
-        daoci.crear(nuevoCollabItem, new OnOperationCallback() {
+        nuevoCollabItem.crear(new OnOperationCallback() {
             @Override
             public void onSuccess() {
                 Toast.makeText(CreateCollabItemActivity.this, "CollabItem creado con éxito", Toast.LENGTH_SHORT).show();

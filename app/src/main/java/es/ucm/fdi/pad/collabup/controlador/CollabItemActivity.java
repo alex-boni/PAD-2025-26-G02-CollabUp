@@ -11,23 +11,19 @@ import android.widget.ListView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Etiqueta;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 
 //VISTA DEL COLLABITEM INDIVIDUAL -> Incluirá botones de editar y eliminar
 public class CollabItemActivity extends AppCompatActivity {
-
-    //--------------Atributos base de datos
-    private FirebaseFirestore db;
 
     //------------- Atributos vista
     private EditText eTxtNombreCollabItem, eTxtDescripcionCollabItem, eTxtFechaCollabItem;
@@ -36,7 +32,8 @@ public class CollabItemActivity extends AppCompatActivity {
     private ListView lvUsrsAsigCollabItem, lvEtiqCollabItem;
 
     //------------
-    private CollabItem collabItem; //el que estoy viendo
+    private String idI; //el que estoy viendo
+    private String idC; //la collab del item
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,36 +53,19 @@ public class CollabItemActivity extends AppCompatActivity {
         btnEliminarCollabItem = findViewById(R.id.btnEliminarCollabItem);
 
         //Valores que llegan de arriba
-
-        /*
+        //todo MODULO COLLAB pasar parametros
+        //todo mirar si se pasan con bundles (mejor)
         idI = getIntent().getStringExtra("idI");
         if (idI == null) {
             idI = ""; // o algún valor por defecto
-            idI = "YdpM0KRzLYP8ylrrvpwz"; //para hacerlo ahora
+            idI = "sbXK1U1ShID0lQN3Ue1v"; //para hacerlo ahora
         }
-         */
-        //todo MODULO COLLAB pasar parametros
-        collabItem = (CollabItem) getIntent().getSerializableExtra("collabItem");
-
-        //Por ahora:
-        String fechastr = "07/11/2025";
-        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()); //todo posible cambiar
-        Date date = null; // convierte el String a Date
-        try {
-            date = formato.parse(fechastr);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-        Timestamp fecha = new Timestamp(date);
-        CollabItem collabItem = new CollabItem("Pruebas de CollabItem", "Aquí " +
-                "hare todas las pruebas de collabItem", fecha, new ArrayList<String>(),
-                new ArrayList<Etiqueta>(), "G1rScmUcdWhg4T0D7HfA");
-        if (collabItem != null) {
-            mostrarDatosCollabItem(collabItem);
+        idC = getIntent().getStringExtra("idC");
+        if (idC == null) {
+            idC = ""; // o algún valor por defecto
+            idC = "Bt8zGlf5fevw4Tqej0Kn"; //para hacerlo ahora
         }
 
-        // Inicializar Firebase
-        db = FirebaseFirestore.getInstance();
 
         //-----------Acciones botones
         //Editar
@@ -107,6 +87,25 @@ public class CollabItemActivity extends AppCompatActivity {
         btnEditarCollabItem.setOnClickListener(v -> {
             //todo eliminar item
         });
+
+        CollabItem collabItemModel = new CollabItem(null, null, null, null, null, idC);
+        collabItemModel.setIdI(idI);
+        collabItemModel.cargarDatosCollabItem(new OnDataLoadedCallback<CollabItem>() {
+            @Override
+            public void onSuccess(CollabItem item) {
+                if (item != null) {
+                    mostrarDatosCollabItem(item);
+                } else {
+                    eTxtNombreCollabItem.setText("Item no encontrado");
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                eTxtNombreCollabItem.setText("Error al cargar: " + e.getMessage());
+            }
+        });
+
 
     }
 
@@ -174,47 +173,6 @@ public class CollabItemActivity extends AppCompatActivity {
     }
 
 
-    /*
-    Esto no funciona porque necesito tb el id del collab, pero creo que es mejor simplemente
-    pasar el collabitem por pantalla
-    private void cargarDatosCollabItem() {
-        db.collection("collabItems").document(idI)
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        String nombre = documentSnapshot.getString("nombre");
-                        String descripcion = documentSnapshot.getString("descripcion");
-
-                        // Si la fecha se guarda como Timestamp:
-                        Timestamp timestamp = documentSnapshot.getTimestamp("fecha");
-                        String fechaFormateada = "";
-                        if (timestamp != null) {
-                            Date date = timestamp.toDate();
-                            SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                            fechaFormateada = formato.format(date);
-                        }
-
-                        // Mostrar en los EditText
-                        eTxtNombreCollabItem.setText(nombre);
-                        eTxtDescripcionCollabItem.setText(descripcion);
-                        eTxtFechaCollabItem.setText(fechaFormateada);
-
-                        // Si tienes una lista de usuarios asignados:
-                        java.util.List<String> usuariosAsignados = (java.util.List<String>) documentSnapshot.get("usuariosAsignados");
-                        if (usuariosAsignados != null) {
-                            // Muestra los nombres en la lista o adaptador
-                            mostrarUsuariosAsignados(usuariosAsignados);
-                        }
-
-                    } else {
-                        eTxtNombreCollabItem.setText("No encontrado");
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    eTxtNombreCollabItem.setText("Error al cargar");
-                });
-    }
-
     private void mostrarUsuariosAsignados(java.util.List<String> usuarios) {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
@@ -222,8 +180,7 @@ public class CollabItemActivity extends AppCompatActivity {
                 usuarios
         );
         lvUsrsAsigCollabItem.setAdapter(adapter);
-
-     */
+    }
 
 
 }
