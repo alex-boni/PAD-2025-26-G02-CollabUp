@@ -2,11 +2,12 @@ package es.ucm.fdi.pad.collabup.modelo.collabView;
 
 import com.google.firebase.Timestamp;
 
+import java.io.Serializable;
 import java.util.List;
 
 import es.ucm.fdi.pad.collabup.modelo.Etiqueta;
 
-public class CollabItem {
+public class CollabItem implements Serializable {
 
     private String nombre;
     private String descripcion;
@@ -14,7 +15,6 @@ public class CollabItem {
     private List<String> usuariosAsignados;
     private List<Etiqueta> etiquetasItem; //lista de etiquetas asignadas al item
     private String idC;
-    private String idI;
 
 
     //todo asignar id cuando se cree
@@ -39,13 +39,6 @@ public class CollabItem {
         this.idC = idC;
     }
 
-    public String getIdI() {
-        return idI;
-    }
-
-    public void setIdI(String idI) {
-        this.idI = idI;
-    }
 
     public String getNombre() {
         return nombre;

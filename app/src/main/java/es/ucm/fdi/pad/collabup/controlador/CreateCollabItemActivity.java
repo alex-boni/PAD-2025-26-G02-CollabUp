@@ -86,7 +86,7 @@ public class CreateCollabItemActivity extends AppCompatActivity {
 
         List<String> uasig = null; //todo MODULO COLLAB NECESITO ESTOS PARÁMETROS
         List<Etiqueta> easig = null;
-        String idC = "AqxjtEgzCnkKLuEZcX59";
+        String idC = "G1rScmUcdWhg4T0D7HfA";
 
         // Validaciones
         if (nombre.isEmpty()) {
@@ -105,10 +105,10 @@ public class CreateCollabItemActivity extends AppCompatActivity {
                 .add(nuevoCollabItem)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(CreateCollabItemActivity.this, "CollabItem creado con éxito", Toast.LENGTH_SHORT).show();
-                    nuevoCollabItem.setIdI(documentReference.getId());
+                    //nuevoCollabItem.setIdI(documentReference.getId()); así se cogería el id
                     finish(); // Cierra la actividad y vuelve al fragmento
                 })
                 .addOnFailureListener(e -> Toast.makeText(CreateCollabItemActivity.this, "Error al crear: " + e.getMessage(), Toast.LENGTH_LONG).show());
     }
-    
+
 }
