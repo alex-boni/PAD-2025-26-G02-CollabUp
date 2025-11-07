@@ -14,6 +14,7 @@ public class CollabItem {
     private List<String> usuariosAsignados;
     private List<Etiqueta> etiquetasItem; //lista de etiquetas asignadas al item
     private String idC;
+    private String idI;
 
 
     //todo asignar id cuando se cree
@@ -36,6 +37,14 @@ public class CollabItem {
 
     public void setIdC(String idC) {
         this.idC = idC;
+    }
+
+    public String getIdI() {
+        return idI;
+    }
+
+    public void setIdI(String idI) {
+        this.idI = idI;
     }
 
     public String getNombre() {

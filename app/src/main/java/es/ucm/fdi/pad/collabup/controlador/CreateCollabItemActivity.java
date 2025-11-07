@@ -9,8 +9,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.Timestamp;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
@@ -29,18 +27,13 @@ public class CreateCollabItemActivity extends AppCompatActivity {
 
     //Atributos base de datos
     private FirebaseFirestore db;
-    private FirebaseAuth mAuth;
 
     // ---------Atributos vista
-    private EditText eTxtNombreCollabItem;
-    private EditText eTxtDescripcionCollabItem;
-    private EditText eTxtFechaCollabItem;
+    private EditText eTxtNombreCollabItem, eTxtDescripcionCollabItem, eTxtFechaCollabItem;
     private Button btnCrearCollabItem;
 
     private String idC; //id del collab en el que estamos
 
-
-    //---------------- FUNCIONES BASE DE DATOS
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,14 +46,15 @@ public class CreateCollabItemActivity extends AppCompatActivity {
         btnCrearCollabItem = findViewById(R.id.btnCrearCollabItem);
         eTxtFechaCollabItem = findViewById(R.id.eTxtFechaCollabItem);
 
-        idC = getIntent().getStringExtra("idC"); //llega de arriba
+        //Valores que llegan
+        idC = getIntent().getStringExtra("idC");
         if (idC == "") {
             idC = ""; // o algún valor por defecto
         }
+        //todo faltan
 
         // Inicializar Firebase
         db = FirebaseFirestore.getInstance();
-        mAuth = FirebaseAuth.getInstance();
 
         // Configurar listener del botón
         btnCrearCollabItem.setOnClickListener(new View.OnClickListener() {
@@ -90,27 +84,17 @@ public class CreateCollabItemActivity extends AppCompatActivity {
         }
         Timestamp fecha = new Timestamp(date);
 
-        List<String> uasig = null;
+        List<String> uasig = null; //todo MODULO COLLAB NECESITO ESTOS PARÁMETROS
         List<Etiqueta> easig = null;
-        String idC = "AqxjtEgzCnkKLuEZcX59"; //todo MODULO COLLAB necesito: id collab
-
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        String idC = "AqxjtEgzCnkKLuEZcX59";
 
         // Validaciones
         if (nombre.isEmpty()) {
             eTxtNombreCollabItem.setError("El nombre es requerido");
             return;
         }
-        /*
-        if (currentUser == null) {
-            Toast.makeText(this, "Error: Usuario no autenticado", Toast.LENGTH_SHORT).show();
-            return;
-        }
 
-         */
-
-        // Crear el objeto CollabItem
-        //String uidCreador = currentUser.getUid();
+        // Creamos el objeto CollabItem
         CollabItem nuevoCollabItem = new CollabItem(nombre, descripcion, fecha, uasig, easig, idC);
 
         // Guardar en Firestore en la colección "collabItem" dentro de su "collabs"
@@ -121,22 +105,10 @@ public class CreateCollabItemActivity extends AppCompatActivity {
                 .add(nuevoCollabItem)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(CreateCollabItemActivity.this, "CollabItem creado con éxito", Toast.LENGTH_SHORT).show();
+                    nuevoCollabItem.setIdI(documentReference.getId());
                     finish(); // Cierra la actividad y vuelve al fragmento
                 })
                 .addOnFailureListener(e -> Toast.makeText(CreateCollabItemActivity.this, "Error al crear: " + e.getMessage(), Toast.LENGTH_LONG).show());
     }
-
-    public void modificar() {
-
-    }
-
-
-    public void eliminar() {
-
-    }
-
-
-    public void obtenerListado() {
-
-    }
+    
 }
