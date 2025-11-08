@@ -26,6 +26,7 @@ import es.ucm.fdi.pad.collabup.modelo.Collab;
 import es.ucm.fdi.pad.collabup.modelo.adapters.CardAdapter;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnCollabClickListener;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
 public class CollabListFragment extends Fragment implements OnCollabClickListener {
 
@@ -142,6 +143,29 @@ public class CollabListFragment extends Fragment implements OnCollabClickListene
                 .commit();
         Toast.makeText(getContext(), "Abriendo Collab: " + collab.getNombre(), Toast.LENGTH_SHORT).show();
     }
+    @Override
+    public void onFavoriteClick(Collab collab, int position) {
+        if(!collab.estaEliminado()){
+            boolean noEraFavorito = !collab.esFavorito();
+            String nuevoEstado = (noEraFavorito) ? "favorito" : "activo";
+            collab.setEstado(nuevoEstado);
+            collab.modificar(collab, new OnOperationCallback() {
+                @Override
+                public void onSuccess() {
+                    adapter.notifyItemChanged(position);
+                    String mensaje = noEraFavorito ? "Marcado como favorito" : "Desmarcado como favorito";
+                    Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(getContext(), "Error al actualizar favorito: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }else {
+            Toast.makeText(getContext(), "No se puede cambiar favorito de un Collab eliminado.", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     private void setupSearchListener() {
         searchEditText.addTextChangedListener(new TextWatcher() {
@@ -194,7 +218,7 @@ public class CollabListFragment extends Fragment implements OnCollabClickListene
                     matchesFilter = true; // El filtro "todos" no excluye nada
                     break;
                 case "actives":
-                    matchesFilter = !collab.getEstado().toLowerCase().contains("eliminado");
+                    matchesFilter = !collab.estaEliminado();
                     break;
                 case "favorites":
                     matchesFilter = collab.getEstado().toLowerCase().contains("favorito");

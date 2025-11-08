@@ -114,6 +114,7 @@ public class Collab implements DAO<Collab> {
         collabData.put("descripcion", reemplazo.getDescripcion());
         collabData.put("imageUri", reemplazo.getImageUri());
         collabData.put("miembros", reemplazo.getMiembros());
+        collabData.put("estado", reemplazo.getEstado());
 
         db.collection("collabs").document(reemplazo.getId()).update(collabData)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -264,6 +265,16 @@ public class Collab implements DAO<Collab> {
     }
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public boolean esFavorito() {
+        return "favorito".equalsIgnoreCase(this.estado);
+    }
+    public boolean estaEliminado() {
+        return "eliminado".equalsIgnoreCase(this.estado);
+    }
+    public boolean estaActivo() {
+        return !"eliminado".equalsIgnoreCase(this.estado);
     }
     
     @Override
