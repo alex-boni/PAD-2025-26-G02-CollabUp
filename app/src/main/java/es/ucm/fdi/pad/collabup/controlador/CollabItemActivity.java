@@ -86,7 +86,7 @@ public class CollabItemActivity extends AppCompatActivity {
         });
 
         //Eliminar
-        btnEditarCollabItem.setOnClickListener(v -> {
+        btnEliminarCollabItem.setOnClickListener(v -> {
             //todo eliminar item
         });
 
