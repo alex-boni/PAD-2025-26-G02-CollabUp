@@ -30,10 +30,13 @@ public class Collab implements DAO<Collab> {
     private Date fechaCreacion;
     private ArrayList<String> miembros;
 
+    private String estado;
+
     public Collab() {
         db = FirebaseFirestore.getInstance();
         this.miembros = new ArrayList<>();
         this.fechaCreacion = new Date();
+        this.estado = "all";
     }
 
     public Collab(String nombre, String descripcion, String imageUri, String creadorId) {
@@ -44,6 +47,7 @@ public class Collab implements DAO<Collab> {
         this.creadorId = creadorId;
         this.miembros = new ArrayList<>();
         this.miembros.add(creadorId);
+        this.estado = "all";
     }
 
     @Override
@@ -80,6 +84,7 @@ public class Collab implements DAO<Collab> {
         collabData.put("creadorId", this.creadorId);
         collabData.put("fechaCreacion", this.fechaCreacion);
         collabData.put("miembros", this.miembros);
+        collabData.put("estado", this.estado);
 
         db.collection("collabs").add(collabData)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -109,6 +114,7 @@ public class Collab implements DAO<Collab> {
         collabData.put("descripcion", reemplazo.getDescripcion());
         collabData.put("imageUri", reemplazo.getImageUri());
         collabData.put("miembros", reemplazo.getMiembros());
+        collabData.put("estado", reemplazo.getEstado());
 
         db.collection("collabs").document(reemplazo.getId()).update(collabData)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -253,6 +259,22 @@ public class Collab implements DAO<Collab> {
 
     public void setMiembros(ArrayList<String> miembros) {
         this.miembros = miembros;
+    }
+    public String getEstado() {
+        return estado;
+    }
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public boolean esFavorito() {
+        return "favorito".equalsIgnoreCase(this.estado);
+    }
+    public boolean estaEliminado() {
+        return "eliminado".equalsIgnoreCase(this.estado);
+    }
+    public boolean estaActivo() {
+        return !"eliminado".equalsIgnoreCase(this.estado);
     }
     
     @Override

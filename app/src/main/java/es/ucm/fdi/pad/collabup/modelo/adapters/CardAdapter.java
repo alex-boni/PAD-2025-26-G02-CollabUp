@@ -14,17 +14,21 @@ import java.util.List;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Collab;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnCollabClickListener;
 
 public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder> {
 
     private List<Collab> items;
+    private final OnCollabClickListener listener;
 
-    public CardAdapter(List<Collab> items) {
+    public CardAdapter(List<Collab> items, OnCollabClickListener listener) {
+        this.listener = listener;
         this.items = items;
     }
 
     public static class CardViewHolder extends RecyclerView.ViewHolder {
         public ImageView image;
+        public ImageView ivFavorite;
         public TextView title;
         public TextView description;
 
@@ -33,6 +37,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
             image = itemView.findViewById(R.id.cardImage);
             title = itemView.findViewById(R.id.cardTitle);
             description = itemView.findViewById(R.id.cardDescription);
+            ivFavorite = itemView.findViewById(R.id.ivFavorite);
         }
     }
 
@@ -40,7 +45,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
     @Override
     public CardViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_collab, parent, false);
+                .inflate(R.layout.collab_card_layout, parent, false);
         return new CardViewHolder(view);
     }
 
@@ -57,9 +62,36 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         } else {
             holder.image.setImageResource(R.drawable.ic_launcher_foreground);
         }
-
+        if(item.estaEliminado()){
+            holder.ivFavorite.setImageResource(R.drawable.ic_deleted);
+        }else if(item.esFavorito()){
+            holder.ivFavorite.setImageResource(R.drawable.ic_favorite_filled);
+        }else{
+            holder.ivFavorite.setImageResource(R.drawable.ic_favorite);
+        }
+        holder.ivFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(item.estaEliminado()){
+                    return;
+                }
+                if (listener != null) {
+                    int actualPosition = holder.getBindingAdapterPosition();
+                    listener.onFavoriteClick(item, actualPosition);
+                }
+            }
+        });
         holder.title.setText(item.getNombre());
         holder.description.setText(item.getDescripcion());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    // Llamar al listener y pasar el objeto 'item' (el Collab actual)
+                    listener.onCollabClick(item);
+                }
+            }
+        });
     }
 
     @Override

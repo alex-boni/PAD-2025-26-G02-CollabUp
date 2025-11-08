@@ -9,4 +9,14 @@
     <string name="label_ajustes">Ajustes</string>
     <string name="setting_label">%1$s %2$s</string>
     <string name="button_create">Guardar</string>
+    <string name="filter">Filtro</string>
+    <string name="settings">Configuración</string>
+    <string name="create_new_collab">Crear nuevo Collab</string>
+    <string name="title_collabs">Collabs</string>
+    <string name="hint_search_collab">Buscar Collabs</string>
+    <string name="chip_all">Todos</string>
+    <string name="chip_favorites">Favoritos</string>
+    <string name="chip_actives">Activos</string>
+    <string name="no_collabs_found">No se encontraron collabs.</string>
+    <string name="chip_deleted">Eliminados</string>
 </resources>
