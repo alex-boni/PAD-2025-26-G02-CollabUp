@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (view.getId() == R.id.btnIrSingup) {
             startActivity(new Intent(this, SingupController.class));
         } else if (view.getId() == R.id.btnIrLogin) {
-            startActivity(new Intent(this, LoginController.class));
+            startActivity(new Intent(this, AppController.class));
         }
     }
 }
