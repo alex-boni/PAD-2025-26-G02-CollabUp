@@ -1,11 +1,14 @@
 package es.ucm.fdi.pad.collabup.modelo.collabView;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import es.ucm.fdi.pad.collabup.modelo.Etiqueta;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.DAO;
@@ -14,6 +17,9 @@ import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
 public class CollabItem implements Serializable, DAO<CollabItem> {
 
+    @Exclude
+    private transient String idI; //para que no se guarde el campo en firebase
+
     private String nombre;
     private String descripcion;
     private Timestamp fecha;
@@ -21,7 +27,7 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
     private List<Etiqueta> etiquetasItem; //lista de etiquetas asignadas al item
     private String idC;
 
-    private String idI;
+
     private FirebaseFirestore db;
 
     //----------------------MÉTODOS---------------------------
@@ -46,10 +52,12 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         this.idC = idC;
     }
 
+    @Exclude
     public String getIdI() {
         return idI;
     }
 
+    @Exclude
     public void setIdI(String idI) {
         this.idI = idI;
     }
@@ -105,7 +113,7 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
     public void crear(OnOperationCallback callback) {
         db.collection("collabs")
                 .document(this.getIdC())
-                .collection("collabItem")
+                .collection("collabItems")
                 .add(this)
                 .addOnSuccessListener(documentReference -> {
                     this.idI = documentReference.getId();
@@ -118,7 +126,7 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
     public void cargarDatosCollabItem(OnDataLoadedCallback<CollabItem> callback) {
         db.collection("collabs")
                 .document(this.getIdC())
-                .collection("collabItem")
+                .collection("collabItems")
                 .document(this.idI)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
@@ -138,7 +146,20 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
 
     @Override
     public void modificar(CollabItem reemplazo, OnOperationCallback callback) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("nombre", reemplazo.nombre);
+        updates.put("descripcion", reemplazo.descripcion);
+        updates.put("fecha", reemplazo.fecha);
+        updates.put("usuariosAsignados", reemplazo.getUsuariosAsignados());
+        updates.put("etiquetasItem", reemplazo.getEtiquetasItem());
 
+        db.collection("collabs")
+                .document(reemplazo.getIdC())
+                .collection("collabItems")
+                .document(reemplazo.getIdI())
+                .update(updates)
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(callback::onFailure);
     }
 
     @Override

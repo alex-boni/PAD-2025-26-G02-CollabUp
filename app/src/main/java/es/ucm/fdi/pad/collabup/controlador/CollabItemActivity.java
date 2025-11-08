@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,13 +15,16 @@ import com.google.firebase.Timestamp;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Etiqueta;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
 //VISTA DEL COLLABITEM INDIVIDUAL -> Incluirá botones de editar y eliminar
 public class CollabItemActivity extends AppCompatActivity {
@@ -58,7 +62,7 @@ public class CollabItemActivity extends AppCompatActivity {
         idI = getIntent().getStringExtra("idI");
         if (idI == null) {
             idI = ""; // o algún valor por defecto
-            idI = "sbXK1U1ShID0lQN3Ue1v"; //para hacerlo ahora
+            idI = "u9WP085b5Sf9jJloCBL9"; //para hacerlo ahora
         }
         idC = getIntent().getStringExtra("idC");
         if (idC == null) {
@@ -77,10 +81,8 @@ public class CollabItemActivity extends AppCompatActivity {
 
         // Guardar
         btnGuardarCollabItem.setOnClickListener(v -> {
-            //todo update tabla
+            modificarCollabItem();
             setEditable(false);
-            btnGuardarCollabItem.setVisibility(View.GONE);
-            btnEditarCollabItem.setVisibility(View.VISIBLE);
         });
 
         //Eliminar
@@ -141,8 +143,37 @@ public class CollabItemActivity extends AppCompatActivity {
         }
         Timestamp fecha = new Timestamp(date);
 
+        //todo usuarios y etiquetas
+        List<String> usrsAsig = new ArrayList<>();
+        List<Etiqueta> etAsig = new ArrayList<>();
+
+
+        if (nombre.isEmpty()) {
+            Toast.makeText(this, "Por favor ponle un nombre al CollabItem", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        CollabItem ciActualizado = new CollabItem(nombre, descripcion, fecha, usrsAsig, etAsig, idC);
+        ciActualizado.setIdI(idI);
+
+        ciActualizado.modificar(ciActualizado, new OnOperationCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(CollabItemActivity.this, "CollabItem actualizado correctamente", Toast.LENGTH_SHORT).show();
+                setEditable(false);
+                btnGuardarCollabItem.setVisibility(View.GONE);
+                btnEditarCollabItem.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(CollabItemActivity.this, "Error al actualizar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
+    //Función que se usa para mostrar los datos del item al que estamos viendo una vez ya tenemos
+    //la información
     private void mostrarDatosCollabItem(CollabItem item) {
         eTxtNombreCollabItem.setText(item.getNombre());
         eTxtDescripcionCollabItem.setText(item.getDescripcion());
