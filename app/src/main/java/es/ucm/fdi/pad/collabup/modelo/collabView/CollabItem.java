@@ -164,7 +164,18 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
 
     @Override
     public void eliminar(OnOperationCallback callback) {
+        if (idI == null || idI.isEmpty()) {
+            callback.onFailure(new Exception("ID del CollabItem no válido"));
+            return;
+        }
 
+        db.collection("collabs")
+                .document(idC)
+                .collection("collabItems")
+                .document(idI)
+                .delete()
+                .addOnSuccessListener(aVoid -> callback.onSuccess())
+                .addOnFailureListener(callback::onFailure);
     }
 
     @Override

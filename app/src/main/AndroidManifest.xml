@@ -18,7 +18,10 @@
         <activity
             android:name=".controlador.MainActivity"
             android:exported="true">
-
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <activity
@@ -33,24 +36,14 @@
             android:name=".controlador.AppController"
             android:exported="false" />
 
-        <activity
-            android:name=".controlador.CreateCollabActivity"
-            android:exported="false" />
-
         <!-- CollabItems -->
         <activity
             android:name=".controlador.CreateCollabItemActivity"
             android:exported="false" />
 
-
         <activity
             android:name=".controlador.CollabItemActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:exported="false" />
 
 
     </application>

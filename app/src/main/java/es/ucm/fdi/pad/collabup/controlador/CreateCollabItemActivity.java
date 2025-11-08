@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Etiqueta;
@@ -45,7 +46,7 @@ public class CreateCollabItemActivity extends AppCompatActivity {
 
         //Valores que llegan
         idC = getIntent().getStringExtra("idC");
-        if (idC == "") {
+        if (Objects.equals(idC, "")) {
             idC = ""; // o algún valor por defecto
         }
         //todo faltan
@@ -68,12 +69,16 @@ public class CreateCollabItemActivity extends AppCompatActivity {
         String fechastr = eTxtFechaCollabItem.getText().toString().trim();
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()); //todo posible cambiar
         Date date = null; // convierte el String a Date
-        try {
-            date = formato.parse(fechastr);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
+        Timestamp fecha = null;
+        if (!fechastr.isEmpty()) {
+            try {
+                date = formato.parse(fechastr);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+            fecha = new Timestamp(date);
         }
-        Timestamp fecha = new Timestamp(date);
+
 
         List<String> uasig = null; //todo MODULO COLLAB NECESITO ESTOS PARÁMETROS
         List<Etiqueta> easig = null;

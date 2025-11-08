@@ -87,7 +87,15 @@ public class CollabItemActivity extends AppCompatActivity {
 
         //Eliminar
         btnEliminarCollabItem.setOnClickListener(v -> {
-            //todo eliminar item
+            // Muestro diálogo de confirmación
+            new androidx.appcompat.app.AlertDialog.Builder(CollabItemActivity.this)
+                    .setTitle("Eliminar CollabItem")
+                    .setMessage("¿Estás seguro de que quieres eliminar este CollabItem?")
+                    .setPositiveButton("Sí", (dialog, which) -> {
+                        eliminarCollabItem(); //elimino collabitem
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
         });
 
         CollabItem collabItemModel = new CollabItem(null, null, null, null, null, idC);
@@ -128,20 +136,22 @@ public class CollabItemActivity extends AppCompatActivity {
         }
     }
 
-    //-------------- Funciones base de datos
-    private void modificarCollabItem() {
+    private CollabItem obtenerCollabItemDePantalla() {
 
         String nombre = eTxtNombreCollabItem.getText().toString().trim();
         String descripcion = eTxtDescripcionCollabItem.getText().toString().trim();
         String fechastr = eTxtFechaCollabItem.getText().toString().trim();
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()); //todo posible cambiar
         Date date = null; // convierte el String a Date
-        try {
-            date = formato.parse(fechastr);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
+        Timestamp fecha = null;
+        if (!fechastr.isEmpty()) {
+            try {
+                date = formato.parse(fechastr);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+            fecha = new Timestamp(date);
         }
-        Timestamp fecha = new Timestamp(date);
 
         //todo usuarios y etiquetas
         List<String> usrsAsig = new ArrayList<>();
@@ -150,11 +160,47 @@ public class CollabItemActivity extends AppCompatActivity {
 
         if (nombre.isEmpty()) {
             Toast.makeText(this, "Por favor ponle un nombre al CollabItem", Toast.LENGTH_SHORT).show();
-            return;
+            return null;
         }
 
-        CollabItem ciActualizado = new CollabItem(nombre, descripcion, fecha, usrsAsig, etAsig, idC);
-        ciActualizado.setIdI(idI);
+        CollabItem ci = new CollabItem(nombre, descripcion, fecha, usrsAsig, etAsig, idC);
+        ci.setIdI(idI);
+
+        return ci;
+    }
+
+    //-------------- Funciones base de datos
+    //Función que se usa para mostrar los datos del item al que estamos viendo una vez ya tenemos
+    //la información
+    private void mostrarDatosCollabItem(CollabItem item) {
+        eTxtNombreCollabItem.setText(item.getNombre());
+        eTxtDescripcionCollabItem.setText(item.getDescripcion());
+        if (item.getFecha() != null) {
+            Date date = item.getFecha().toDate();
+            String fechaStr = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date);
+            eTxtFechaCollabItem.setText(fechaStr);
+        }
+        if (item.getUsuariosAsignados() != null) {
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                    this,
+                    android.R.layout.simple_list_item_1,
+                    item.getUsuariosAsignados()
+            );
+            lvUsrsAsigCollabItem.setAdapter(adapter);
+        }
+        if (item.getEtiquetasItem() != null) {
+            ArrayAdapter<Etiqueta> adapter = new ArrayAdapter<>(
+                    this,
+                    android.R.layout.simple_list_item_1,
+                    item.getEtiquetasItem()
+            );
+            lvEtiqCollabItem.setAdapter(adapter);
+        }
+    }
+
+    private void modificarCollabItem() {
+
+        CollabItem ciActualizado = obtenerCollabItemDePantalla();
 
         ciActualizado.modificar(ciActualizado, new OnOperationCallback() {
             @Override
@@ -172,46 +218,23 @@ public class CollabItemActivity extends AppCompatActivity {
         });
     }
 
-    //Función que se usa para mostrar los datos del item al que estamos viendo una vez ya tenemos
-    //la información
-    private void mostrarDatosCollabItem(CollabItem item) {
-        eTxtNombreCollabItem.setText(item.getNombre());
-        eTxtDescripcionCollabItem.setText(item.getDescripcion());
 
-        if (item.getFecha() != null) {
-            Date date = item.getFecha().toDate();
-            String fechaStr = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date);
-            eTxtFechaCollabItem.setText(fechaStr);
-        }
+    private void eliminarCollabItem() {
+        CollabItem ciEliminar = new CollabItem(null, null, null, null, null, idC);
+        ciEliminar.setIdI(this.idI);
 
-        if (item.getUsuariosAsignados() != null) {
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                    this,
-                    android.R.layout.simple_list_item_1,
-                    item.getUsuariosAsignados()
-            );
-            lvUsrsAsigCollabItem.setAdapter(adapter);
-        }
+        ciEliminar.eliminar(new OnOperationCallback() {
+            @Override
+            public void onSuccess() {
+                Toast.makeText(CollabItemActivity.this, "CollabItem eliminado correctamente", Toast.LENGTH_SHORT).show();
+                finish(); // cierro la activity y vuelvo a la lista
+            }
 
-        if (item.getEtiquetasItem() != null) {
-            ArrayAdapter<Etiqueta> adapter = new ArrayAdapter<>(
-                    this,
-                    android.R.layout.simple_list_item_1,
-                    item.getEtiquetasItem()
-            );
-            lvEtiqCollabItem.setAdapter(adapter);
-        }
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(CollabItemActivity.this, "Error al eliminar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
-
-
-    private void mostrarUsuariosAsignados(java.util.List<String> usuarios) {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this,
-                android.R.layout.simple_list_item_1,
-                usuarios
-        );
-        lvUsrsAsigCollabItem.setAdapter(adapter);
-    }
-
-
 }
