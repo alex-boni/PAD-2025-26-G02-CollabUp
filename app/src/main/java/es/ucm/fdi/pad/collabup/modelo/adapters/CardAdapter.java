@@ -62,7 +62,9 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         } else {
             holder.image.setImageResource(R.drawable.ic_launcher_foreground);
         }
-        if(item.esFavorito()){
+        if(item.estaEliminado()){
+            holder.ivFavorite.setImageResource(R.drawable.ic_deleted);
+        }else if(item.esFavorito()){
             holder.ivFavorite.setImageResource(R.drawable.ic_favorite_filled);
         }else{
             holder.ivFavorite.setImageResource(R.drawable.ic_favorite);
@@ -70,6 +72,9 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         holder.ivFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(item.estaEliminado()){
+                    return;
+                }
                 if (listener != null) {
                     int actualPosition = holder.getBindingAdapterPosition();
                     listener.onFavoriteClick(item, actualPosition);
