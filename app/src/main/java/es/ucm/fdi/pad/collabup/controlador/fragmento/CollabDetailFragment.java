@@ -131,11 +131,17 @@ public class CollabDetailFragment extends Fragment {
 
     private void cargarDetallesDelCollabDesdeFirestore(String id) {
             Collab dao = new Collab();
+            Toast.makeText(getContext(), "Cargando Collab con ID: " + id, Toast.LENGTH_SHORT).show();
+
             dao.obtener(id, new OnDataLoadedCallback<Collab>() {
                 @Override
                 public void onSuccess(Collab data) {
                     if(isAdded()){
                         currentCollab = data;
+                        tvCollabTitle.setText(currentCollab.getNombre());
+                        tvCollabDescription.setText(currentCollab.getDescripcion());
+                        tvCollabCreator.setText("Creado por: " + currentCollab.getCreadorId());
+
                     }
                 }
 
@@ -147,13 +153,6 @@ public class CollabDetailFragment extends Fragment {
                 }
             });
 
-        Toast.makeText(getContext(), "Cargando Collab con ID: " + id, Toast.LENGTH_SHORT).show();
-
-        // Simular la actualización de la UI
-        tvCollabTitle.setText("Detalles del Collab: " + id.substring(0, 5) + "...");
-        tvCollabDescription.setText("Aquí va la descripción cargada de la base de datos.");
-        tvCollabCreator.setText("Creado por: [Usuario]");
-        btnViewAllTasks.setText("Ver Todas las Tareas (4)");
 
     }
 }

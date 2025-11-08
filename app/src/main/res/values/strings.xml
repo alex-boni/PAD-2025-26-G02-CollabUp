@@ -9,7 +9,7 @@
     <string name="hint_search_collab">Buscar Collabs</string>
     <string name="chip_all">Todos</string>
     <string name="chip_favorites">Favoritos</string>
-    <string name="chip_archived">Archivados</string>
+    <string name="chip_actives">Activos</string>
     <string name="no_collabs_found">No se encontraron collabs.</string>
     <string name="chip_deleted">Eliminados</string>
 </resources>
