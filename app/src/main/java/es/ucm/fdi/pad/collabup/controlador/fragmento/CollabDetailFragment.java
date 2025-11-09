@@ -22,12 +22,14 @@ import es.ucm.fdi.pad.collabup.R;
 // Importa la clase Collab para manejar los datos
 import es.ucm.fdi.pad.collabup.controlador.LoginController;
 import es.ucm.fdi.pad.collabup.modelo.Collab;
+import es.ucm.fdi.pad.collabup.modelo.Usuario;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 
 public class CollabDetailFragment extends Fragment {
 
     // 1. RENOMBRAR la clave del argumento
     private static final String ARG_COLLAB_ID = "collab_id";
+    private static final String RESULT_KEY = "collab_updated";
 
     // Variables para almacenar los datos
     private String collabId;
@@ -40,16 +42,11 @@ public class CollabDetailFragment extends Fragment {
     private TextView tvCollabCreator;
     private RecyclerView rvMembers;
     private Button btnViewAllTasks;
-    private Button btnAddTarea;
+    private Button btnAddCollabItem;
 
 
-    public CollabDetailFragment() {
-        // Constructor público requerido
-    }
+    public CollabDetailFragment() {}
 
-    /**
-     * Factory method para crear una nueva instancia pasando el ID del Collab.
-     */
     public static CollabDetailFragment newInstance(String collabId) {
         CollabDetailFragment fragment = new CollabDetailFragment();
         Bundle args = new Bundle();
@@ -69,6 +66,13 @@ public class CollabDetailFragment extends Fragment {
                 Toast.makeText(getContext(), "Error: ID de Collab no proporcionado.", Toast.LENGTH_LONG).show();
             }
         }
+        getParentFragmentManager().setFragmentResultListener(RESULT_KEY, this, (requestKey, result) -> {
+            if (requestKey.equals(RESULT_KEY) && collabId != null) {
+                // El Collab ha sido actualizado, recargamos los datos desde Firestore
+                Toast.makeText(getContext(), "Detectada actualización de Collab. Recargando datos...", Toast.LENGTH_SHORT).show();
+                cargarDetallesDelCollabDesdeFirestore(collabId);
+            }
+        });
     }
 
     @Override
@@ -86,12 +90,12 @@ public class CollabDetailFragment extends Fragment {
         tvCollabDescription = view.findViewById(R.id.tvCollabDescription);
         tvCollabCreator = view.findViewById(R.id.tvCollabCreator);
         rvMembers = view.findViewById(R.id.rvMembers);
-        btnViewAllTasks = view.findViewById(R.id.btnViewAllTasks);
-        btnAddTarea = view.findViewById(R.id.btnAddTarea);
+        btnViewAllTasks = view.findViewById(R.id.btnViewAllCollabItems);
+        btnAddCollabItem = view.findViewById(R.id.btnAddCollabItem);
 
         setupToolbar();
 
-        if (collabId != null) {
+        if (collabId != null ) {
             cargarDetallesDelCollabDesdeFirestore(collabId);
         }
 
@@ -99,7 +103,7 @@ public class CollabDetailFragment extends Fragment {
             Toast.makeText(getContext(), "Navegando a Tareas...", Toast.LENGTH_SHORT).show();
         });
 
-        btnAddTarea.setOnClickListener(v -> {
+        btnAddCollabItem.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Abriendo formulario Tarea...", Toast.LENGTH_SHORT).show();
         });
     }
@@ -115,10 +119,19 @@ public class CollabDetailFragment extends Fragment {
             if (itemId == R.id.action_edit) {
                 // Lógica de edición
                 Toast.makeText(getContext(), "Editar Collab", Toast.LENGTH_SHORT).show();
+                if (collabId != null) {
+                    // Navegar al fragmento de edición, pasándole el ID
+                    Fragment editFragment = CollabEditFragment.newInstance(collabId);
+
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.fragmentApp, editFragment) // R.id.fragmentApp es el contenedor principal
+                            .addToBackStack("collab_detail_tag")
+                            .commit();
+                }
                 return true;
-            } else if (itemId == R.id.action_archive) {
-                // Lógica de archivo
-                Toast.makeText(getContext(), "Archivar Collab", Toast.LENGTH_SHORT).show();
+            } else if (itemId == R.id.action_delete) {
+                // Lógica de eliminación
+                Toast.makeText(getContext(), "Eliminar Collab", Toast.LENGTH_SHORT).show();
                 return true;
             } else if (itemId == R.id.action_exit) {
                 // Lógica para salir del Collab
@@ -140,8 +153,22 @@ public class CollabDetailFragment extends Fragment {
                         currentCollab = data;
                         tvCollabTitle.setText(currentCollab.getNombre());
                         tvCollabDescription.setText(currentCollab.getDescripcion());
-                        tvCollabCreator.setText("Creado por: " + currentCollab.getCreadorId());
+                        Usuario daoUsuario = new Usuario();
+                        daoUsuario.obtener(data.getCreadorId(), new OnDataLoadedCallback<Usuario>() {
+                            @Override
+                            public void onSuccess(Usuario data) {
+                                if(isAdded()){
+                                    tvCollabCreator.setText("Creado por: " + data.getNombre());
+                                }
+                            }
 
+                            @Override
+                            public void onFailure(Exception e) {
+                                if(isAdded()){
+                                    Toast.makeText(getContext(), "Error al cargar creador: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
                     }
                 }
 
