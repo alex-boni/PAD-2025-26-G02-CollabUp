@@ -88,14 +88,7 @@ public class CollabListFragment extends Fragment implements OnCollabClickListene
 
     private void cargarCollabsDesdeFirestore() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        String userId;
-
-        if (currentUser != null) {
-            userId = "temp_user_dev";
-            Toast.makeText(getContext(), "Modo desarrollo: cargando collabs de usuario temporal", Toast.LENGTH_SHORT).show();
-        } else {
-            userId = currentUser.getUid();
-        }
+        String userId = currentUser.getUid();
 
         Collab collabDAO = new Collab();
         collabDAO.obtenerCollabsDelUsuario(userId, new OnDataLoadedCallback<ArrayList<Collab>>() {
