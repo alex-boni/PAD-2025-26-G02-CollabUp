@@ -134,6 +134,29 @@ public class Usuario implements DAO<Usuario> {
                 });
     }
 
+    public void buscarPorNombreUsuario(String nombreUsuario, OnDataLoadedCallback<Usuario> callback) {
+        db.collection("usuarios")
+                .whereEqualTo("usuario", nombreUsuario)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        if (!queryDocumentSnapshots.isEmpty()) {
+                            Usuario usuario = queryDocumentSnapshots.getDocuments().get(0).toObject(Usuario.class);
+                            callback.onSuccess(usuario);
+                        } else {
+                            callback.onFailure(new Exception("Usuario no encontrado"));
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        callback.onFailure(e);
+                    }
+                });
+    }
+
     // --- Getters y Setters ---
     public String getUID() { return UID; }
     public void setUID(String UID) { this.UID = UID; }

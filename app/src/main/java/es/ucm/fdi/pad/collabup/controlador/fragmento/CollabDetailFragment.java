@@ -1,5 +1,6 @@
 package es.ucm.fdi.pad.collabup.controlador.fragmento;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -11,9 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.Firebase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,7 +26,11 @@ import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.controlador.LoginController;
 import es.ucm.fdi.pad.collabup.modelo.Collab;
 import es.ucm.fdi.pad.collabup.modelo.Usuario;
+import es.ucm.fdi.pad.collabup.modelo.adapters.MemberAdapter;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
+
+import java.util.ArrayList;
 
 public class CollabDetailFragment extends Fragment {
 
@@ -33,7 +40,9 @@ public class CollabDetailFragment extends Fragment {
 
     // Variables para almacenar los datos
     private String collabId;
-    private Collab currentCollab; // Para almacenar el objeto Collab después de cargarlo
+    private Collab currentCollab;
+    private MemberAdapter memberAdapter;
+    private ArrayList<Usuario> listaMiembros;
 
     // Componentes del Layout
     private Toolbar detailToolbar;
@@ -43,6 +52,7 @@ public class CollabDetailFragment extends Fragment {
     private RecyclerView rvMembers;
     private Button btnViewAllTasks;
     private Button btnAddCollabItem;
+    private FloatingActionButton fabAddMember;
 
 
     public CollabDetailFragment() {}
@@ -92,6 +102,11 @@ public class CollabDetailFragment extends Fragment {
         rvMembers = view.findViewById(R.id.rvMembers);
         btnViewAllTasks = view.findViewById(R.id.btnViewAllCollabItems);
         btnAddCollabItem = view.findViewById(R.id.btnAddCollabItem);
+        fabAddMember = view.findViewById(R.id.fabAddMember);
+
+        listaMiembros = new ArrayList<>();
+        memberAdapter = new MemberAdapter(listaMiembros);
+        rvMembers.setAdapter(memberAdapter);
 
         setupToolbar();
 
@@ -105,6 +120,10 @@ public class CollabDetailFragment extends Fragment {
 
         btnAddCollabItem.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Abriendo formulario Tarea...", Toast.LENGTH_SHORT).show();
+        });
+
+        fabAddMember.setOnClickListener(v -> {
+            mostrarDialogoAgregarMiembro();
         });
     }
 
@@ -169,6 +188,8 @@ public class CollabDetailFragment extends Fragment {
                                 }
                             }
                         });
+                        
+                        cargarMiembros(currentCollab.getMiembros());
                     }
                 }
 
@@ -181,5 +202,98 @@ public class CollabDetailFragment extends Fragment {
             });
 
 
+    }
+
+    private void cargarMiembros(ArrayList<String> miembrosIds) {
+        listaMiembros.clear();
+        
+        if (miembrosIds == null || miembrosIds.isEmpty()) {
+            memberAdapter.notifyDataSetChanged();
+            return;
+        }
+
+        Usuario daoUsuario = new Usuario();
+        for (String miembroId : miembrosIds) {
+            daoUsuario.obtener(miembroId, new OnDataLoadedCallback<Usuario>() {
+                @Override
+                public void onSuccess(Usuario usuario) {
+                    if (isAdded()) {
+                        listaMiembros.add(usuario);
+                        memberAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    if (isAdded()) {
+                        Toast.makeText(getContext(), "Error al cargar miembro: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+    }
+
+    private void mostrarDialogoAgregarMiembro() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Añadir Miembro");
+
+        final EditText input = new EditText(getContext());
+        input.setHint("Nombre de usuario");
+        builder.setView(input);
+
+        builder.setPositiveButton("Añadir", (dialog, which) -> {
+            String nombreUsuario = input.getText().toString().trim();
+            if (!nombreUsuario.isEmpty()) {
+                buscarYAgregarUsuario(nombreUsuario);
+            } else {
+                Toast.makeText(getContext(), "Por favor, introduce un nombre de usuario", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
+
+    private void buscarYAgregarUsuario(String nombreUsuario) {
+        Usuario daoUsuario = new Usuario();
+        daoUsuario.buscarPorNombreUsuario(nombreUsuario, new OnDataLoadedCallback<Usuario>() {
+            @Override
+            public void onSuccess(Usuario usuario) {
+                if (isAdded() && currentCollab != null) {
+                    agregarMiembroAlCollab(usuario.getUID(), usuario.getNombre());
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                if (isAdded()) {
+                    Toast.makeText(getContext(), "Usuario no encontrado: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void agregarMiembroAlCollab(String usuarioId, String nombreUsuario) {
+        if (currentCollab == null) {
+            Toast.makeText(getContext(), "Error: No se ha cargado el Collab", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        currentCollab.agregarMiembro(usuarioId, new OnOperationCallback() {
+            @Override
+            public void onSuccess() {
+                if (isAdded()) {
+                    Toast.makeText(getContext(), nombreUsuario + " añadido al Collab", Toast.LENGTH_SHORT).show();
+                    cargarDetallesDelCollabDesdeFirestore(collabId);
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                if (isAdded()) {
+                    Toast.makeText(getContext(), "Error al añadir miembro: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }
