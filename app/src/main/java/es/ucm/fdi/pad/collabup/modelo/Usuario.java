@@ -2,12 +2,10 @@ package es.ucm.fdi.pad.collabup.modelo;
 
 import androidx.annotation.NonNull;
 
-// Imports de la interfaz DAO y los nuevos callbacks
 import es.ucm.fdi.pad.collabup.modelo.interfaz.DAO;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
-// Imports de Firebase Firestore
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -19,26 +17,22 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Clase de modelo Usuario.
- * Ahora implementa la interfaz DAO con callbacks para operaciones asíncronas de Firebase.
- */
 public class Usuario implements DAO<Usuario> {
 
-    // Instancia de la base de datos de Firestore
-    // Nota: @Exclude se usaría si subiéramos el objeto entero, pero creando un Map es más limpio.
     private transient FirebaseFirestore db;
 
+    // --- Campos Esenciales (del registro) ---
     private String UID = "defaultValue";
     private String email = "defaultValue";
     private String nombre = "defaultValue";
     private String usuario = "defaultValue";
+
+    // --- Campos Opcionales (para el perfil) ---
     private String ubicacion;
-    private Date fechaNacimiento;
     private String presentacion;
     private String urlFoto;
+    // Se ha eliminado 'fechaNacimiento'
 
-    // Constructor vacío
     public Usuario() {
         db = FirebaseFirestore.getInstance();
     }
@@ -52,7 +46,6 @@ public class Usuario implements DAO<Usuario> {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if (documentSnapshot.exists()) {
-                            // Convierte el documento en un objeto Usuario
                             Usuario usuarioObtenido = documentSnapshot.toObject(Usuario.class);
                             callback.onSuccess(usuarioObtenido);
                         } else {
@@ -70,16 +63,40 @@ public class Usuario implements DAO<Usuario> {
 
     @Override
     public void crear(OnOperationCallback callback) {
-        // Creamos un mapa con los datos que queremos guardar
+        // Creamos un mapa SOLO con los datos esenciales del registro
         Map<String, Object> userData = new HashMap<>();
-        userData.put("uid", this.UID); // Asegúrate de que el campo coincida
+        userData.put("uid", this.UID);
         userData.put("email", this.email);
         userData.put("nombre", this.nombre);
         userData.put("usuario", this.usuario);
-        // Dejamos los otros campos como nulos (no se añaden al mapa)
 
-        // Usamos el UID de Firebase Authentication como ID del documento
+        // Los campos opcionales (ubicacion, presentacion, urlFoto)
+        // no se añaden aquí, se guardarán como 'null' en Firestore
+        // si se añaden más adelante y luego se borran.
+        // Al no estar en el mapa, no se crean en el documento.
+
         db.collection("usuarios").document(this.UID).set(userData)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        callback.onSuccess();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        callback.onFailure(e);
+                    }
+                });
+    }
+
+    public void actualizarCampos(Map<String, Object> campos, OnOperationCallback callback) {
+        if (UID == null || UID.equals("defaultValue")) {
+            callback.onFailure(new Exception("Usuario no válido (UID nulo)"));
+            return;
+        }
+
+        db.collection("usuarios").document(this.UID).update(campos)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -96,19 +113,13 @@ public class Usuario implements DAO<Usuario> {
 
     @Override
     public void modificar(Usuario reemplazo, OnOperationCallback callback) {
-        // TODO: Implementar lógica de modificación (similar a 'crear' pero con update)
-        // db.collection("usuarios").document(reemplazo.getUID()).update(mapaDeDatos)
-        //     .addOnSuccessListener...
-        //     .addOnFailureListener...
+        // TODO: Implementar lógica de modificación
         callback.onFailure(new Exception("Modificar no implementado"));
     }
 
     @Override
     public void eliminar(OnOperationCallback callback) {
         // TODO: Implementar lógica de eliminación
-        // db.collection("usuarios").document(this.UID).delete()
-        //     .addOnSuccessListener...
-        //     .addOnFailureListener...
         callback.onFailure(new Exception("Eliminar no implementado"));
     }
 
@@ -135,20 +146,25 @@ public class Usuario implements DAO<Usuario> {
     }
 
     // --- Getters y Setters ---
+
     public String getUID() { return UID; }
     public void setUID(String UID) { this.UID = UID; }
+
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
+
     public String getUsuario() { return usuario; }
     public void setUsuario(String usuario) { this.usuario = usuario; }
+
     public String getUbicacion() { return ubicacion; }
     public void setUbicacion(String ubicacion) { this.ubicacion = ubicacion; }
-    public Date getFechaNacimiento() { return fechaNacimiento; }
-    public void setFechaNacimiento(Date fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
+
     public String getPresentacion() { return presentacion; }
     public void setPresentacion(String presentacion) { this.presentacion = presentacion; }
+
     public String getUrlFoto() { return urlFoto; }
     public void setUrlFoto(String urlFoto) { this.urlFoto = urlFoto; }
 
@@ -158,6 +174,8 @@ public class Usuario implements DAO<Usuario> {
                 "email='" + email + '\'' +
                 ", nombre='" + nombre + '\'' +
                 ", usuario='" + usuario + '\'' +
+                ", ubicacion='" + ubicacion + '\'' +
+                ", presentacion='" + presentacion + '\'' +
                 '}';
     }
 }
