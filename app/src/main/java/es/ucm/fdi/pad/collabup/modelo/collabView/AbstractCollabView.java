@@ -14,26 +14,52 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-import es.ucm.fdi.pad.collabup.modelo.interfaz.DAO;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
 //Clase general de los collabViews para no repetir métodos
-public abstract class AbstractCollabView implements CollabView, DAO<AbstractCollabView> {
+public abstract class AbstractCollabView implements CollabView {
 
-    private String idV;
+    private String collabId; //id del collab al que pertenece
+    private String uid; //id del collabview
     protected String nombre;
-
+    private Map<CollabViewSetting, Object> settings; //ajustes del collabview
     private List<CollabItem> listaCollabItems; //lista de eventos
 
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    public AbstractCollabView() {
+        this.settings = new HashMap<>();
+        getStaticCreationSettings().forEach((s) -> this.settings.put(s, null));
+    }
+
+    @Override
+    public String getUid() {
+        return uid;
+    }
+
+    @Override
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    @Override
     public String getName() {
         return nombre;
     }
 
-    //------------------VISTAS A SACAR
+    @Override
+    public void setName(String name) {
+        this.nombre = name;
+    }
 
     //PRIORITARIO
     public Activity getFullViewActivity() { //devuelve vista específica general
@@ -144,30 +170,155 @@ public abstract class AbstractCollabView implements CollabView, DAO<AbstractColl
 
     protected abstract Fragment getFragmentAjustes();
 
-
-    //----------------- MÉTODOS DEL DAO, ACCESO A BASE DE DATOS
     @Override
-    public void obtener(String identificador, OnDataLoadedCallback<AbstractCollabView> callback) {
+    public Map<CollabViewSetting, Object> getSettings() {
+        return new HashMap<>(settings);
+    }
 
+    @Override
+    public CollabView build(String collabId, String uid, String name, Map<String, Object> settings) {
+        AbstractCollabView cv;
+        try {
+            cv = this.getClass().getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException |
+                 InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+        cv.collabId = collabId;
+        cv.uid = uid;
+        cv.nombre = name;
+        for (CollabViewSetting s : getStaticCreationSettings()) {
+            cv.settings.put(s, settings.getOrDefault(s.getName(), null));
+        }
+        return cv;
+    }
+
+
+//----------------- MÉTODOS DEL DAO, ACCESO A BASE DE DATOS
+
+
+    @Override
+    public void obtener(String identificador, OnDataLoadedCallback<CollabView> callback) {
+        db.collection("collabs")
+                .document(collabId)
+                .collection("collabViews")
+                .document(identificador)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    CollabViewTransfer t = documentSnapshot.toObject(CollabViewTransfer.class);
+                    if (t != null) {
+                        Registry<CollabView> reg = Registry.getRegistry(CollabView.class);
+                        try {
+                            CollabView cvStatic = (CollabView) reg.get(t.type).getMethod("getStaticInstance").invoke(null);
+
+                            assert cvStatic != null;
+                            CollabView cv = cvStatic.build(collabId, documentSnapshot.getId(), t.name, t.settings);
+
+                            callback.onSuccess(cv);
+                        } catch (IllegalAccessException | InvocationTargetException |
+                                 NoSuchMethodException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else {
+                        callback.onSuccess(null);
+                    }
+                })
+                .addOnFailureListener(callback::onFailure);
     }
 
     @Override
     public void crear(OnOperationCallback callback) {
+        Map<String, Object> settings = new HashMap<>();
+        for (Map.Entry<CollabViewSetting, Object> entry : this.settings.entrySet()) {
+            settings.put(entry.getKey().getName(), entry.getValue());
+        }
 
+        CollabViewTransfer t = new CollabViewTransfer(null, nombre, this.getClass().getSimpleName(), settings);
+
+        db.collection("collabs")
+                .document(collabId)
+                .collection("collabViews")
+                .add(t)
+                .addOnSuccessListener(documentReference -> {
+                    // Actualizar el uid del CollabView con el ID generado por Firestore
+                    this.uid = documentReference.getId();
+                    callback.onSuccess();
+                })
+                .addOnFailureListener(callback::onFailure);
     }
 
     @Override
-    public void modificar(AbstractCollabView reemplazo, OnOperationCallback callback) {
-
+    public void modificar(CollabView reemplazo, OnOperationCallback callback) {
+        Map<String, Object> settings = new HashMap<>();
+        for (Map.Entry<CollabViewSetting, Object> entry : reemplazo.getSettings().entrySet()) {
+            settings.put(entry.getKey().getName(), entry.getValue());
+        }
+        CollabViewTransfer t = new CollabViewTransfer(
+                reemplazo.getUid(),
+                reemplazo.getName(),
+                reemplazo.getClass().getSimpleName(),
+                settings
+        );
+        db.collection("collabs")
+                .document(collabId)
+                .collection("collabViews")
+                .document(reemplazo.getUid())
+                .set(t)
+                .addOnSuccessListener(v -> callback.onSuccess())
+                .addOnFailureListener(callback::onFailure);
     }
 
     @Override
     public void eliminar(OnOperationCallback callback) {
-
+        db.collection("collabs")
+                .document(collabId)
+                .collection("collabViews")
+                .document(uid)
+                .delete()
+                .addOnSuccessListener(v -> callback.onSuccess())
+                .addOnFailureListener(callback::onFailure);
     }
 
     @Override
-    public void obtenerListado(OnDataLoadedCallback<ArrayList<AbstractCollabView>> callback) {
+    public void obtenerListado(OnDataLoadedCallback<ArrayList<CollabView>> callback) {
+        db.collection("collabs")
+                .document(collabId)
+                .collection("collabViews")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    ArrayList<CollabView> collabViews = new ArrayList<>();
+                    Registry<CollabView> reg = Registry.getRegistry(CollabView.class);
+                    for (var doc : queryDocumentSnapshots.getDocuments()) {
+                        CollabViewTransfer t = doc.toObject(CollabViewTransfer.class);
+                        if (t != null) {
+                            try {
+                                CollabView cvStatic = (CollabView) reg.get(t.type).getMethod("getStaticInstance").invoke(null);
 
+                                assert cvStatic != null;
+                                CollabView cv = cvStatic.build(collabId, doc.getId(), t.name, t.settings);
+                                collabViews.add(cv);
+                            } catch (IllegalAccessException | InvocationTargetException |
+                                     NoSuchMethodException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+                    callback.onSuccess(collabViews);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
+    public static class CollabViewTransfer {
+        public CollabViewTransfer(String uid, String name, String type, Map<String, Object> settings) {
+            this.uid = uid;
+            this.name = name;
+            this.type = type;
+            this.settings = settings;
+        }
+
+        public String uid;
+        public String name;
+        public String type;
+        public Map<String, Object> settings;
     }
 }
