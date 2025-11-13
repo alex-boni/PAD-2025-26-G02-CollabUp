@@ -37,8 +37,13 @@
             android:exported="false" />
         <activity
             android:name=".controlador.CreateCollabActivity"
+            android:exported="true" />
+        <activity
+            android:name=".controlador.AddCollabViewActivity"
+            android:exported="true" />
+        <activity
+            android:name=".controlador.ConfigurarNuevoCollabViewActivity"
             android:exported="false" />
-
     </application>
 
 </manifest>

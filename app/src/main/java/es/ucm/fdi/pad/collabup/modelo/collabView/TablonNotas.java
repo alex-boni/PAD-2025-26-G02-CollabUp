@@ -8,8 +8,8 @@ import android.widget.ImageView;
 
 import androidx.fragment.app.Fragment;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Collections;
+import java.util.Set;
 
 import es.ucm.fdi.pad.collabup.R;
 
@@ -44,8 +44,8 @@ public class TablonNotas extends AbstractCollabView {
     }
 
     @Override
-    public CollabView build(Map<String, Object> settings) {
-        return null;
+    public CollabView getStaticInstance() {
+        return new TablonNotas();
     }
 
     @Override
@@ -54,7 +54,8 @@ public class TablonNotas extends AbstractCollabView {
     }
 
     @Override
-    public List<CollabViewSetting> getCreationSettings() {
-        return null;
+    public Set<CollabViewSetting> getStaticCreationSettings() {
+        return Collections.emptySet();
     }
+
 }
