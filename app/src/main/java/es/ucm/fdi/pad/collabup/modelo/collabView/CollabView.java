@@ -6,11 +6,18 @@ import android.view.View;
 
 import androidx.fragment.app.Fragment;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import es.ucm.fdi.pad.collabup.modelo.interfaz.DAO;
 
 //Interfaz collabViews
-public interface CollabView {
+public interface CollabView extends DAO<CollabView> {
+
+    String getUid();
+
+    void setUid(String uid);
+
     /**
      * Obtiene el nombre del CollabView.
      *
@@ -18,13 +25,17 @@ public interface CollabView {
      */
     String getName();
 
+    void setName(String name);
+
+    CollabView getStaticInstance();
+
     /**
-     * Construye una instancia de CollabView a partir de un mapa de configuraciones.
+     * Construye una instancia usable de CollabView a partir de un collabId y mapa de configuraciones.
      *
      * @param settings especificas para cada CollabView.
      * @return una nueva instancia de CollabView configurada.
      */
-    CollabView build(Map<String, Object> settings);
+    CollabView build(String collabId, String uid, String name, Map<String, Object> settings);
 
     /**
      * Popula la CollabView con el CollabItem proporcionado.
@@ -71,5 +82,9 @@ public interface CollabView {
      *
      * @return un conjunto de pares clave-obligatoriedad que representan los ajustes de creación
      */
-    List<CollabViewSetting> getCreationSettings();
+    Set<CollabViewSetting> getStaticCreationSettings();
+
+    Map<CollabViewSetting, Object> getSettings();
+
+
 }

@@ -16,10 +16,20 @@ import androidx.core.view.WindowCompat;
 import java.lang.reflect.InvocationTargetException;
 
 import es.ucm.fdi.pad.collabup.R;
+import es.ucm.fdi.pad.collabup.modelo.collabView.Calendario;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
+import es.ucm.fdi.pad.collabup.modelo.collabView.Lista;
 import es.ucm.fdi.pad.collabup.modelo.collabView.Registry;
+import es.ucm.fdi.pad.collabup.modelo.collabView.TablonNotas;
 
 public class AddCollabViewActivity extends AppCompatActivity {
+
+    static {
+        Registry<CollabView> registry = Registry.getOrCreateRegistry(CollabView.class);
+        registry.register(TablonNotas.class);
+        registry.register(Calendario.class);
+        registry.register(Lista.class);
+    }
 
     // Launcher para abrir ConfigurarNuevoCollabViewActivity y recibir su resultado
     private ActivityResultLauncher<Intent> configureLauncher;
@@ -70,7 +80,7 @@ public class AddCollabViewActivity extends AppCompatActivity {
         Registry<CollabView> registry = Registry.getOrCreateRegistry(CollabView.class);
         for (Class<? extends CollabView> cvClass : registry.getAll()) {
             try {
-                CollabView cvInstance = cvClass.getDeclaredConstructor().newInstance();
+                CollabView cvInstance = (CollabView) cvClass.getMethod("getStaticInstance").invoke(null);
 
                 View mini = cvInstance.getStaticAddCollabViewInListEntry(this);
                 if (mini == null) continue; // evitar añadir vistas nulas
@@ -99,7 +109,7 @@ public class AddCollabViewActivity extends AppCompatActivity {
 
                 containerView.addView(mini);
 
-            } catch (InstantiationException | IllegalAccessException |
+            } catch (IllegalAccessException |
                      NoSuchMethodException | InvocationTargetException e) {
                 throw new RuntimeException("Error al instanciar CollabView: " + cvClass.getName(), e);
             }
