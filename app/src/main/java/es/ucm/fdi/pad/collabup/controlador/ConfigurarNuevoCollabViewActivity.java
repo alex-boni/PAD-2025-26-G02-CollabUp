@@ -1,5 +1,6 @@
 package es.ucm.fdi.pad.collabup.controlador;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.Menu;
@@ -12,6 +13,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,21 +21,32 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.WindowCompat;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabViewSetting;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
 public class ConfigurarNuevoCollabViewActivity extends AppCompatActivity {
+
+    private String collabId;
+    private CollabView instance;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_configure_new_collabview);
 
+        Intent intent = getIntent();
+        collabId = intent.getStringExtra("COLLAB_ID");
+
         Class<? extends CollabView> collabView;
-        Object extra = getIntent().getSerializableExtra("COLLABVIEW");
+        Object extra = intent.getSerializableExtra("COLLABVIEW");
         if (extra instanceof Class) {
             //noinspection unchecked
             collabView = (Class<? extends CollabView>) extra;
@@ -41,7 +54,6 @@ public class ConfigurarNuevoCollabViewActivity extends AppCompatActivity {
             throw new IllegalArgumentException("COLLAB_VIEW extra missing or wrong type");
         }
 
-        CollabView instance;
         try {
             instance = collabView.getDeclaredConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
@@ -68,10 +80,10 @@ public class ConfigurarNuevoCollabViewActivity extends AppCompatActivity {
 
         LinearLayout containerView = findViewById(R.id.ajustes_list);
 
-        List<CollabViewSetting> settings = instance.getCreationSettings();
+        Set<CollabViewSetting> settings = instance.getStaticCreationSettings();
         if (settings == null) {
             // Evitar NPE (NullPointerException si una implementación devuelve null
-            settings = Collections.emptyList();
+            settings = Collections.emptySet();
         }
 
         if (settings.isEmpty()) {
@@ -210,6 +222,7 @@ public class ConfigurarNuevoCollabViewActivity extends AppCompatActivity {
                     break;
                 }
             }
+            group.setId(generateSettingId(setting.getName()));
             containerView.addView(group);
         }
     }
@@ -224,13 +237,122 @@ public class ConfigurarNuevoCollabViewActivity extends AppCompatActivity {
         if (actionView != null) {
             TextView tv = actionView.findViewById(R.id.menu_create_text);
             tv.setOnClickListener(v -> {
-                // TODO Guardar CollabView con los ajustes en BD y crear objeto CollabView asociado
-                // para actualziar la vista Collab
-                setResult(RESULT_OK);
-                finish();
+                CollabView actualInstance = instance.build(collabId, null, null, getSettingsFromUI());
+                actualInstance.crear(new OnOperationCallback() {
+                    @Override
+                    public void onSuccess() {
+                        // CollabView añadido con éxito
+                        Toast.makeText(ConfigurarNuevoCollabViewActivity.this, "CollabView añadido con éxito", Toast.LENGTH_SHORT).show();
+                        setResult(RESULT_OK);
+                        finish();
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(ConfigurarNuevoCollabViewActivity.this, "Error al añadir CollabView: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+
+
             });
         }
 
         return true;
+    }
+
+    private Map<String, Object> getSettingsFromUI() {
+        LinearLayout containerView = findViewById(R.id.ajustes_list);
+        Set<CollabViewSetting> settings = instance.getStaticCreationSettings();
+
+        Map<String, Object> settingsMap = new HashMap<>();
+
+        for (CollabViewSetting setting : settings) {
+            // Obtener el grupo correspondiente a este setting usando su ID
+            LinearLayout groupView = findViewById(generateSettingId(setting.getName()));
+            switch (setting.getType()) {
+                case TEXTO: {
+                    EditText et = null;
+                    for (int i = 0; i < groupView.getChildCount(); i++) {
+                        View v = groupView.getChildAt(i);
+                        if (v instanceof EditText) {
+                            et = (EditText) v;
+                            break;
+                        }
+                    }
+                    if (et != null) {
+                        String text = et.getText().toString();
+                        if (setting.isRequired() && text.isEmpty()) {
+                            et.setError("Este campo es obligatorio");
+                            throw new IllegalStateException("Faltan campos obligatorios");
+                        }
+                        settingsMap.put(setting.getName(), text);
+                    }
+                    break;
+                }
+                case NUMERO: {
+                    EditText etNum = null;
+                    for (int i = 0; i < groupView.getChildCount(); i++) {
+                        View v = groupView.getChildAt(i);
+                        if (v instanceof EditText) {
+                            etNum = (EditText) v;
+                            break;
+                        }
+                    }
+                    if (etNum != null) {
+                        String numStr = etNum.getText().toString();
+                        if (setting.isRequired() && numStr.isEmpty()) {
+                            etNum.setError("Este campo es obligatorio");
+                            throw new IllegalStateException("Faltan campos obligatorios");
+                        }
+                        Integer number = null;
+                        if (!numStr.isEmpty()) {
+                            number = Integer.parseInt(numStr);
+                        }
+                        settingsMap.put(setting.getName(), number);
+                    }
+                    break;
+                }
+                case LISTA_OPCIONES: {
+                    Spinner spinner = null;
+                    for (int i = 0; i < groupView.getChildCount(); i++) {
+                        View v = groupView.getChildAt(i);
+                        if (v instanceof Spinner) {
+                            spinner = (Spinner) v;
+                            break;
+                        }
+                    }
+                    if (spinner != null) {
+                        String selectedOption = (String) spinner.getSelectedItem();
+                        settingsMap.put(setting.getName(), selectedOption);
+                    }
+                    break;
+                }
+                case BOOLEANO: {
+                    CheckBox cb = null;
+                    for (int i = 0; i < groupView.getChildCount(); i++) {
+                        View v = groupView.getChildAt(i);
+                        if (v instanceof CheckBox) {
+                            cb = (CheckBox) v;
+                            break;
+                        }
+                    }
+                    if (cb != null) {
+                        boolean checked = cb.isChecked();
+                        settingsMap.put(setting.getName(), checked);
+                    }
+                    break;
+                }
+            }
+        }
+
+        return settingsMap;
+    }
+
+    /**
+     * Genera un ID predecible para un setting basado en su nombre.
+     */
+    private int generateSettingId(String settingName) {
+        String sanitized = settingName.replaceAll("[^a-zA-Z0-9_]", "_").toLowerCase();
+        return ("setting_" + sanitized).hashCode();
     }
 }

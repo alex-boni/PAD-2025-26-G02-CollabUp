@@ -37,17 +37,21 @@
         <activity
             android:name=".controlador.AppController"
             android:exported="false" />
-
-        <!-- CollabItems -->
+        <activity
+            android:name=".controlador.CreateCollabActivity"
+            android:exported="true" />
         <activity
             android:name=".controlador.CreateCollabItemActivity"
             android:exported="false" />
-
         <activity
             android:name=".controlador.CollabItemActivity"
             android:exported="false" />
         <activity
             android:name=".controlador.EditProfileActivity"
+            android:name=".controlador.AddCollabViewActivity"
+            android:exported="true" />
+        <activity
+            android:name=".controlador.ConfigurarNuevoCollabViewActivity"
             android:exported="false" />
 
 
