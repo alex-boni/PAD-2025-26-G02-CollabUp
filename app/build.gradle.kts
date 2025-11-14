@@ -59,4 +59,11 @@ dependencies {
     // Para agregar MUI
     implementation("com.google.android.material:material:1.12.0")
 
+    // Para guardar archivos (fotos)
+    implementation("com.google.firebase:firebase-storage")
+
+    // Para cargar imágenes desde una URL (muy recomendado)
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+
 }

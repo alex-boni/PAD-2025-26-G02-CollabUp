@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="provincias">
+        <item>Selecciona una provincia</item>
+        <item>A Coruña</item>
+        <item>Álava</item>
+        <item>Albacete</item>
+        <item>Alicante</item>
+        <item>Almería</item>
+        <item>Asturias</item>
+        <item>Ávila</item>
+        <item>Madrid</item>
+        <item>Barcelona</item>
+    </string-array>
+
+    <string-array name="localidades_default">
+        <item>Selecciona una localidad</item>
+    </string-array>
+
+    <string-array name="localidades_madrid">
+        <item>Selecciona una localidad</item>
+        <item>Madrid</item>
+        <item>Móstoles</item>
+        <item>Alcalá de Henares</item>
+        <item>Fuenlabrada</item>
+        <item>Leganés</item>
+        <item>Getafe</item>
+    </string-array>
+
+    <string-array name="localidades_barcelona">
+        <item>Selecciona una localidad</item>
+        <item>Barcelona</item>
+        <item>L\'Hospitalet de Llobregat</item>
+        <item>Terrassa</item>
+        <item>Badalona</item>
+    </string-array>
+</resources>
