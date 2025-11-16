@@ -103,18 +103,23 @@ public class CollabDetailFragment extends Fragment {
             Toast.makeText(getContext(), "Navegando a Tareas...", Toast.LENGTH_SHORT).show();
             if (collabId != null) {
                 Intent intent = new Intent(getActivity(), CollabItemsListActivity.class);
-                intent.putExtra("collabId", collabId);
+                Bundle bundle = new Bundle(); //paso de parametros
+
+                bundle.putString("collabId", collabId);
+                bundle.putStringArrayList("miembros", currentCollab.getMiembros());
+                //todo necesito una lista de ids de los collabViews del collab
+
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
 
-
+        //Se abre vista de añadir un collabItem
         btnAddTarea.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Abriendo formulario Tarea...", Toast.LENGTH_SHORT).show();
-            //Se abre vista de añadir un collabItem
             Intent intent = new Intent(getActivity(), CreateCollabItemActivity.class);
-
             Bundle bundle = new Bundle(); //paso de parametros
+
             bundle.putString("idC", currentCollab.getId());
             ArrayList<String> miembros = new ArrayList<>(currentCollab.getMiembros());
             bundle.putStringArrayList("miembros", miembros);

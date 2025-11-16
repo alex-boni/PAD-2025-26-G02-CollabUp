@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:padding="16dp"
     android:fillViewport="true">
-    
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -94,6 +94,41 @@
             android:divider="@android:color/darker_gray"
             android:dividerHeight="1dp"
             android:paddingBottom="8dp" />
+
+        <!-- Botón para seleccionar miembros -->
+        <Button
+            android:id="@+id/btnSeleccionMiembros"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Seleccionar miembros"
+            android:layout_marginTop="8dp"
+            android:visibility="gone" />
+
+        <!-- CollabViewsAsignadas -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CollabViews asignadas:"
+            android:textStyle="bold"
+            android:paddingTop="12dp" />
+
+        <ListView
+            android:id="@+id/lvCVAsigCollabItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="1dp"
+            android:paddingBottom="8dp" />
+
+        <!-- Botón para seleccionar CollabViews -->
+        <Button
+            android:id="@+id/btnSeleccionCV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Seleccionar Collab Views"
+            android:layout_marginTop="8dp"
+            android:visibility="gone" />
+
 
         <!-- Etiquetas -->
         <TextView
