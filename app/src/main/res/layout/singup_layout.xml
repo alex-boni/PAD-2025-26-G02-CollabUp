@@ -1,95 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".controlador.SingupController"
-    android:background="#FFf5f5f5">
+    android:padding="24dp"
+    tools:context=".controlador.SingupController">
 
     <TextView
-        android:id="@+id/txtRegistrate"
+        android:id="@+id/txtSignupTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="40dp"
-        android:textSize="40sp"
-        android:textColor="#00008B" android:text="Regístrese" />
+        android:layout_marginTop="24dp"
+        android:text="@string/signup_title"
+        android:textColor="?attr/colorPrimary"
+        android:textSize="34sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/imgLogo"
-        android:layout_width="wrap_content"
-        android:layout_height="70dp"
-        android:layout_below="@id/txtRegistrate"
-        android:src="@android:drawable/sym_def_app_icon"/> <EditText
-    android:id="@+id/eTxtNombre"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_below="@id/imgLogo"
-    android:layout_marginStart="20dp"
-    android:layout_marginTop="35dp"
-    android:layout_marginEnd="20dp"
-    android:layout_marginBottom="15dp"
-    android:backgroundTint="#858585"
-    android:hint="Nombre"
-    android:inputType="text"
-    android:textColor="#000000" android:textColorHint="#8A8A8A"
-    android:textSize="18sp" />
-
-    <EditText
-        android:id="@+id/eTxtUsuario"
-        android:layout_width="match_parent"
+    <!-- CAMPO "NOMBRE" -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutFullName"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/eTxtNombre"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="15dp"
-        android:backgroundTint="#858585"
-        android:hint="Usuario"
-        android:inputType="text"
-        android:textColor="#000000" android:textColorHint="#8A8A8A"
-        android:textSize="18sp" />
+        android:layout_marginTop="32dp"
+        android:hint="@string/name_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtSignupTitle">
 
-    <EditText
-        android:id="@+id/eTxtEmailRegistro"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/eTxtUsuario"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="15dp"
-        android:backgroundTint="#858585"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
-        android:textColor="#000000" android:textColorHint="#8A8A8A"
-        android:textSize="18sp" />
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/eTxtNombre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <EditText
-        android:id="@+id/eTxtPassword"
-        android:layout_width="match_parent"
+    <!-- CAMPO "USUARIO" -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutUsername"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/eTxtEmailRegistro"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="15dp"
-        android:backgroundTint="#858585"
-        android:hint="Contraseña"
-        android:inputType="textPassword"
-        android:textColor="#000000" android:textColorHint="#8A8A8A"
-        android:textSize="18sp" />
+        android:layout_marginTop="16dp"
+        android:hint="@string/username_hint"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutFullName">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/eTxtUsuario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- CAMPO "EMAIL" -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutEmail"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="@string/email_hint"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutUsername">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/eTxtEmailRegistro"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- CAMPO "CONTRASEÑA" -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutPassword"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="@string/password_hint"
+        app:endIconMode="password_toggle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutEmail">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/eTxtPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/btnSingup"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/eTxtPassword"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:text="REGISTRARME"
-        android:textColor="#F5F5DC" android:textSize="18sp" />
+        android:layout_marginBottom="8dp"
+        android:paddingVertical="12dp"
+        android:text="@string/signup_button"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@id/txtLoginPrompt"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-</RelativeLayout>
+    <TextView
+        android:id="@+id/txtLoginPrompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:padding="8dp"
+        android:text="@string/already_have_account"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

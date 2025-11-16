@@ -1,59 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".controlador.MainActivity"
-    android:background="#FFFFFF">
+    android:padding="16dp"
+    tools:context=".controlador.MainActivity">
 
-
-    <TextView
-    android:id="@+id/txtBienvenido"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="10dp"
-    android:layout_marginLeft="15dp"
-    android:textColor="#000000"
-    android:text="Bienvenido" />
-
+    <!-- Cadena vertical que centra todo el contenido -->
     <TextView
         android:id="@+id/txtCollaUp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/txtBienvenido"
-        android:layout_marginTop="70dp"
-        android:layout_marginLeft="15dp"
-        android:layout_centerHorizontal="true"
-        android:textSize="50sp"
-        android:textColor="#000000"
-        android:text="@string/app_name" />
+        android:text="@string/app_name"
+        android:textColor="@color/black"
+        android:textSize="45sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/imgIcono"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" /> <!-- Inicia la cadena -->
 
     <ImageView
         android:id="@+id/imgIcono"
-        android:layout_width="wrap_content"
-        android:layout_height="170dp"
-        android:layout_below="@id/txtCollaUp"
-        android:layout_marginTop="15dp"
-        android:src="@drawable/logo" />
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="32dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/logo"
+        app:layout_constraintBottom_toTopOf="@+id/btnIrLogin"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtCollaUp" />
 
     <Button
         android:id="@+id/btnIrLogin"
-        android:layout_width="200dp"
-        android:layout_height="80dp"
-        android:layout_below="@id/imgIcono"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
-        android:textSize="30sp"
-        android:text="Login" />
+        style="@style/Widget.Material3.Button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="32dp"
+        android:paddingVertical="12dp"
+        android:text="@string/login_button"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/btnIrSingup"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imgIcono" />
 
     <Button
         android:id="@+id/btnIrSingup"
-        android:layout_width="200dp"
-        android:layout_height="80dp"
-        android:layout_below="@id/btnIrLogin"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
-        android:textSize="30sp"
-        android:text="Signup" />
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        android:paddingVertical="12dp"
+        android:text="@string/signup_button"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnIrLogin" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
