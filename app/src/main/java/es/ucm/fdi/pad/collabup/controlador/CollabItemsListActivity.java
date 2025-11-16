@@ -10,7 +10,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
@@ -51,7 +51,9 @@ public class CollabItemsListActivity extends AppCompatActivity {
 
     private void cargarCollabItems() {
         CollabItem model = new CollabItem();
-        model.setCollabsAsignadas(Arrays.asList(collabId));
+        model.setIdC(collabId);
+        List<String> lista = new ArrayList<>();
+        model.setcvAsignadas(lista);
         model.obtenerCollabItemsCollab(collabId, new OnDataLoadedCallback<ArrayList<CollabItem>>() {
             @Override
             public void onSuccess(ArrayList<CollabItem> items) {

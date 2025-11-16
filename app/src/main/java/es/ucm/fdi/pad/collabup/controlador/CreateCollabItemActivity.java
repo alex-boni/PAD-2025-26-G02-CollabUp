@@ -194,7 +194,7 @@ public class CreateCollabItemActivity extends AppCompatActivity {
         }
 
         // Creamos el objeto CollabItem
-        CollabItem nuevoCollabItem = new CollabItem(nombre, descripcion, fecha, miembrosElegidos, easig, cvElegidas);
+        CollabItem nuevoCollabItem = new CollabItem(nombre, descripcion, fecha, miembrosElegidos, easig, idC, cvElegidas);
         //Lo añadimos a la base de datos
         nuevoCollabItem.crear(new OnOperationCallback() {
             @Override

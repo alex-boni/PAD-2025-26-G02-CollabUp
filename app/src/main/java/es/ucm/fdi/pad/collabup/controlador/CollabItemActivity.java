@@ -103,7 +103,8 @@ public class CollabItemActivity extends AppCompatActivity {
 
         CollabItem collabItemModel = new CollabItem();
         collabItemModel.setIdI(idI);
-        collabItemModel.setCollabsAsignadas(Arrays.asList(idC));
+        collabItemModel.setIdC(idC);
+        collabItemModel.setcvAsignadas(Arrays.asList(idC));
         collabItemModel.cargarDatosCollabItem(new OnDataLoadedCallback<CollabItem>() {
             @Override
             public void onSuccess(CollabItem item) {
@@ -168,7 +169,7 @@ public class CollabItemActivity extends AppCompatActivity {
             return null;
         }
 
-        CollabItem ci = new CollabItem(nombre, descripcion, fecha, usrsAsig, etAsig, collabAsig);
+        CollabItem ci = new CollabItem(nombre, descripcion, fecha, usrsAsig, etAsig, idC, collabAsig);
         ci.setIdI(idI);
 
         return ci;
@@ -206,7 +207,6 @@ public class CollabItemActivity extends AppCompatActivity {
     private void modificarCollabItem() {
 
         CollabItem ciActualizado = obtenerCollabItemDePantalla();
-
         ciActualizado.modificar(ciActualizado, new OnOperationCallback() {
             @Override
             public void onSuccess() {
@@ -227,7 +227,8 @@ public class CollabItemActivity extends AppCompatActivity {
     private void eliminarCollabItem() {
         CollabItem ciEliminar = new CollabItem();
         ciEliminar.setIdI(this.idI);
-        ciEliminar.setCollabsAsignadas(Arrays.asList(idC));
+        ciEliminar.setIdC(this.idC);
+        ciEliminar.setcvAsignadas(Arrays.asList(idC));
 
         ciEliminar.eliminar(new OnOperationCallback() {
             @Override
