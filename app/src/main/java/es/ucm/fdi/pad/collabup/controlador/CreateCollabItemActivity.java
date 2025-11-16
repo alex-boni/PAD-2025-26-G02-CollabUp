@@ -29,7 +29,7 @@ public class CreateCollabItemActivity extends AppCompatActivity {
 
     // ---------Atributos vista
     private EditText eTxtNombreCollabItem, eTxtDescripcionCollabItem, eTxtFechaCollabItem;
-    Button btnSeleccionMiembros;
+    Button btnSeleccionMiembros, btnSeleccionCV;
     private Button btnCrearCollabItem;
 
     //---------- Atributos necesarios
@@ -37,6 +37,10 @@ public class CreateCollabItemActivity extends AppCompatActivity {
     private ArrayList<String> miembros; //miembros del collab
     private boolean[] seleccionados; //miembros seleccionados para el item
     private List<String> miembrosElegidos = new ArrayList<>(); // auxiliar
+
+    private ArrayList<String> cv; //collabviews del collab
+    private boolean[] cvseleccionados; //cv seleccionados para el item
+    private List<String> cvElegidas = new ArrayList<>(); // auxiliar
 
 
     @Override
@@ -50,6 +54,7 @@ public class CreateCollabItemActivity extends AppCompatActivity {
         btnCrearCollabItem = findViewById(R.id.btnCrearCollabItem);
         eTxtFechaCollabItem = findViewById(R.id.eTxtFechaCollabItem);
         btnSeleccionMiembros = findViewById(R.id.btnSeleccionMiembros);
+        btnSeleccionCV = findViewById(R.id.btnSeleccionCV);
 
         Toolbar toolbar = findViewById(R.id.toolbarCollabItem);
         setSupportActionBar(toolbar);
@@ -58,17 +63,23 @@ public class CreateCollabItemActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 
-        //parámetros que llegan: idCollab, miembros del collab
+        //parámetros que llegan: idCollab, miembros del collab, collabViews
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             idC = bundle.getString("idC");
             miembros = bundle.getStringArrayList("miembros");
+            cv = bundle.getStringArrayList("cv"); //todo faltan collabViews
+            //todo por ahora hasta que llegue
+            cv = new ArrayList<>();
         } else {
             idC = "ryO2NPfO9YaaWfNkhibD"; //por defecto //todo revisar
         }
 
         if (miembros != null) {
             seleccionados = new boolean[miembros.size()];
+        }
+        if (cv != null) {
+            cvseleccionados = new boolean[cv.size()];
         }
 
 
@@ -98,6 +109,40 @@ public class CreateCollabItemActivity extends AppCompatActivity {
                         miembrosElegidos.isEmpty()
                                 ? "Seleccionar miembros"
                                 : "Miembros: " + miembrosElegidos.size()
+                );
+            });
+
+            builder.setNegativeButton("Cancelar", null);
+
+            builder.show();
+        });
+
+        //Para seleccionar las CollabViews asignados al collabItem
+        btnSeleccionCV.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Selecciona las Collab Views");
+
+            builder.setMultiChoiceItems(
+                    cv.toArray(new String[0]), // elementos
+                    cvseleccionados,                         // checkboxes
+                    (dialog, which, isChecked) -> {
+                        cvseleccionados[which] = isChecked;
+                    }
+            );
+
+            builder.setPositiveButton("OK", (dialog, which) -> {
+                cvElegidas.clear();
+
+                for (int i = 0; i < cvseleccionados.length; i++) {
+                    if (cvseleccionados[i]) {
+                        cvElegidas.add(cv.get(i));
+                    }
+                }
+
+                btnSeleccionCV.setText(
+                        cvElegidas.isEmpty()
+                                ? "Seleccionar Collab Views"
+                                : "Collab Views: " + cvElegidas.size()
                 );
             });
 
@@ -149,7 +194,7 @@ public class CreateCollabItemActivity extends AppCompatActivity {
         }
 
         // Creamos el objeto CollabItem
-        CollabItem nuevoCollabItem = new CollabItem(nombre, descripcion, fecha, miembrosElegidos, easig, idC);
+        CollabItem nuevoCollabItem = new CollabItem(nombre, descripcion, fecha, miembrosElegidos, easig, cvElegidas);
         //Lo añadimos a la base de datos
         nuevoCollabItem.crear(new OnOperationCallback() {
             @Override

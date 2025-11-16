@@ -31,8 +31,7 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
     private Timestamp fecha;
     private List<String> usuariosAsignados;
     private List<Etiqueta> etiquetasItem; //lista de etiquetas asignadas al item
-    private String idC;
-
+    private List<String> cvAsignadas; //collabViews a los que pertenece el item
 
     private FirebaseFirestore db;
 
@@ -40,26 +39,18 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
     //--------------------- Métodos básicos
 
     public CollabItem(String nombre, String descripcion, Timestamp fecha,
-                      List<String> usuariosAsignados, List<Etiqueta> etiquetasItem, String idC) {
+                      List<String> usuariosAsignados, List<Etiqueta> etiquetasItem, List<String> cvAsignadas) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.fecha = fecha;
         this.usuariosAsignados = usuariosAsignados;
         this.etiquetasItem = etiquetasItem;
-        this.idC = idC;
+        this.cvAsignadas = cvAsignadas;
         db = FirebaseFirestore.getInstance();
     }
 
     public CollabItem() {
         // Constructor vacío requerido
-    }
-
-    public String getIdC() {
-        return idC;
-    }
-
-    public void setId(String idC) {
-        this.idC = idC;
     }
 
     @Exclude
@@ -113,11 +104,22 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         this.etiquetasItem = etiquetasItem;
     }
 
+    public List<String> getCollabsAsignadas() {
+        return cvAsignadas;
+    }
+
+    public String getEjCollabAsignada() { //saco cualquier collab que tenga este item
+        return cvAsignadas.get(0);
+    }
+
+    public void setCollabsAsignadas(List<String> collabsAsignadas) {
+        this.cvAsignadas = collabsAsignadas;
+    }
 
     @Override
     public void obtener(String identificador, OnDataLoadedCallback<CollabItem> callback) {
         db.collection("collabs")
-                .document(this.getIdC())
+                .document(this.getEjCollabAsignada())
                 .collection("collabItems")
                 .document(identificador)
                 .get()
@@ -139,7 +141,7 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
     @Override
     public void crear(OnOperationCallback callback) {
         db.collection("collabs")
-                .document(this.getIdC())
+                .document(this.getEjCollabAsignada())
                 .collection("collabItems")
                 .add(this)
                 .addOnSuccessListener(documentReference -> {
@@ -153,7 +155,7 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
     //todo revisar diferencias con  método obtener
     public void cargarDatosCollabItem(OnDataLoadedCallback<CollabItem> callback) {
         db.collection("collabs")
-                .document(this.getIdC())
+                .document(this.getEjCollabAsignada())
                 .collection("collabItems")
                 .document(this.idI)
                 .get()
@@ -182,7 +184,7 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         updates.put("etiquetasItem", reemplazo.getEtiquetasItem());
 
         db.collection("collabs")
-                .document(reemplazo.getIdC())
+                .document(reemplazo.getEjCollabAsignada())
                 .collection("collabItems")
                 .document(reemplazo.getIdI())
                 .update(updates)
@@ -198,7 +200,7 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         }
 
         db.collection("collabs")
-                .document(idC)
+                .document(getEjCollabAsignada())
                 .collection("collabItems")
                 .document(idI)
                 .delete()
@@ -226,10 +228,11 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
                             String descripcion = document.getString("descripcion");
                             Timestamp fecha = document.getTimestamp("fecha");
                             List<String> usuariosAsignados = (List<String>) document.get("usuariosAsignados");
+                            List<String> collabsAsignadas = (List<String>) document.get("collabsAsignadas");
                             List<Etiqueta> etiquetasItem = (List<Etiqueta>) document.get("etiquetasItem");
 
                             // Creamos el objeto manualmente
-                            CollabItem item = new CollabItem(nombre, descripcion, fecha, usuariosAsignados, etiquetasItem, collabId);
+                            CollabItem item = new CollabItem(nombre, descripcion, fecha, usuariosAsignados, etiquetasItem, collabsAsignadas);
                             item.setIdI(document.getId());
 
                             listaItems.add(item);

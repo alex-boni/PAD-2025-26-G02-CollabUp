@@ -118,6 +118,7 @@ public class CollabDetailFragment extends Fragment {
             bundle.putString("idC", currentCollab.getId());
             ArrayList<String> miembros = new ArrayList<>(currentCollab.getMiembros());
             bundle.putStringArrayList("miembros", miembros);
+            //todo necesito una lista de ids de los collabViews del collab
             intent.putExtras(bundle);
 
             startActivity(intent);

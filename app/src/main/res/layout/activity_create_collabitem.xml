@@ -54,6 +54,12 @@
         android:text="Seleccionar miembros" />
 
     <Button
+        android:id="@+id/btnSeleccionCV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Seleccionar Collab Views a los que pertenecera" />
+
+    <Button
         android:id="@+id/btnCrearCollabItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

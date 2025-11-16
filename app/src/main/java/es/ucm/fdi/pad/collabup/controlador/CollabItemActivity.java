@@ -16,6 +16,7 @@ import com.google.firebase.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -100,8 +101,9 @@ public class CollabItemActivity extends AppCompatActivity {
                     .show();
         });
 
-        CollabItem collabItemModel = new CollabItem(null, null, null, null, null, idC);
+        CollabItem collabItemModel = new CollabItem();
         collabItemModel.setIdI(idI);
+        collabItemModel.setCollabsAsignadas(Arrays.asList(idC));
         collabItemModel.cargarDatosCollabItem(new OnDataLoadedCallback<CollabItem>() {
             @Override
             public void onSuccess(CollabItem item) {
@@ -157,6 +159,7 @@ public class CollabItemActivity extends AppCompatActivity {
 
         //todo usuarios y etiquetas
         List<String> usrsAsig = new ArrayList<>();
+        List<String> collabAsig = new ArrayList<>();
         List<Etiqueta> etAsig = new ArrayList<>();
 
 
@@ -165,7 +168,7 @@ public class CollabItemActivity extends AppCompatActivity {
             return null;
         }
 
-        CollabItem ci = new CollabItem(nombre, descripcion, fecha, usrsAsig, etAsig, idC);
+        CollabItem ci = new CollabItem(nombre, descripcion, fecha, usrsAsig, etAsig, collabAsig);
         ci.setIdI(idI);
 
         return ci;
@@ -222,8 +225,9 @@ public class CollabItemActivity extends AppCompatActivity {
 
 
     private void eliminarCollabItem() {
-        CollabItem ciEliminar = new CollabItem(null, null, null, null, null, idC);
+        CollabItem ciEliminar = new CollabItem();
         ciEliminar.setIdI(this.idI);
+        ciEliminar.setCollabsAsignadas(Arrays.asList(idC));
 
         ciEliminar.eliminar(new OnOperationCallback() {
             @Override
