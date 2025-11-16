@@ -46,6 +46,9 @@
             android:name=".controlador.CollabItemActivity"
             android:exported="false" />
         <activity
+            android:name=".controlador.CollabItemsListActivity"
+            android:exported="false" />
+        <activity
             android:name=".controlador.EditProfileActivity"
             android:exported="false" />
         <activity

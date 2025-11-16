@@ -55,6 +55,9 @@ public class CollabItemActivity extends AppCompatActivity {
         btnEditarCollabItem = findViewById(R.id.btnEditarCollabItem);
         btnGuardarCollabItem = findViewById(R.id.btnGuardarCollabItem);
         btnEliminarCollabItem = findViewById(R.id.btnEliminarCollabItem);
+        //(Para volver atrás)
+        Button btnVolver = findViewById(R.id.btnVolverCollabItem);
+        btnVolver.setOnClickListener(v -> finish());
 
         //Valores que llegan de arriba
         //todo mirar si se pasan con bundles (mejor)

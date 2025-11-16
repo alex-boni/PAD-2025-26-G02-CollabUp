@@ -1,8 +1,14 @@
 package es.ucm.fdi.pad.collabup.modelo.collabView;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -42,6 +48,10 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         this.etiquetasItem = etiquetasItem;
         this.idC = idC;
         db = FirebaseFirestore.getInstance();
+    }
+
+    public CollabItem() {
+        // Constructor vacío requerido
     }
 
     public String getIdC() {
@@ -106,7 +116,24 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
 
     @Override
     public void obtener(String identificador, OnDataLoadedCallback<CollabItem> callback) {
-
+        db.collection("collabs")
+                .document(this.getIdC())
+                .collection("collabItems")
+                .document(identificador)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        this.setDescripcion(documentSnapshot.getString("descripcion"));
+                        this.setEtiquetasItem((List<Etiqueta>) documentSnapshot.get("etiquetas"));
+                        this.setFecha(documentSnapshot.getTimestamp("fecha"));
+                        this.setNombre(documentSnapshot.getString("nombre"));
+                        this.setUsuariosAsignados((List<String>) documentSnapshot.get("usuarios"));
+                        callback.onSuccess(this); // Llama al callback con el objeto cargado
+                    } else {
+                        callback.onSuccess(null); // No existe el documento
+                    }
+                })
+                .addOnFailureListener(callback::onFailure);
     }
 
     @Override
@@ -123,6 +150,7 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
     }
 
 
+    //todo revisar diferencias con  método obtener
     public void cargarDatosCollabItem(OnDataLoadedCallback<CollabItem> callback) {
         db.collection("collabs")
                 .document(this.getIdC())
@@ -181,6 +209,40 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
     @Override
     public void obtenerListado(OnDataLoadedCallback<ArrayList<CollabItem>> callback) {
 
+    }
+
+    public void obtenerCollabItemsCollab(String collabId, OnDataLoadedCallback<ArrayList<CollabItem>> callback) {
+        db.collection("collabs")
+                .document(collabId)
+                .collection("collabItems")
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        ArrayList<CollabItem> listaItems = new ArrayList<>();
+                        for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                            // Leemos los campos manualmente
+                            String nombre = document.getString("nombre");
+                            String descripcion = document.getString("descripcion");
+                            Timestamp fecha = document.getTimestamp("fecha");
+                            List<String> usuariosAsignados = (List<String>) document.get("usuariosAsignados");
+                            List<Etiqueta> etiquetasItem = (List<Etiqueta>) document.get("etiquetasItem");
+
+                            // Creamos el objeto manualmente
+                            CollabItem item = new CollabItem(nombre, descripcion, fecha, usuariosAsignados, etiquetasItem, collabId);
+                            item.setIdI(document.getId());
+
+                            listaItems.add(item);
+                        }
+                        callback.onSuccess(listaItems);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        callback.onFailure(e);
+                    }
+                });
     }
 
 

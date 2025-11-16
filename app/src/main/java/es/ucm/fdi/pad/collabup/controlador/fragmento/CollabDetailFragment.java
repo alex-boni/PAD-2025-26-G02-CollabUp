@@ -18,8 +18,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import es.ucm.fdi.pad.collabup.R;
+import es.ucm.fdi.pad.collabup.controlador.CollabItemsListActivity;
 import es.ucm.fdi.pad.collabup.controlador.CreateCollabItemActivity;
 import es.ucm.fdi.pad.collabup.modelo.Collab;
+import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 
 public class CollabDetailFragment extends Fragment {
@@ -39,6 +41,9 @@ public class CollabDetailFragment extends Fragment {
     private RecyclerView rvMembers;
     private Button btnViewAllTasks;
     private Button btnAddTarea;
+
+    //Para mostrar los collabItems
+    private ArrayList<CollabItem> listaCollabItems = new ArrayList<>();
 
 
     public CollabDetailFragment() {
@@ -93,9 +98,16 @@ public class CollabDetailFragment extends Fragment {
             cargarDetallesDelCollabDesdeFirestore(collabId);
         }
 
+
         btnViewAllTasks.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Navegando a Tareas...", Toast.LENGTH_SHORT).show();
+            if (collabId != null) {
+                Intent intent = new Intent(getActivity(), CollabItemsListActivity.class);
+                intent.putExtra("collabId", collabId);
+                startActivity(intent);
+            }
         });
+
 
         btnAddTarea.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Abriendo formulario Tarea...", Toast.LENGTH_SHORT).show();
