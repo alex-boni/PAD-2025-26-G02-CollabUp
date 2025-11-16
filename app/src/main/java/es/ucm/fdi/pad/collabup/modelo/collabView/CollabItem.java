@@ -141,7 +141,8 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
                         this.setEtiquetasItem((List<Etiqueta>) documentSnapshot.get("etiquetas"));
                         this.setFecha(documentSnapshot.getTimestamp("fecha"));
                         this.setNombre(documentSnapshot.getString("nombre"));
-                        this.setUsuariosAsignados((List<String>) documentSnapshot.get("usuarios"));
+                        this.setUsuariosAsignados((List<String>) documentSnapshot.get("usuariosAsignados"));
+                        this.setcvAsignadas((List<String>) documentSnapshot.get("cvAsignadas"));
                         callback.onSuccess(this); // Llama al callback con el objeto cargado
                     } else {
                         callback.onSuccess(null); // No existe el documento

@@ -22,6 +22,8 @@ public class CollabItemsListActivity extends AppCompatActivity {
     private ArrayList<CollabItem> listaItems = new ArrayList<>();
     private ArrayAdapter<String> adapter; // Adapter simple solo con nombres de items
     private String collabId;
+    private ArrayList<String> miembros;
+    private ArrayList<String> collabViews;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,18 +35,37 @@ public class CollabItemsListActivity extends AppCompatActivity {
         btnVolver.setOnClickListener(v -> finish());
 
         lvCollabItems = findViewById(R.id.lvCollabItems);
-        collabId = getIntent().getStringExtra("collabId");
+
+        //Obtengo parámetros
+        Bundle bundle = getIntent().getExtras();
+        //todo faltan las collabViews del collab
+        if (bundle != null) {
+            collabId = bundle.getString("collabId");
+            miembros = bundle.getStringArrayList("miembros");
+
+        } else {
+            collabId = "ryO2NPfO9YaaWfNkhibD"; //por defecto //todo revisar
+            miembros = new ArrayList<>();
+        }
+
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
         lvCollabItems.setAdapter(adapter);
 
         cargarCollabItems();
 
+        //cuando hacemos click en algún item se va a la vista de ese item
         lvCollabItems.setOnItemClickListener((parent, view, position, id) -> {
             CollabItem itemSeleccionado = listaItems.get(position);
             Intent intent = new Intent(CollabItemsListActivity.this, CollabItemActivity.class);
-            intent.putExtra("idI", itemSeleccionado.getIdI());
-            intent.putExtra("idC", collabId);
+            Bundle bundleToGo = new Bundle(); //paso de parametros
+
+            bundleToGo.putString("idI", itemSeleccionado.getIdI());
+            bundleToGo.putString("idC", collabId);
+            bundleToGo.putStringArrayList("miembros", this.miembros);
+            bundleToGo.putStringArrayList("collabViews", this.collabViews);
+
+            intent.putExtras(bundleToGo);
             startActivity(intent);
         });
     }
