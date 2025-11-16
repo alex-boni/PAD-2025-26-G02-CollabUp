@@ -6,16 +6,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.firebase.Timestamp;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Etiqueta;
@@ -27,10 +29,14 @@ public class CreateCollabItemActivity extends AppCompatActivity {
 
     // ---------Atributos vista
     private EditText eTxtNombreCollabItem, eTxtDescripcionCollabItem, eTxtFechaCollabItem;
+    Button btnSeleccionMiembros;
     private Button btnCrearCollabItem;
 
     //---------- Atributos necesarios
     private String idC; //id del collab en el que estamos
+    private ArrayList<String> miembros; //miembros del collab
+    private boolean[] seleccionados; //miembros seleccionados para el item
+    private List<String> miembrosElegidos = new ArrayList<>(); // auxiliar
 
 
     @Override
@@ -43,14 +49,62 @@ public class CreateCollabItemActivity extends AppCompatActivity {
         eTxtDescripcionCollabItem = findViewById(R.id.eTxtDescripcionCollabItem);
         btnCrearCollabItem = findViewById(R.id.btnCrearCollabItem);
         eTxtFechaCollabItem = findViewById(R.id.eTxtFechaCollabItem);
+        btnSeleccionMiembros = findViewById(R.id.btnSeleccionMiembros);
 
-        //Valores que llegan
-        idC = getIntent().getStringExtra("idC");
-        if (Objects.equals(idC, "")) {
-            idC = ""; // o algún valor por defecto
+        Toolbar toolbar = findViewById(R.id.toolbarCollabItem);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
-        //todo faltan
 
+        //parámetros que llegan: idCollab, miembros del collab
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            idC = bundle.getString("idC");
+            miembros = bundle.getStringArrayList("miembros");
+        } else {
+            idC = "ryO2NPfO9YaaWfNkhibD"; //por defecto //todo revisar
+        }
+
+        if (miembros != null) {
+            seleccionados = new boolean[miembros.size()];
+        }
+
+
+        //Para seleccionar los miembros asignados al collabItem
+        btnSeleccionMiembros.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Selecciona los miembros");
+
+            builder.setMultiChoiceItems(
+                    miembros.toArray(new String[0]), // elementos
+                    seleccionados,                         // checkboxes
+                    (dialog, which, isChecked) -> {
+                        seleccionados[which] = isChecked;
+                    }
+            );
+
+            builder.setPositiveButton("OK", (dialog, which) -> {
+                miembrosElegidos.clear();
+
+                for (int i = 0; i < seleccionados.length; i++) {
+                    if (seleccionados[i]) {
+                        miembrosElegidos.add(miembros.get(i));
+                    }
+                }
+
+                btnSeleccionMiembros.setText(
+                        miembrosElegidos.isEmpty()
+                                ? "Seleccionar miembros"
+                                : "Miembros: " + miembrosElegidos.size()
+                );
+            });
+
+            builder.setNegativeButton("Cancelar", null);
+
+            builder.show();
+        });
 
         // Configurar listener del botón
         btnCrearCollabItem.setOnClickListener(new View.OnClickListener() {
@@ -59,6 +113,13 @@ public class CreateCollabItemActivity extends AppCompatActivity {
                 crearNuevoCollabItem();
             }
         });
+    }
+
+    //Para volver atrás
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();  // vuelve a la vista anterior
+        return true;
     }
 
     //Crear item en collab
@@ -79,10 +140,7 @@ public class CreateCollabItemActivity extends AppCompatActivity {
             fecha = new Timestamp(date);
         }
 
-
-        List<String> uasig = null; //todo MODULO COLLAB NECESITO ESTOS PARÁMETROS
         List<Etiqueta> easig = null;
-        String idC = "Bt8zGlf5fevw4Tqej0Kn";
 
         // Validaciones
         if (nombre.isEmpty()) {
@@ -91,7 +149,7 @@ public class CreateCollabItemActivity extends AppCompatActivity {
         }
 
         // Creamos el objeto CollabItem
-        CollabItem nuevoCollabItem = new CollabItem(nombre, descripcion, fecha, uasig, easig, idC);
+        CollabItem nuevoCollabItem = new CollabItem(nombre, descripcion, fecha, miembrosElegidos, easig, idC);
         //Lo añadimos a la base de datos
         nuevoCollabItem.crear(new OnOperationCallback() {
             @Override
@@ -106,5 +164,6 @@ public class CreateCollabItemActivity extends AppCompatActivity {
             }
         });
     }
+
 
 }

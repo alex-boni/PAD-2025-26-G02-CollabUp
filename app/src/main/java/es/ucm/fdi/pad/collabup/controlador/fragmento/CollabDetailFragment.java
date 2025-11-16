@@ -2,11 +2,6 @@ package es.ucm.fdi.pad.collabup.controlador.fragmento;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.widget.Toolbar; // Importar Toolbar
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,13 +9,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.Firebase;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 
 import es.ucm.fdi.pad.collabup.R;
-// Importa la clase Collab para manejar los datos
-import es.ucm.fdi.pad.collabup.controlador.LoginController;
+import es.ucm.fdi.pad.collabup.controlador.CreateCollabItemActivity;
 import es.ucm.fdi.pad.collabup.modelo.Collab;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 
@@ -101,6 +99,16 @@ public class CollabDetailFragment extends Fragment {
 
         btnAddTarea.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Abriendo formulario Tarea...", Toast.LENGTH_SHORT).show();
+            //Se abre vista de añadir un collabItem
+            Intent intent = new Intent(getActivity(), CreateCollabItemActivity.class);
+
+            Bundle bundle = new Bundle(); //paso de parametros
+            bundle.putString("idC", currentCollab.getId());
+            ArrayList<String> miembros = new ArrayList<>(currentCollab.getMiembros());
+            bundle.putStringArrayList("miembros", miembros);
+            intent.putExtras(bundle);
+
+            startActivity(intent);
         });
     }
 
@@ -130,28 +138,28 @@ public class CollabDetailFragment extends Fragment {
     }
 
     private void cargarDetallesDelCollabDesdeFirestore(String id) {
-            Collab dao = new Collab();
-            Toast.makeText(getContext(), "Cargando Collab con ID: " + id, Toast.LENGTH_SHORT).show();
+        Collab dao = new Collab();
+        Toast.makeText(getContext(), "Cargando Collab con ID: " + id, Toast.LENGTH_SHORT).show();
 
-            dao.obtener(id, new OnDataLoadedCallback<Collab>() {
-                @Override
-                public void onSuccess(Collab data) {
-                    if(isAdded()){
-                        currentCollab = data;
-                        tvCollabTitle.setText(currentCollab.getNombre());
-                        tvCollabDescription.setText(currentCollab.getDescripcion());
-                        tvCollabCreator.setText("Creado por: " + currentCollab.getCreadorId());
+        dao.obtener(id, new OnDataLoadedCallback<Collab>() {
+            @Override
+            public void onSuccess(Collab data) {
+                if (isAdded()) {
+                    currentCollab = data;
+                    tvCollabTitle.setText(currentCollab.getNombre());
+                    tvCollabDescription.setText(currentCollab.getDescripcion());
+                    tvCollabCreator.setText("Creado por: " + currentCollab.getCreadorId());
 
-                    }
                 }
+            }
 
-                @Override
-                public void onFailure(Exception e) {
-                    if(isAdded()){
-                        Toast.makeText(getContext(), "Error al cargar Collab: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
+            @Override
+            public void onFailure(Exception e) {
+                if (isAdded()) {
+                    Toast.makeText(getContext(), "Error al cargar Collab: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
-            });
+            }
+        });
 
 
     }

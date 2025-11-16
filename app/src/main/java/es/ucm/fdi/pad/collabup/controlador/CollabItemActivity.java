@@ -57,7 +57,6 @@ public class CollabItemActivity extends AppCompatActivity {
         btnEliminarCollabItem = findViewById(R.id.btnEliminarCollabItem);
 
         //Valores que llegan de arriba
-        //todo MODULO COLLAB pasar parametros
         //todo mirar si se pasan con bundles (mejor)
         idI = getIntent().getStringExtra("idI");
         if (idI == null) {
