@@ -86,6 +86,12 @@ public class CollabListFragment extends Fragment implements OnCollabClickListene
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        cargarCollabsDesdeFirestore();
+    }
+
     private void cargarCollabsDesdeFirestore() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         String userId = currentUser.getUid();
