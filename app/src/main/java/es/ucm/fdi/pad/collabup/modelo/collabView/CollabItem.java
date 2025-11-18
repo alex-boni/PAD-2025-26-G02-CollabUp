@@ -119,6 +119,7 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         return cvAsignadas;
     }
 
+    @Exclude
     public String getEjCollabAsignada() { //saco cualquier collab que tenga este item
         if (cvAsignadas == null || cvAsignadas.isEmpty()) return null;
         return cvAsignadas.get(0);
