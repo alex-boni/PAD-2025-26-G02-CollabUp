@@ -52,7 +52,7 @@ public class CollabDetailFragment extends Fragment {
     private TextView tvCollabCreator;
     private RecyclerView rvMembers;
     private Button btnViewAllTasks;
-    private Button btnAddCollabItem;
+    private FloatingActionButton btnAddCollabItem;
     private FloatingActionButton fabAddMember;
 
     //Para mostrar los collabItems
@@ -189,8 +189,6 @@ public class CollabDetailFragment extends Fragment {
 
     private void cargarDetallesDelCollabDesdeFirestore(String id) {
         Collab dao = new Collab();
-        Toast.makeText(getContext(), "Cargando Collab con ID: " + id, Toast.LENGTH_SHORT).show();
-
             dao.obtener(id, new OnDataLoadedCallback<Collab>() {
                 @Override
                 public void onSuccess(Collab data) {
