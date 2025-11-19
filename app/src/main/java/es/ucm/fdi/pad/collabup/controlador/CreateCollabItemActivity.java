@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Etiqueta;
@@ -174,6 +175,7 @@ public class CreateCollabItemActivity extends AppCompatActivity {
         String descripcion = eTxtDescripcionCollabItem.getText().toString().trim();
         String fechastr = eTxtFechaCollabItem.getText().toString().trim();
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()); //todo posible cambiar
+        formato.setTimeZone(TimeZone.getTimeZone("UTC"));
         Date date = null; // convierte el String a Date
         Timestamp fecha = null;
         if (!fechastr.isEmpty()) {

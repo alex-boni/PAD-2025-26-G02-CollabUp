@@ -83,6 +83,7 @@ public class CollabItemActivity extends AppCompatActivity {
             idC = bundle.getString("idC");
             miembros = bundle.getStringArrayList("miembros");
             cv = bundle.getStringArrayList("collabViews");
+            cv = new ArrayList<>(); //todo QUITAR CUANDO FUNCIONEN COLLABVIEWS
         } else { //todo revisar
             idC = "ryO2NPfO9YaaWfNkhibD"; //por defecto
             miembros = new ArrayList<>();
