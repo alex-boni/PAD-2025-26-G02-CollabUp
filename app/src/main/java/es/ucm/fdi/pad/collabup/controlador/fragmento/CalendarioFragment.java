@@ -34,7 +34,7 @@ public class CalendarioFragment extends Fragment {
 
     // ID del Collab y usuario de ejemplo
     private final String EJEMPLO_USUARIO_ID = "DXjuPYl8UcW7QMkbAVTZUXRZZfz1";
-    private final String EJEMPLO_COLLAB_ID = "pB458T2Aqhq55DPGH2UN";
+    private final String EJEMPLO_COLLAB_ID = "ryO2NPfO9YaaWfNkhibD";
 
     @Nullable
     @Override
@@ -61,6 +61,7 @@ public class CalendarioFragment extends Fragment {
         });
         recyclerView.setAdapter(adapter);
 
+        /*
         // listener para cuando el usuario cambia la fecha
         calendarView.setOnDateChangeListener((v, year, month, dayOfMonth) -> {
 
@@ -80,12 +81,14 @@ public class CalendarioFragment extends Fragment {
             }
         });
 
+         */
+
         calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
             Calendar cal = Calendar.getInstance();
             cal.set(year, month, dayOfMonth);
             Timestamp fecha = new Timestamp(cal.getTime());
 
-            // Cargar los items de ese día para el usuario
+            // Cargo los items de ese día del usuario
             new CollabItem().obtenerCollabItemsUsrFecha(EJEMPLO_USUARIO_ID, EJEMPLO_COLLAB_ID, fecha, new OnDataLoadedCallback<List<CollabItem>>() {
                 @Override
                 public void onSuccess(List<CollabItem> result) {

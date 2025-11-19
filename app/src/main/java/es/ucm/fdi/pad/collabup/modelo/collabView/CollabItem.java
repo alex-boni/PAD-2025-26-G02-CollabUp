@@ -16,6 +16,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import es.ucm.fdi.pad.collabup.modelo.Etiqueta;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.DAO;
@@ -305,7 +306,8 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
                         if (fechaItem == null) continue; // Solo me interesan los que tienen fecha
 
                         // Solo voy a comparar día mes y año.
-                        Calendar calItem = Calendar.getInstance();
+
+                        Calendar calItem = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
                         calItem.setTime(fechaItem.toDate());
 
                         Calendar calSel = Calendar.getInstance();
