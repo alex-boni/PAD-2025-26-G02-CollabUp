@@ -19,6 +19,10 @@ public class Calendario extends AbstractCollabView {
         this.nombre = "Calendario";
     }
 
+    public static CollabView getStaticInstance() {
+        return new Calendario();
+    }
+
     @Override
     protected Fragment getVistaGrande() {
         return null;
@@ -40,11 +44,6 @@ public class Calendario extends AbstractCollabView {
     @Override
     protected Fragment getFragmentAjustes() {
         return null;
-    }
-
-    @Override
-    public CollabView getStaticInstance() {
-        return new Calendario();
     }
 
     @Override

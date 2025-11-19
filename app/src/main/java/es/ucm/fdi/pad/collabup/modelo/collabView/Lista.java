@@ -19,6 +19,10 @@ public class Lista extends AbstractCollabView {
         this.nombre = "Lista";
     }
 
+    public static CollabView getStaticInstance() {
+        return new Lista();
+    }
+
     @Override
     protected Fragment getVistaGrande() {
         return null;
@@ -44,11 +48,6 @@ public class Lista extends AbstractCollabView {
     }
 
     @Override
-    public CollabView getStaticInstance() {
-        return new Lista();
-    }
-
-    @Override
     public void populate(CollabItem item) {
 
     }
@@ -57,5 +56,5 @@ public class Lista extends AbstractCollabView {
     public Set<CollabViewSetting> getStaticCreationSettings() {
         return Collections.emptySet();
     }
-    
+
 }
