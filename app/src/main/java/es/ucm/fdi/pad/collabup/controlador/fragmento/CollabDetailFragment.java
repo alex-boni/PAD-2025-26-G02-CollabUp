@@ -19,12 +19,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Collab;
 import es.ucm.fdi.pad.collabup.modelo.Usuario;
 import es.ucm.fdi.pad.collabup.modelo.adapters.MemberAdapter;
-import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
@@ -49,9 +49,6 @@ public class CollabDetailFragment extends Fragment {
     private Button btnViewAllTasks;
     private Button btnAddCollabItem;
     private FloatingActionButton fabAddMember;
-
-    //Para mostrar los collabItems
-    private ArrayList<CollabItem> listaCollabItems = new ArrayList<>();
 
 
     public CollabDetailFragment() {
@@ -117,11 +114,23 @@ public class CollabDetailFragment extends Fragment {
 
         btnViewAllTasks.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Navegando a Tareas...", Toast.LENGTH_SHORT).show();
+
+            //Para mostrar los nombres pero mantener la lógica con los ids
+            MiembrosData data = obtenerIdsYNombres(listaMiembros);
+            ArrayList<String> miembrosIds = data.ids;
+            ArrayList<String> miembrosNombres = data.nombres;
+
+            //todo faltan ids collab views del collab
+            ArrayList<String> cvIds = new ArrayList<>();
+            ArrayList<String> cvNombres = new ArrayList<>();
+
             if (collabId != null) {
                 CollabItemsListFragment fragment = CollabItemsListFragment.newInstance(
                         collabId,
-                        new ArrayList<>(currentCollab.getMiembros()),
-                        new ArrayList<>() // todo faltan los ids de collabViews
+                        miembrosIds,
+                        miembrosNombres,
+                        cvIds,
+                        cvNombres
                 );
 
                 getParentFragmentManager()
@@ -135,10 +144,21 @@ public class CollabDetailFragment extends Fragment {
         btnAddCollabItem.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Abriendo formulario Tarea...", Toast.LENGTH_SHORT).show();
 
+            //Para mostrar los nombres pero mantener la lógica con los ids
+            MiembrosData data = obtenerIdsYNombres(listaMiembros);
+            ArrayList<String> miembrosIds = data.ids;
+            ArrayList<String> miembrosNombres = data.nombres;
+
+            //todo faltan ids collab views del collab
+            ArrayList<String> cvIds = new ArrayList<>();
+            ArrayList<String> cvNombres = new ArrayList<>();
+
             CreateCollabItemFragment fragment = CreateCollabItemFragment.newInstance(
                     currentCollab.getId(),
-                    new ArrayList<>(currentCollab.getMiembros()),
-                    new ArrayList<>()   //todo faltan ids collab views del collab
+                    miembrosIds,
+                    miembrosNombres,
+                    cvIds,
+                    cvNombres
             );
 
             getParentFragmentManager()
@@ -152,6 +172,31 @@ public class CollabDetailFragment extends Fragment {
             mostrarDialogoAgregarMiembro();
         });
     }
+
+    //Clase auxiliar para obtener ids y el nombre de la lista de miembros de forma general
+    public class MiembrosData {
+        public ArrayList<String> ids;
+        public ArrayList<String> nombres;
+
+        public MiembrosData(ArrayList<String> ids, ArrayList<String> nombres) {
+            this.ids = ids;
+            this.nombres = nombres;
+        }
+    }
+
+    //Función que obtiene una lista con los ids de los miembros y otra con sus nombres
+    private MiembrosData obtenerIdsYNombres(List<Usuario> listaMiembros) {
+        ArrayList<String> miembrosIds = new ArrayList<>();
+        ArrayList<String> miembrosNombres = new ArrayList<>();
+
+        for (Usuario u : listaMiembros) {
+            miembrosIds.add(u.getUID());
+            miembrosNombres.add(u.getNombre());
+        }
+
+        return new MiembrosData(miembrosIds, miembrosNombres);
+    }
+
 
     private void setupToolbar() {
         detailToolbar.setNavigationOnClickListener(v -> {

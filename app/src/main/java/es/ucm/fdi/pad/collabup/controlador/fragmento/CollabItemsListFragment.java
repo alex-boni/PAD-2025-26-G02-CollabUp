@@ -27,7 +27,9 @@ public class CollabItemsListFragment extends Fragment {
     private ArrayAdapter<String> adapter; // Adapter simple solo con nombres de items
     private String collabId;
     private ArrayList<String> miembros;
+    private ArrayList<String> miembrosNombres; //nombres de los miembros del collab
     private ArrayList<String> collabViews;
+    private ArrayList<String> cvNombres;
 
     private MaterialToolbar toolbar;
 
@@ -35,12 +37,16 @@ public class CollabItemsListFragment extends Fragment {
     public CollabItemsListFragment() {
     }
 
-    public static CollabItemsListFragment newInstance(String collabId, ArrayList<String> miembros, ArrayList<String> collabViews) {
+    public static CollabItemsListFragment newInstance(String collabId, ArrayList<String> miembros,
+                                                      ArrayList<String> miembrosNombres, ArrayList<String> collabViews,
+                                                      ArrayList<String> cvNombres) {
         CollabItemsListFragment fragment = new CollabItemsListFragment();
         Bundle args = new Bundle();
         args.putString("collabId", collabId);
         args.putStringArrayList("miembros", miembros);
-        args.putStringArrayList("collabViews", collabViews);
+        args.putStringArrayList("miembrosNombres", miembrosNombres);
+        args.putStringArrayList("cv", collabViews);
+        args.putStringArrayList("cvNombres", collabViews);
         fragment.setArguments(args);
         return fragment;
     }
@@ -67,10 +73,13 @@ public class CollabItemsListFragment extends Fragment {
         if (bundle != null) {
             collabId = bundle.getString("collabId");
             miembros = bundle.getStringArrayList("miembros");
-            collabViews = bundle.getStringArrayList("collabViews");
+            miembrosNombres = bundle.getStringArrayList("miembrosNombres");
+            collabViews = bundle.getStringArrayList("cv");
+            cvNombres = bundle.getStringArrayList("cvNombres");
         } else {
             collabId = "ryO2NPfO9YaaWfNkhibD";
             miembros = new ArrayList<>();
+            miembrosNombres = new ArrayList<>();
             collabViews = new ArrayList<>();
         }
 
@@ -85,7 +94,9 @@ public class CollabItemsListFragment extends Fragment {
                     itemSeleccionado.getIdI(),
                     collabId,
                     miembros,
-                    collabViews
+                    miembrosNombres,
+                    collabViews,
+                    cvNombres
             );
             getParentFragmentManager()
                     .beginTransaction()

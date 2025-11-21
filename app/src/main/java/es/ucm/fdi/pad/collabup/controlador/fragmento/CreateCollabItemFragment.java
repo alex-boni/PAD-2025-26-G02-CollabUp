@@ -41,7 +41,10 @@ public class CreateCollabItemFragment extends Fragment {
     private boolean[] seleccionados; //miembros seleccionados para el item
     private List<String> miembrosElegidos = new ArrayList<>(); // auxiliar
 
+    private ArrayList<String> miembrosNombres; //nombres de los miembros del collab
+
     private ArrayList<String> cv; //collabviews del collab
+    private ArrayList<String> cvNombres; //Nombres de collabviews del collab
     private boolean[] cvseleccionados; //cv seleccionados para el item
     private List<String> cvElegidas = new ArrayList<>(); // auxiliar
 
@@ -50,12 +53,15 @@ public class CreateCollabItemFragment extends Fragment {
 
 
     //Crea fragment, mete los argumentos necesarios y devuelve el fragmento listo para usarse.
-    public static CreateCollabItemFragment newInstance(String idC, ArrayList<String> miembros, ArrayList<String> cv) {
+    public static CreateCollabItemFragment newInstance(String idC, ArrayList<String> miembros, ArrayList<String>
+            miembrosNombres, ArrayList<String> cv, ArrayList<String> cvNombres) {
         CreateCollabItemFragment fragment = new CreateCollabItemFragment();
         Bundle args = new Bundle();
         args.putString("idC", idC);
         args.putStringArrayList("miembros", miembros);
+        args.putStringArrayList("miembrosNombres", miembrosNombres);
         args.putStringArrayList("cv", cv);
+        args.putStringArrayList("cvNombres", cvNombres);
         fragment.setArguments(args);
         return fragment;
     }
@@ -93,7 +99,9 @@ public class CreateCollabItemFragment extends Fragment {
         if (bundle != null) {
             idC = bundle.getString("idC");
             miembros = bundle.getStringArrayList("miembros");
+            miembrosNombres = bundle.getStringArrayList("miembrosNombres");
             cv = bundle.getStringArrayList("cv");
+            cvNombres = bundle.getStringArrayList("cvNombres");
         }
 
         if (miembros != null) seleccionados = new boolean[miembros.size()];
@@ -109,7 +117,8 @@ public class CreateCollabItemFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Selecciona los miembros");
 
-        builder.setMultiChoiceItems(miembros.toArray(new String[0]), seleccionados,
+        //aqui van los nombres para que se muestren los nombres
+        builder.setMultiChoiceItems(miembrosNombres.toArray(new String[0]), seleccionados,
                 (dialog, which, isChecked) -> seleccionados[which] = isChecked
         );
 
@@ -130,7 +139,7 @@ public class CreateCollabItemFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Selecciona las CollabViews");
 
-        builder.setMultiChoiceItems(cv.toArray(new String[0]), cvseleccionados,
+        builder.setMultiChoiceItems(cvNombres.toArray(new String[0]), cvseleccionados,
                 (dialog, which, isChecked) -> cvseleccionados[which] = isChecked
         );
 

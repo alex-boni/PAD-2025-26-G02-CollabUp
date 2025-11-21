@@ -23,8 +23,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Etiqueta;
@@ -48,7 +50,12 @@ public class CollabItemFragment extends Fragment {
 
     //Selecciones:
     private List<String> miembros = new ArrayList<>(); //elementos posibles
+    private List<String> miembrosNombres = new ArrayList<>(); //nombres de los miembros
+
+    private Map<String, String> idANombre = new HashMap<>();
     private List<String> cv = new ArrayList<>();
+    private List<String> cvNombres = new ArrayList<>();
+    private Map<String, String> idANombreCV = new HashMap<>();
 
     private boolean[] seleccionados; //los seleccionados
     private boolean[] cvseleccionados;
@@ -60,13 +67,17 @@ public class CollabItemFragment extends Fragment {
     public CollabItemFragment() {
     }
 
-    public static CollabItemFragment newInstance(String idI, String idC, ArrayList<String> miembros, ArrayList<String> collabViews) {
+    public static CollabItemFragment newInstance(String idI, String idC, ArrayList<String> miembros,
+                                                 ArrayList<String> miembrosNombres, ArrayList<String> collabViews,
+                                                 ArrayList<String> cvNombres) {
         CollabItemFragment fragment = new CollabItemFragment();
         Bundle args = new Bundle();
         args.putString("idI", idI);
         args.putString("idC", idC);
         args.putStringArrayList("miembros", miembros);
-        args.putStringArrayList("collabViews", collabViews);
+        args.putStringArrayList("miembrosNombres", miembrosNombres);
+        args.putStringArrayList("cv", collabViews);
+        args.putStringArrayList("cvNombres", cvNombres);
         fragment.setArguments(args);
         return fragment;
     }
@@ -111,8 +122,17 @@ public class CollabItemFragment extends Fragment {
             idI = bundle.getString("idI");
             idC = bundle.getString("idC");
             miembros = bundle.getStringArrayList("miembros");
-            cv = bundle.getStringArrayList("collabViews");
+            miembrosNombres = bundle.getStringArrayList("miembrosNombres");
+            for (int i = 0; i < miembros.size(); i++) { //hago el map id nombre
+                idANombre.put(miembros.get(i), miembrosNombres.get(i));
+            }
+            cv = bundle.getStringArrayList("cv");
+            cvNombres = bundle.getStringArrayList("cvNombres");
+            for (int i = 0; i < cv.size(); i++) { //hago el map id nombre
+                idANombreCV.put(cv.get(i), cvNombres.get(i));
+            }
             cv = new ArrayList<>(); // TODO: quitar cuando funcionen las collab views
+            cvNombres = new ArrayList<>();
         }
 
         // Configuramos botones y listas (igual que antes)
@@ -165,7 +185,7 @@ public class CollabItemFragment extends Fragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Selecciona los miembros");
-        builder.setMultiChoiceItems(miembros.toArray(new String[0]), seleccionados,
+        builder.setMultiChoiceItems(miembrosNombres.toArray(new String[0]), seleccionados,
                 (dialog, which, isChecked) -> seleccionados[which] = isChecked);
         builder.setPositiveButton("OK", (dialog, which) -> {
             miembrosElegidos.clear();
@@ -184,7 +204,7 @@ public class CollabItemFragment extends Fragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Selecciona Collab Views");
-        builder.setMultiChoiceItems(cv.toArray(new String[0]), cvseleccionados,
+        builder.setMultiChoiceItems(cvNombres.toArray(new String[0]), cvseleccionados,
                 (dialog, which, isChecked) -> cvseleccionados[which] = isChecked);
         builder.setPositiveButton("OK", (dialog, which) -> {
             cvElegidas.clear();
@@ -257,20 +277,33 @@ public class CollabItemFragment extends Fragment {
 
     //----Modificación de listas
     private void actualizarListaUsuarios() {
+        List<String> nombresAsignados = new ArrayList<>();
+        for (String id : miembrosElegidos) {
+            String nombre = idANombre.getOrDefault(id, id); // ponemos id en caso raro de que no haya nombre
+            nombresAsignados.add(nombre);
+        }
+
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_list_item_1,
-                miembrosElegidos);
+                nombresAsignados);
         lvUsrsAsigCollabItem.setAdapter(adapter);
-        btnSeleccionMiembros.setText(miembrosElegidos.isEmpty() ? "Seleccionar miembros" : "Miembros: " + miembrosElegidos.size());
+
+        btnSeleccionMiembros.setText(nombresAsignados.isEmpty() ? "Seleccionar miembros" :
+                "Miembros: " + nombresAsignados.size());
     }
 
     private void actualizarListaCV() {
+        List<String> nombrescvAsignados = new ArrayList<>();
+        for (String id : cvElegidas) {
+            String nombre = idANombre.getOrDefault(id, id); // ponemos id en caso raro de que no haya nombre
+            nombrescvAsignados.add(nombre);
+        }
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_list_item_1,
-                cvElegidas);
+                nombrescvAsignados);
         lvCvAsigCollabItem.setAdapter(adapter);
 
-        btnSeleccionCV.setText(cvElegidas.isEmpty() ? "Seleccionar Collab Views" : "Collab Views: " + cvElegidas.size());
+        btnSeleccionCV.setText(nombrescvAsignados.isEmpty() ? "Seleccionar Collab Views" : "Collab Views: " + nombrescvAsignados.size());
     }
 
     //-------------- Funciones base de datos
