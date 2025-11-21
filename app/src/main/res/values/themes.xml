@@ -6,6 +6,8 @@
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorSecondary">@color/teal_200</item>
+        <item name="android:colorBackground">#edecee</item>
+        <item name="colorOnSurface">#000000</item>
     </style>
 
     <style name="Theme.CollabUp" parent="Base.Theme.CollabUp" />
