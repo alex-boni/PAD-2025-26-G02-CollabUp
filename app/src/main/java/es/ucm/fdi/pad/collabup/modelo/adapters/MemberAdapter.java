@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import com.bumptech.glide.Glide;
+
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Usuario;
 
@@ -43,9 +45,19 @@ public class MemberAdapter extends RecyclerView.Adapter<MemberAdapter.MemberView
 
     @Override
     public void onBindViewHolder(@NonNull MemberViewHolder holder, int position) {
+
+
         Usuario member = members.get(position);
+
+
         holder.tvMemberName.setText(member.getNombre());
-        holder.ivMemberImage.setImageResource(R.drawable.ic_person);
+        String urlFoto = member.getUrlFoto();
+
+        Glide.with(holder.itemView.getContext()) //utiliza el contexto de la vista, en caso de no tener foto, utiliza como placeholder la foto por defecto
+                .load(urlFoto)
+                .placeholder(R.drawable.ic_person)
+                .error(R.drawable.ic_person)
+                .into(holder.ivMemberImage);
     }
 
     @Override
