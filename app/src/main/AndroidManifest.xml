@@ -4,7 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
     <application
         android:allowBackup="true"
@@ -38,18 +40,17 @@
             android:name=".controlador.AppController"
             android:exported="false" />
         <activity
-            android:name=".controlador.CreateCollabActivity"
-            android:exported="true" />
-        <activity
-            android:name=".controlador.CreateCollabItemActivity"
+            android:name=".controlador.fragmento.CreateCollabItemFragment"
             android:exported="false" />
         <activity
-            android:name=".controlador.CollabItemActivity"
+            android:name=".controlador.fragmento.CollabItemFragment"
+            android:exported="false" />
+        <activity
+            android:name=".controlador.fragmento.CollabItemsListFragment"
             android:exported="false" />
         <activity
             android:name=".controlador.EditProfileActivity"
             android:exported="false" />
-
         <activity
             android:name=".controlador.AddCollabViewActivity"
             android:exported="false" />

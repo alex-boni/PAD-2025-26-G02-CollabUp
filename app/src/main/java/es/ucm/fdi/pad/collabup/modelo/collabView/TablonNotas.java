@@ -19,6 +19,10 @@ public class TablonNotas extends AbstractCollabView {
         this.nombre = "Tablón de Notas";
     }
 
+    public static CollabView getStaticInstance() {
+        return new TablonNotas();
+    }
+
     @Override
     protected Fragment getVistaGrande() {
         return null;
@@ -41,11 +45,6 @@ public class TablonNotas extends AbstractCollabView {
     @Override
     protected Fragment getFragmentAjustes() {
         return null;
-    }
-
-    @Override
-    public CollabView getStaticInstance() {
-        return new TablonNotas();
     }
 
     @Override

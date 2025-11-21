@@ -27,7 +27,16 @@ public interface CollabView extends DAO<CollabView> {
 
     void setName(String name);
 
-    CollabView getStaticInstance();
+    /**
+     * Devuelve una nueva instancia estática de un CollabView.
+     * para invocar metodos pseudo-estaticos
+     * Este método DEBE ser implementado en cada subclase.
+     *
+     * @return una nueva instancia de la CollabView
+     */
+    static CollabView getStaticInstance() {
+        throw new AssertionError("Este método debe ser implementado en cada subclase de CollabView");
+    }
 
     /**
      * Construye una instancia usable de CollabView a partir de un collabId y mapa de configuraciones.

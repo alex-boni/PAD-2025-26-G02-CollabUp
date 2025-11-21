@@ -9,8 +9,8 @@
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/action_archive"
-        android:title="Archivar"
+        android:id="@+id/action_delete"
+        android:title="Eliminar Collab"
         app:showAsAction="never" />
 
     <item

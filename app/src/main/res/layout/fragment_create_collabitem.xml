@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbarCollabItem"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:title="Nuevo CollabItem"
+        android:titleTextColor="@android:color/white"
+        app:navigationIcon="?attr/homeAsUpIndicator" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Crear nuevo CollabItem"
+        android:textSize="24sp"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="24dp" />
+
+    <EditText
+        android:id="@+id/eTxtNombreCollabItem"
+        android:layout_width="391dp"
+        android:layout_height="58dp"
+        android:layout_marginBottom="16dp"
+        android:hint="Nombre del CollabItem"
+        android:inputType="textCapSentences" />
+
+    <EditText
+        android:id="@+id/eTxtDescripcionCollabItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Descripción breve"
+        android:inputType="textMultiLine"
+        android:minLines="3"
+        android:gravity="top"
+        android:layout_marginBottom="24dp" />
+
+    <EditText
+        android:id="@+id/eTxtFechaCollabItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Fecha"
+        android:inputType="date" />
+
+    <Button
+        android:id="@+id/btnSeleccionMiembros"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Seleccionar miembros" />
+
+    <Button
+        android:id="@+id/btnSeleccionCV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Seleccionar Collab Views a los que pertenecera" />
+
+    <Button
+        android:id="@+id/btnCrearCollabItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Crear"
+        android:textSize="18sp" />
+
+</LinearLayout>

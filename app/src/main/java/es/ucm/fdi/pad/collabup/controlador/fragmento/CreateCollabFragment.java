@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
@@ -39,6 +40,7 @@ public class CreateCollabFragment extends Fragment {
     private Button btnSelectImage;
     private Button btnCancel;
     private Button btnCreate;
+    private Toolbar createCollabToolbar;
 
     private Uri selectedImageUri = null;
     private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
@@ -100,12 +102,14 @@ public class CreateCollabFragment extends Fragment {
         btnSelectImage = view.findViewById(R.id.btnSelectImage);
         btnCancel = view.findViewById(R.id.btnCancel);
         btnCreate = view.findViewById(R.id.btnCreate);
+        createCollabToolbar= view.findViewById(R.id.createCollabToolbar);
     }
 
     private void setupListeners() {
         btnSelectImage.setOnClickListener(v -> selectImage());
         btnCancel.setOnClickListener(v -> cancelCreation());
         btnCreate.setOnClickListener(v -> createCollab());
+        createCollabToolbar.setNavigationOnClickListener(v -> cancelCreation());
     }
 
     private void selectImage() {
@@ -132,14 +136,7 @@ public class CreateCollabFragment extends Fragment {
 
         if (isValid) {
             FirebaseUser currentUser = mAuth.getCurrentUser();
-            String userId;
-            
-            if (currentUser == null) {
-                userId = "temp_user_dev";
-                Toast.makeText(getContext(), "Modo desarrollo: usando usuario temporal", Toast.LENGTH_SHORT).show();
-            } else {
-                userId = currentUser.getUid();
-            }
+            String userId = currentUser.getUid();
 
             String imageUriString = selectedImageUri != null ? selectedImageUri.toString() : null;
             Collab nuevoCollab = new Collab(name, description, imageUriString, userId);

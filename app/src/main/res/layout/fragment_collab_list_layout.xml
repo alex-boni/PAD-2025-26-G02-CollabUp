@@ -14,6 +14,7 @@
             android:id="@+id/mainToolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:paddingTop="4dp"
             app:title="@string/title_collabs"
             app:menu="@menu/collab_options_menu"
             app:layout_scrollFlags="scroll|enterAlways|snap" />
