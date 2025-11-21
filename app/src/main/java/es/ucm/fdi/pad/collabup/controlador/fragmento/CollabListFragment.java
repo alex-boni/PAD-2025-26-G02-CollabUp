@@ -133,11 +133,19 @@ public class CollabListFragment extends Fragment implements OnCollabClickListene
         Bundle args = new Bundle();
         args.putString("collab_id", collab.getId());
 
-        CollabDetailFragment detailFragment = new CollabDetailFragment();
-        detailFragment.setArguments(args);
+//        CollabDetailFragment detailFragment = new CollabDetailFragment();
+//        detailFragment.setArguments(args);
+//
+//        getParentFragmentManager().beginTransaction()
+//                .replace(R.id.fragmentApp, detailFragment)
+//                .addToBackStack("collab_list")
+//                .commit();
+//        Toast.makeText(getContext(), "Abriendo Collab: " + collab.getNombre(), Toast.LENGTH_SHORT).show();
+        CollabItemViewListFragment collabItemViewFragment = new CollabItemViewListFragment();
+        collabItemViewFragment.setArguments(args);
 
         getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragmentApp, detailFragment)
+                .replace(R.id.fragmentApp, collabItemViewFragment)
                 .addToBackStack("collab_list")
                 .commit();
         Toast.makeText(getContext(), "Abriendo Collab: " + collab.getNombre(), Toast.LENGTH_SHORT).show();
