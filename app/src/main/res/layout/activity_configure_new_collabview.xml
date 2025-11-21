@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:labelFor="@id/editTextNombre"
-                android:text="@string/label_nombre"
+                android:text="@string/label_name"
                 android:textAlignment="center"
                 android:textSize="18sp" />
 
@@ -53,7 +53,7 @@
                 android:layout_marginTop="8dp"
                 android:autofillHints=""
                 android:ems="10"
-                android:hint="Nombre"
+                android:hint="@string/name_label"
                 android:inputType="text" />
 
             <TextView
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="1dp"
-                android:text="@string/label_ajustes"
+                android:text="@string/label_settings"
                 android:textAlignment="center"
                 android:textSize="20sp" />
 

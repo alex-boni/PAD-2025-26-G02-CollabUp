@@ -53,6 +53,8 @@ public interface CollabView extends DAO<CollabView> {
      */
     void populate(CollabItem item);
 
+    void remove(CollabItem item);
+
     /**
      * Obtiene la actividad que muestra la vista completa de la CollabView.
      *

@@ -3,12 +3,10 @@
     android:id="@+id/menu_create_text"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:paddingLeft="12dp"
-    android:paddingRight="12dp"
-    android:gravity="center_vertical"
-    android:background="@null"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:gravity="center"
+    android:background="?attr/selectableItemBackgroundBorderless"
     android:text="@string/button_create"
-    android:textColor="?attr/colorOnPrimary"
-    android:textAllCaps="false"
-    android:textSize="16sp" />
-
+    android:textAppearance="?attr/textAppearanceLabelLarge"
+    android:textColor="?attr/colorOnSurface" />

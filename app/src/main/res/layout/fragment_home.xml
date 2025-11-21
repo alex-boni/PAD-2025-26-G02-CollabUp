@@ -1,73 +1,96 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:background="#FFf5f5f5">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurfaceContainer">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/welcomeCard"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:background="?attr/colorPrimary"
-        android:elevation="4dp">
+        android:layout_margin="16dp"
+        app:cardBackgroundColor="?attr/colorPrimaryContainer"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageView
-            android:id="@+id/imgProfileHome"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:src="@android:drawable/ic_menu_gallery" />
-
-        <TextView
-            android:id="@+id/tvWelcomeName"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toEndOf="@id/imgProfileHome"
-            android:layout_toStartOf="@id/btnFriends"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="16dp"
-            android:text="¡Hola!"
-            android:textSize="20sp"
-            android:textColor="@android:color/white"
-            android:textStyle="bold" />
+            android:padding="16dp">
 
-        <ImageButton
-            android:id="@+id/btnFriends"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:src="@android:drawable/picture_frame"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Amigos"
-            app:tint="@android:color/white" />
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/imgProfileHome"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@drawable/logo"/>
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/tvWelcomeMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/welcome_message_simple"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnPrimaryContainer"
+                app:layout_constraintTop_toTopOf="@id/imgProfileHome"
+                app:layout_constraintStart_toEndOf="@id/imgProfileHome"
+                android:layout_marginStart="16dp"/>
+
+            <TextView
+                android:id="@+id/tvWelcomeName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                tools:text="Óscar"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnPrimaryContainer"
+                app:layout_constraintTop_toBottomOf="@id/tvWelcomeMessage"
+                app:layout_constraintStart_toStartOf="@id/tvWelcomeMessage"
+                app:layout_constraintEnd_toStartOf="@+id/btnFriends"
+                android:layout_marginEnd="16dp"/>
+
+            <ImageButton
+                android:id="@+id/btnFriends"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/friends_button"
+                android:textColor="?attr/colorOnPrimaryContainer"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <TextView
+        android:id="@+id/tvActiveCollabsTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tus Collabs Activos"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="16dp"
         android:layout_marginStart="16dp"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginTop="16dp"
+        android:text="@string/active_collabs_title"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        app:layout_constraintTop_toBottomOf="@id/welcomeCard"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvRecentCollabs"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:clipToPadding="false"
-        android:paddingHorizontal="16dp"
         android:paddingTop="8dp"
-        android:scrollbars="vertical"
+        android:paddingBottom="8dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/tvActiveCollabsTitle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:listitem="@layout/collab_card_layout" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

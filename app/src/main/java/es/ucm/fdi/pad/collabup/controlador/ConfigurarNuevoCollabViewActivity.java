@@ -34,7 +34,10 @@ import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 public class ConfigurarNuevoCollabViewActivity extends AppCompatActivity {
 
     private String collabId;
+
     private CollabView instance;
+
+    private final Map<String, View> settingWidgets = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,23 +48,23 @@ public class ConfigurarNuevoCollabViewActivity extends AppCompatActivity {
         Intent intent = getIntent();
         collabId = intent.getStringExtra("COLLAB_ID");
 
-        Class<? extends CollabView> collabView;
         Object extra = intent.getSerializableExtra("COLLABVIEW");
+        Class<? extends CollabView> clazz;
         if (extra instanceof Class) {
             //noinspection unchecked
-            collabView = (Class<? extends CollabView>) extra;
+            clazz = (Class<? extends CollabView>) extra;
         } else {
             throw new IllegalArgumentException("COLLAB_VIEW extra missing or wrong type");
         }
 
         try {
-            instance = collabView.getDeclaredConstructor().newInstance();
+            instance = (CollabView) clazz.getMethod("getStaticInstance").invoke(null);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
 
         Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("Configurar " + instance.getName());
+        toolbar.setTitle("Configurar " + clazz.getSimpleName());
 
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -141,6 +144,8 @@ public class ConfigurarNuevoCollabViewActivity extends AppCompatActivity {
                     }
 
                     group.addView(et);
+                    // Guardar referencia directa con clave predecible
+                    settingWidgets.put(generateSettingId(setting.getName()) + "_widget", et);
                     break;
                 }
                 case NUMERO: {
@@ -174,6 +179,8 @@ public class ConfigurarNuevoCollabViewActivity extends AppCompatActivity {
                     }
 
                     group.addView(etNum);
+                    // Guardar referencia directa con clave predecible
+                    settingWidgets.put(generateSettingId(setting.getName()) + "_widget", etNum);
                     break;
                 }
                 case LISTA_OPCIONES: {
@@ -209,6 +216,8 @@ public class ConfigurarNuevoCollabViewActivity extends AppCompatActivity {
                     spinner.setAdapter(adapter);
 
                     group.addView(spinner);
+                    // Guardar referencia directa con clave predecible
+                    settingWidgets.put(generateSettingId(setting.getName()) + "_widget", spinner);
                     break;
                 }
                 case BOOLEANO: {
@@ -219,6 +228,8 @@ public class ConfigurarNuevoCollabViewActivity extends AppCompatActivity {
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.WRAP_CONTENT));
                     group.addView(cb);
+                    // Guardar referencia directa con clave predecible
+                    settingWidgets.put(generateSettingId(setting.getName()) + "_widget", cb);
                     break;
                 }
             }
@@ -237,7 +248,13 @@ public class ConfigurarNuevoCollabViewActivity extends AppCompatActivity {
         if (actionView != null) {
             TextView tv = actionView.findViewById(R.id.menu_create_text);
             tv.setOnClickListener(v -> {
-                CollabView actualInstance = instance.build(collabId, null, null, getSettingsFromUI());
+                EditText nombre = findViewById(R.id.editTextNombre);
+                String collabViewName = nombre.getText().toString().trim();
+                if (collabViewName.isEmpty()) {
+                    nombre.setError("El nombre no puede estar vacío");
+                    return;
+                }
+                CollabView actualInstance = instance.build(collabId, null, collabViewName, getSettingsFromUI());
                 actualInstance.crear(new OnOperationCallback() {
                     @Override
                     public void onSuccess() {
@@ -261,85 +278,62 @@ public class ConfigurarNuevoCollabViewActivity extends AppCompatActivity {
     }
 
     private Map<String, Object> getSettingsFromUI() {
-        LinearLayout containerView = findViewById(R.id.ajustes_list);
         Set<CollabViewSetting> settings = instance.getStaticCreationSettings();
+        if (settings == null) {
+            settings = Collections.emptySet();
+        }
 
         Map<String, Object> settingsMap = new HashMap<>();
 
         for (CollabViewSetting setting : settings) {
-            // Obtener el grupo correspondiente a este setting usando su ID
-            LinearLayout groupView = findViewById(generateSettingId(setting.getName()));
+            String widgetKey = generateSettingId(setting.getName()) + "_widget";
+            View widget = settingWidgets.get(widgetKey);
+
+            if (widget == null) {
+                // Widget no encontrado, saltar
+                continue;
+            }
+
             switch (setting.getType()) {
                 case TEXTO: {
-                    EditText et = null;
-                    for (int i = 0; i < groupView.getChildCount(); i++) {
-                        View v = groupView.getChildAt(i);
-                        if (v instanceof EditText) {
-                            et = (EditText) v;
-                            break;
-                        }
+                    EditText et = (EditText) widget;
+                    String text = et.getText().toString().trim();
+                    if (setting.isRequired() && text.isEmpty()) {
+                        et.setError("Este campo es obligatorio");
+                        throw new IllegalStateException("Faltan campos obligatorios");
                     }
-                    if (et != null) {
-                        String text = et.getText().toString();
-                        if (setting.isRequired() && text.isEmpty()) {
-                            et.setError("Este campo es obligatorio");
-                            throw new IllegalStateException("Faltan campos obligatorios");
-                        }
-                        settingsMap.put(setting.getName(), text);
-                    }
+                    settingsMap.put(setting.getName(), text);
                     break;
                 }
                 case NUMERO: {
-                    EditText etNum = null;
-                    for (int i = 0; i < groupView.getChildCount(); i++) {
-                        View v = groupView.getChildAt(i);
-                        if (v instanceof EditText) {
-                            etNum = (EditText) v;
-                            break;
-                        }
+                    EditText etNum = (EditText) widget;
+                    String numStr = etNum.getText().toString().trim();
+                    if (setting.isRequired() && numStr.isEmpty()) {
+                        etNum.setError("Este campo es obligatorio");
+                        throw new IllegalStateException("Faltan campos obligatorios");
                     }
-                    if (etNum != null) {
-                        String numStr = etNum.getText().toString();
-                        if (setting.isRequired() && numStr.isEmpty()) {
-                            etNum.setError("Este campo es obligatorio");
-                            throw new IllegalStateException("Faltan campos obligatorios");
-                        }
-                        Integer number = null;
-                        if (!numStr.isEmpty()) {
+                    Integer number = null;
+                    if (!numStr.isEmpty()) {
+                        try {
                             number = Integer.parseInt(numStr);
+                        } catch (NumberFormatException e) {
+                            etNum.setError("Número inválido");
+                            throw new IllegalStateException("Número inválido");
                         }
-                        settingsMap.put(setting.getName(), number);
                     }
+                    settingsMap.put(setting.getName(), number);
                     break;
                 }
                 case LISTA_OPCIONES: {
-                    Spinner spinner = null;
-                    for (int i = 0; i < groupView.getChildCount(); i++) {
-                        View v = groupView.getChildAt(i);
-                        if (v instanceof Spinner) {
-                            spinner = (Spinner) v;
-                            break;
-                        }
-                    }
-                    if (spinner != null) {
-                        String selectedOption = (String) spinner.getSelectedItem();
-                        settingsMap.put(setting.getName(), selectedOption);
-                    }
+                    Spinner spinner = (Spinner) widget;
+                    String selectedOption = (String) spinner.getSelectedItem();
+                    settingsMap.put(setting.getName(), selectedOption);
                     break;
                 }
                 case BOOLEANO: {
-                    CheckBox cb = null;
-                    for (int i = 0; i < groupView.getChildCount(); i++) {
-                        View v = groupView.getChildAt(i);
-                        if (v instanceof CheckBox) {
-                            cb = (CheckBox) v;
-                            break;
-                        }
-                    }
-                    if (cb != null) {
-                        boolean checked = cb.isChecked();
-                        settingsMap.put(setting.getName(), checked);
-                    }
+                    CheckBox cb = (CheckBox) widget;
+                    boolean checked = cb.isChecked();
+                    settingsMap.put(setting.getName(), checked);
                     break;
                 }
             }

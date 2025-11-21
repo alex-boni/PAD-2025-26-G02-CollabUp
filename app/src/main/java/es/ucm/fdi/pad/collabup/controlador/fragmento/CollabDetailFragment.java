@@ -47,7 +47,7 @@ public class CollabDetailFragment extends Fragment {
     private TextView tvCollabCreator;
     private RecyclerView rvMembers;
     private Button btnViewAllTasks;
-    private Button btnAddCollabItem;
+    private FloatingActionButton btnAddCollabItem;
     private FloatingActionButton fabAddMember;
 
 
@@ -216,23 +216,21 @@ public class CollabDetailFragment extends Fragment {
 
     private void cargarDetallesDelCollabDesdeFirestore(String id) {
         Collab dao = new Collab();
-        Toast.makeText(getContext(), "Cargando Collab con ID: " + id, Toast.LENGTH_SHORT).show();
-
-        dao.obtener(id, new OnDataLoadedCallback<Collab>() {
-            @Override
-            public void onSuccess(Collab data) {
-                if (isAdded()) {
-                    currentCollab = data;
-                    tvCollabTitle.setText(currentCollab.getNombre());
-                    tvCollabDescription.setText(currentCollab.getDescripcion());
-                    Usuario daoUsuario = new Usuario();
-                    daoUsuario.obtener(data.getCreadorId(), new OnDataLoadedCallback<Usuario>() {
-                        @Override
-                        public void onSuccess(Usuario data) {
-                            if (isAdded()) {
-                                tvCollabCreator.setText("Creado por: " + data.getNombre());
+            dao.obtener(id, new OnDataLoadedCallback<Collab>() {
+                @Override
+                public void onSuccess(Collab data) {
+                    if(isAdded()){
+                        currentCollab = data;
+                        tvCollabTitle.setText(currentCollab.getNombre());
+                        tvCollabDescription.setText(currentCollab.getDescripcion());
+                        Usuario daoUsuario = new Usuario();
+                        daoUsuario.obtener(data.getCreadorId(), new OnDataLoadedCallback<Usuario>() {
+                            @Override
+                            public void onSuccess(Usuario data) {
+                                if(isAdded()){
+                                    tvCollabCreator.setText("Creado por: " + data.getNombre());
+                                }
                             }
-                        }
 
                         @Override
                         public void onFailure(Exception e) {

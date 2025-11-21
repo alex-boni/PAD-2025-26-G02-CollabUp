@@ -1,14 +1,19 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
     app:cardCornerRadius="16dp"
-    app:cardElevation="6dp"
-    app:strokeColor="@color/gray_300"
+    app:cardElevation="4dp"
+    app:strokeColor="?attr/colorOutlineVariant"
     app:strokeWidth="1dp"
     android:clickable="true"
+    android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,50 +23,56 @@
 
         <ImageView
             android:id="@+id/cardImage"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_foreground"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-
-        <ImageView
-            android:id="@+id/ivFavorite"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="4dp"
-            android:contentDescription="Marcar como favorito"
-            android:src="@drawable/ic_favorite"
-            app:tint="?attr/colorOnSurface"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            tools:src="@drawable/logo"
+            android:contentDescription="@string/collab_image_description"/>
 
         <TextView
             android:id="@+id/cardTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Card Title"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            tools:text="Título del Collab"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:maxLines="1"
+            android:ellipsize="end"
             app:layout_constraintStart_toEndOf="@id/cardImage"
             app:layout_constraintTop_toTopOf="@id/cardImage"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginStart="16dp"/>
+            app:layout_constraintEnd_toStartOf="@+id/ivFavorite"/>
 
         <TextView
             android:id="@+id/cardDescription"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Card description"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
             android:layout_marginTop="4dp"
+            tools:text="Una breve descripción del contenido de la colaboración."
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:maxLines="2"
+            android:ellipsize="end"
             app:layout_constraintStart_toStartOf="@id/cardTitle"
             app:layout_constraintTop_toBottomOf="@id/cardTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/cardImage"/>
+            app:layout_constraintEnd_toEndOf="@id/cardTitle"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
+        <ImageView
+            android:id="@+id/ivFavorite"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="6dp"
+            android:contentDescription="@string/favorite_icon_description"
+            android:src="@drawable/ic_favorite"
+            app:tint="?attr/colorOnSurfaceVariant"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

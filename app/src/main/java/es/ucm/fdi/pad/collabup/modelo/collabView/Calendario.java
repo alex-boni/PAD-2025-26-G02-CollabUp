@@ -52,6 +52,11 @@ public class Calendario extends AbstractCollabView {
     }
 
     @Override
+    public void remove(CollabItem item) {
+
+    }
+
+    @Override
     public Set<CollabViewSetting> getStaticCreationSettings() {
         return Collections.emptySet();
     }
