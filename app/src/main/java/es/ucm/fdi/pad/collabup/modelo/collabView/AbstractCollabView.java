@@ -179,15 +179,15 @@ public abstract class AbstractCollabView implements CollabView {
     public CollabView build(String collabId, String uid, String name, Map<String, Object> settings) {
         AbstractCollabView cv;
         try {
-            cv = this.getClass().getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException |
+            cv = (AbstractCollabView) this.getClass().getMethod("getStaticInstance").invoke(null);
+        } catch (IllegalAccessException |
                  InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
         cv.collabId = collabId;
         cv.uid = uid;
         cv.nombre = name;
-        for (CollabViewSetting s : getStaticCreationSettings()) {
+        for (CollabViewSetting s : cv.settings.keySet()) {
             cv.settings.put(s, settings.getOrDefault(s.getName(), null));
         }
         return cv;
