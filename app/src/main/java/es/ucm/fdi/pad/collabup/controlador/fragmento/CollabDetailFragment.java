@@ -1,13 +1,7 @@
 package es.ucm.fdi.pad.collabup.controlador.fragmento;
 
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,22 +10,23 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.Firebase;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
-import es.ucm.fdi.pad.collabup.R;
-import es.ucm.fdi.pad.collabup.controlador.CollabItemsListActivity;
-import es.ucm.fdi.pad.collabup.controlador.CreateCollabItemActivity;
-import es.ucm.fdi.pad.collabup.modelo.Collab;
-import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
-import es.ucm.fdi.pad.collabup.modelo.Usuario;
-import es.ucm.fdi.pad.collabup.modelo.adapters.MemberAdapter;
-import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
-import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+
+import es.ucm.fdi.pad.collabup.R;
+import es.ucm.fdi.pad.collabup.modelo.Collab;
+import es.ucm.fdi.pad.collabup.modelo.Usuario;
+import es.ucm.fdi.pad.collabup.modelo.adapters.MemberAdapter;
+import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
 public class CollabDetailFragment extends Fragment {
 
@@ -59,7 +54,8 @@ public class CollabDetailFragment extends Fragment {
     private ArrayList<CollabItem> listaCollabItems = new ArrayList<>();
 
 
-    public CollabDetailFragment() {}
+    public CollabDetailFragment() {
+    }
 
     public static CollabDetailFragment newInstance(String collabId) {
         CollabDetailFragment fragment = new CollabDetailFragment();
@@ -114,7 +110,7 @@ public class CollabDetailFragment extends Fragment {
 
         setupToolbar();
 
-        if (collabId != null ) {
+        if (collabId != null) {
             cargarDetallesDelCollabDesdeFirestore(collabId);
         }
 
@@ -122,30 +118,34 @@ public class CollabDetailFragment extends Fragment {
         btnViewAllTasks.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Navegando a Tareas...", Toast.LENGTH_SHORT).show();
             if (collabId != null) {
-                Intent intent = new Intent(getActivity(), CollabItemsListActivity.class);
-                Bundle bundle = new Bundle(); //paso de parametros
+                CollabItemsListFragment fragment = CollabItemsListFragment.newInstance(
+                        collabId,
+                        new ArrayList<>(currentCollab.getMiembros()),
+                        new ArrayList<>() // todo faltan los ids de collabViews
+                );
 
-                bundle.putString("collabId", collabId);
-                bundle.putStringArrayList("miembros", currentCollab.getMiembros());
-                //todo necesito una lista de ids de los collabViews del collab
-
-                intent.putExtras(bundle);
-                startActivity(intent);
+                getParentFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentApp, fragment)
+                        .addToBackStack(null) // para poder volver atrás
+                        .commit();
             }
         });
 
         btnAddCollabItem.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Abriendo formulario Tarea...", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(getActivity(), CreateCollabItemActivity.class);
-            Bundle bundle = new Bundle(); //paso de parametros
 
-            bundle.putString("idC", currentCollab.getId());
-            ArrayList<String> miembros = new ArrayList<>(currentCollab.getMiembros());
-            bundle.putStringArrayList("miembros", miembros);
-            //todo necesito una lista de ids de los collabViews del collab
-            intent.putExtras(bundle);
+            CreateCollabItemFragment fragment = CreateCollabItemFragment.newInstance(
+                    currentCollab.getId(),
+                    new ArrayList<>(currentCollab.getMiembros()),
+                    new ArrayList<>()   //todo faltan ids collab views del collab
+            );
 
-            startActivity(intent);
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentApp, fragment)  // Ponemos nuestras cosas en el contenedor del fragment
+                    .addToBackStack(null) // para poder volver atrás
+                    .commit();
         });
 
         fabAddMember.setOnClickListener(v -> {
@@ -191,33 +191,34 @@ public class CollabDetailFragment extends Fragment {
         Collab dao = new Collab();
         Toast.makeText(getContext(), "Cargando Collab con ID: " + id, Toast.LENGTH_SHORT).show();
 
-            dao.obtener(id, new OnDataLoadedCallback<Collab>() {
-                @Override
-                public void onSuccess(Collab data) {
-                    if(isAdded()){
-                        currentCollab = data;
-                        tvCollabTitle.setText(currentCollab.getNombre());
-                        tvCollabDescription.setText(currentCollab.getDescripcion());
-                        Usuario daoUsuario = new Usuario();
-                        daoUsuario.obtener(data.getCreadorId(), new OnDataLoadedCallback<Usuario>() {
-                            @Override
-                            public void onSuccess(Usuario data) {
-                                if(isAdded()){
-                                    tvCollabCreator.setText("Creado por: " + data.getNombre());
-                                }
+        dao.obtener(id, new OnDataLoadedCallback<Collab>() {
+            @Override
+            public void onSuccess(Collab data) {
+                if (isAdded()) {
+                    currentCollab = data;
+                    tvCollabTitle.setText(currentCollab.getNombre());
+                    tvCollabDescription.setText(currentCollab.getDescripcion());
+                    Usuario daoUsuario = new Usuario();
+                    daoUsuario.obtener(data.getCreadorId(), new OnDataLoadedCallback<Usuario>() {
+                        @Override
+                        public void onSuccess(Usuario data) {
+                            if (isAdded()) {
+                                tvCollabCreator.setText("Creado por: " + data.getNombre());
                             }
+                        }
 
-                            @Override
-                            public void onFailure(Exception e) {
-                                if(isAdded()){
-                                    Toast.makeText(getContext(), "Error al cargar creador: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                }
+                        @Override
+                        public void onFailure(Exception e) {
+                            if (isAdded()) {
+                                Toast.makeText(getContext(), "Error al cargar creador: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
-                        });
-                        
-                        cargarMiembros(currentCollab.getMiembros());
-                    }
+                        }
+                    });
+
+                    cargarMiembros(currentCollab.getMiembros());
                 }
+            }
+
             @Override
             public void onFailure(Exception e) {
                 if (isAdded()) {
@@ -231,7 +232,7 @@ public class CollabDetailFragment extends Fragment {
 
     private void cargarMiembros(ArrayList<String> miembrosIds) {
         listaMiembros.clear();
-        
+
         if (miembrosIds == null || miembrosIds.isEmpty()) {
             memberAdapter.notifyDataSetChanged();
             return;

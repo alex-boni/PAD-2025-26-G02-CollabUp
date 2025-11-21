@@ -1,6 +1,7 @@
-package es.ucm.fdi.pad.collabup.controlador;
+package es.ucm.fdi.pad.collabup.controlador.fragmento;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -9,9 +10,12 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.Timestamp;
 
 import java.text.ParseException;
@@ -29,13 +33,14 @@ import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
 //VISTA DEL COLLABITEM INDIVIDUAL -> Incluirá botones de editar y eliminar
-public class CollabItemActivity extends AppCompatActivity {
+public class CollabItemFragment extends Fragment {
 
     //------------- Atributos vista
     private EditText eTxtNombreCollabItem, eTxtDescripcionCollabItem, eTxtFechaCollabItem;
 
     private Button btnEditarCollabItem, btnGuardarCollabItem, btnEliminarCollabItem, btnSeleccionMiembros, btnSeleccionCV;
     private ListView lvUsrsAsigCollabItem, lvEtiqCollabItem, lvCvAsigCollabItem;
+    private MaterialToolbar toolbar;
 
     //------------
     private String idI; //el que estoy viendo
@@ -51,129 +56,90 @@ public class CollabItemActivity extends AppCompatActivity {
     private List<String> miembrosElegidos = new ArrayList<>(); //los asignados actualmente
     private List<String> cvElegidas = new ArrayList<>();
 
+
+    public CollabItemFragment() {
+    }
+
+    public static CollabItemFragment newInstance(String idI, String idC, ArrayList<String> miembros, ArrayList<String> collabViews) {
+        CollabItemFragment fragment = new CollabItemFragment();
+        Bundle args = new Bundle();
+        args.putString("idI", idI);
+        args.putString("idC", idC);
+        args.putStringArrayList("miembros", miembros);
+        args.putStringArrayList("collabViews", collabViews);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_collabitem);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_collabitem, container, false);
+    }
 
-        //Textos
-        eTxtNombreCollabItem = findViewById(R.id.eTxtNombreCollabItem);
-        eTxtDescripcionCollabItem = findViewById(R.id.eTxtDescripcionCollabItem);
-        eTxtFechaCollabItem = findViewById(R.id.eTxtFechaCollabItem);
-        //Listas
-        lvUsrsAsigCollabItem = findViewById(R.id.lvUsrsAsigCollabItem);
-        lvEtiqCollabItem = findViewById(R.id.lvEtiqCollabItem);
-        lvCvAsigCollabItem = findViewById(R.id.lvCVAsigCollabItem);
-        //Botones
-        btnEditarCollabItem = findViewById(R.id.btnEditarCollabItem);
-        btnGuardarCollabItem = findViewById(R.id.btnGuardarCollabItem);
-        btnEliminarCollabItem = findViewById(R.id.btnEliminarCollabItem);
-        btnSeleccionMiembros = findViewById(R.id.btnSeleccionMiembros);
-        btnSeleccionCV = findViewById(R.id.btnSeleccionCV);
-        //(Para volver atrás)
-        Button btnVolver = findViewById(R.id.btnVolverCollabItem);
-        btnVolver.setOnClickListener(v -> finish());
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        //Valores que llegan de arriba -> idItem, idCollab, lista miembros collab, collabViews del collab
+        // Textos
+        eTxtNombreCollabItem = view.findViewById(R.id.eTxtNombreCollabItem);
+        eTxtDescripcionCollabItem = view.findViewById(R.id.eTxtDescripcionCollabItem);
+        eTxtFechaCollabItem = view.findViewById(R.id.eTxtFechaCollabItem);
 
-        //Obtengo parámetros
-        Bundle bundle = getIntent().getExtras();
+        // Listas
+        lvUsrsAsigCollabItem = view.findViewById(R.id.lvUsrsAsigCollabItem);
+        lvEtiqCollabItem = view.findViewById(R.id.lvEtiqCollabItem);
+        lvCvAsigCollabItem = view.findViewById(R.id.lvCVAsigCollabItem);
+
+        // Botones
+        btnEditarCollabItem = view.findViewById(R.id.btnEditarCollabItem);
+        btnGuardarCollabItem = view.findViewById(R.id.btnGuardarCollabItem);
+        btnEliminarCollabItem = view.findViewById(R.id.btnEliminarCollabItem);
+        btnSeleccionMiembros = view.findViewById(R.id.btnSeleccionMiembros);
+        btnSeleccionCV = view.findViewById(R.id.btnSeleccionCV);
+
+        toolbar = view.findViewById(R.id.toolbarCollabItem);
+        toolbar.setNavigationOnClickListener(v -> {
+            getParentFragmentManager().popBackStack(); //para poder volver atrás
+        });
+
+
+        // Recuperar argumentos
+        Bundle bundle = getArguments();
         if (bundle != null) {
             idI = bundle.getString("idI");
             idC = bundle.getString("idC");
             miembros = bundle.getStringArrayList("miembros");
             cv = bundle.getStringArrayList("collabViews");
-            cv = new ArrayList<>(); //todo QUITAR CUANDO FUNCIONEN COLLABVIEWS
-        } else { //todo revisar
-            idC = "ryO2NPfO9YaaWfNkhibD"; //por defecto
-            miembros = new ArrayList<>();
-            idI = ""; // o algún valor por defecto
-            idI = "u9WP085b5Sf9jJloCBL9"; //para hacerlo ahora
-            cv = new ArrayList<>();
+            cv = new ArrayList<>(); // TODO: quitar cuando funcionen las collab views
         }
 
-        //-----------Acciones botones
-        //Editar
+        // Configuramos botones y listas (igual que antes)
         btnEditarCollabItem.setOnClickListener(v -> {
             setEditable(true);
             btnEditarCollabItem.setVisibility(View.GONE);
             btnGuardarCollabItem.setVisibility(View.VISIBLE);
         });
 
-        // Guardar
         btnGuardarCollabItem.setOnClickListener(v -> {
             modificarCollabItem();
             setEditable(false);
         });
 
-        //Eliminar
         btnEliminarCollabItem.setOnClickListener(v -> {
-            // Muestro diálogo de confirmación
-            new androidx.appcompat.app.AlertDialog.Builder(CollabItemActivity.this)
+            new AlertDialog.Builder(requireContext())
                     .setTitle("Eliminar CollabItem")
                     .setMessage("¿Estás seguro de que quieres eliminar este CollabItem?")
-                    .setPositiveButton("Sí", (dialog, which) -> {
-                        eliminarCollabItem(); //elimino collabitem
-                    })
+                    .setPositiveButton("Sí", (dialog, which) -> eliminarCollabItem())
                     .setNegativeButton("No", null)
                     .show();
         });
 
-        // Seleccionar miembros
-        btnSeleccionMiembros.setOnClickListener(v -> {
-            seleccionados = new boolean[miembros.size()];
-            for (int i = 0; i < miembros.size(); i++) {
-                seleccionados[i] = miembrosElegidos.contains(miembros.get(i));
-            }
+        btnSeleccionMiembros.setOnClickListener(v -> seleccionarMiembros());
+        btnSeleccionCV.setOnClickListener(v -> seleccionarCV());
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Selecciona los miembros");
-
-            builder.setMultiChoiceItems(
-                    miembros.toArray(new String[0]),
-                    seleccionados,
-                    (dialog, which, isChecked) -> seleccionados[which] = isChecked
-            );
-
-            builder.setPositiveButton("OK", (dialog, which) -> {
-                miembrosElegidos.clear();
-                for (int i = 0; i < seleccionados.length; i++) {
-                    if (seleccionados[i]) miembrosElegidos.add(miembros.get(i));
-                }
-                actualizarListaUsuarios();
-            });
-
-            builder.setNegativeButton("Cancelar", null);
-            builder.show();
-        });
-
-        // Seleccionar CollabViews
-        btnSeleccionCV.setOnClickListener(v -> {
-            cvseleccionados = new boolean[cv.size()];
-            for (int i = 0; i < cv.size(); i++) {
-                cvseleccionados[i] = cvElegidas.contains(cv.get(i));
-            }
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Selecciona Collab Views");
-
-            builder.setMultiChoiceItems(
-                    cv.toArray(new String[0]),
-                    cvseleccionados,
-                    (dialog, which, isChecked) -> cvseleccionados[which] = isChecked
-            );
-
-            builder.setPositiveButton("OK", (dialog, which) -> {
-                cvElegidas.clear();
-                for (int i = 0; i < cvseleccionados.length; i++) {
-                    if (cvseleccionados[i]) cvElegidas.add(cv.get(i));
-                }
-                actualizarListaCV();
-            });
-
-            builder.setNegativeButton("Cancelar", null);
-            builder.show();
-        });
-
+        // Cargar datos del CollabItem
         CollabItem collabItemModel = new CollabItem();
         collabItemModel.setIdI(idI);
         collabItemModel.setIdC(idC);
@@ -181,11 +147,8 @@ public class CollabItemActivity extends AppCompatActivity {
         collabItemModel.obtener(idI, new OnDataLoadedCallback<CollabItem>() {
             @Override
             public void onSuccess(CollabItem item) {
-                if (item != null) {
-                    mostrarDatosCollabItem(item);
-                } else {
-                    eTxtNombreCollabItem.setText("Item no encontrado");
-                }
+                if (item != null) mostrarDatosCollabItem(item);
+                else eTxtNombreCollabItem.setText("Item no encontrado");
             }
 
             @Override
@@ -193,14 +156,50 @@ public class CollabItemActivity extends AppCompatActivity {
                 eTxtNombreCollabItem.setText("Error al cargar: " + e.getMessage());
             }
         });
+    }
 
+    private void seleccionarMiembros() {
+        seleccionados = new boolean[miembros.size()];
+        for (int i = 0; i < miembros.size(); i++)
+            seleccionados[i] = miembrosElegidos.contains(miembros.get(i));
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Selecciona los miembros");
+        builder.setMultiChoiceItems(miembros.toArray(new String[0]), seleccionados,
+                (dialog, which, isChecked) -> seleccionados[which] = isChecked);
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            miembrosElegidos.clear();
+            for (int i = 0; i < seleccionados.length; i++)
+                if (seleccionados[i]) miembrosElegidos.add(miembros.get(i));
+            actualizarListaUsuarios();
+        });
+        builder.setNegativeButton("Cancelar", null);
+        builder.show();
+    }
+
+    private void seleccionarCV() {
+        cvseleccionados = new boolean[cv.size()];
+        for (int i = 0; i < cv.size(); i++)
+            cvseleccionados[i] = cvElegidas.contains(cv.get(i));
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Selecciona Collab Views");
+        builder.setMultiChoiceItems(cv.toArray(new String[0]), cvseleccionados,
+                (dialog, which, isChecked) -> cvseleccionados[which] = isChecked);
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            cvElegidas.clear();
+            for (int i = 0; i < cvseleccionados.length; i++)
+                if (cvseleccionados[i]) cvElegidas.add(cv.get(i));
+            actualizarListaCV();
+        });
+        builder.setNegativeButton("Cancelar", null);
+        builder.show();
     }
 
 
     //Funcion para hacer los elementos generales de forma eficiente y escalable
     private void setEditable(boolean editable) {
-        View root = findViewById(R.id.rootLayoutCollabItem); // el id del layout raíz de activity_collabitem.xml
+        View root = requireView().findViewById(R.id.rootLayoutCollabItem); // el id del layout raíz de activity_collabitem.xml
         setEditableRecursive(root, editable);
 
         //mostramos o ocultamos botones de la selección
@@ -246,7 +245,7 @@ public class CollabItemActivity extends AppCompatActivity {
         List<Etiqueta> etAsig = new ArrayList<>(); //todo etiquetas
 
         if (nombre.isEmpty()) {
-            Toast.makeText(this, "Por favor ponle un nombre al CollabItem", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Por favor ponle un nombre al CollabItem", Toast.LENGTH_SHORT).show();
             return null;
         }
 
@@ -258,7 +257,7 @@ public class CollabItemActivity extends AppCompatActivity {
 
     //----Modificación de listas
     private void actualizarListaUsuarios() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_list_item_1,
                 miembrosElegidos);
         lvUsrsAsigCollabItem.setAdapter(adapter);
@@ -266,7 +265,7 @@ public class CollabItemActivity extends AppCompatActivity {
     }
 
     private void actualizarListaCV() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_list_item_1,
                 cvElegidas);
         lvCvAsigCollabItem.setAdapter(adapter);
@@ -305,7 +304,7 @@ public class CollabItemActivity extends AppCompatActivity {
         }
         if (item.getEtiquetasItem() != null) { //etiquetas
             ArrayAdapter<Etiqueta> adapter = new ArrayAdapter<>(
-                    this,
+                    requireContext(),
                     android.R.layout.simple_list_item_1,
                     item.getEtiquetasItem()
             );
@@ -319,7 +318,7 @@ public class CollabItemActivity extends AppCompatActivity {
         ciActualizado.modificar(ciActualizado, new OnOperationCallback() {
             @Override
             public void onSuccess() {
-                Toast.makeText(CollabItemActivity.this, "CollabItem actualizado correctamente", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "CollabItem actualizado correctamente", Toast.LENGTH_SHORT).show();
                 setEditable(false);
                 btnGuardarCollabItem.setVisibility(View.GONE);
                 btnEditarCollabItem.setVisibility(View.VISIBLE);
@@ -327,7 +326,7 @@ public class CollabItemActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(CollabItemActivity.this, "Error al actualizar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Error al actualizar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -342,13 +341,13 @@ public class CollabItemActivity extends AppCompatActivity {
         ciEliminar.eliminar(new OnOperationCallback() {
             @Override
             public void onSuccess() {
-                Toast.makeText(CollabItemActivity.this, "CollabItem eliminado correctamente", Toast.LENGTH_SHORT).show();
-                finish(); // cierro la activity y vuelvo a la lista
+                Toast.makeText(requireContext(), "CollabItem eliminado correctamente", Toast.LENGTH_SHORT).show();
+                getParentFragmentManager().popBackStack(); // cierro el fragment y vuelvo a la lista
             }
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(CollabItemActivity.this, "Error al eliminar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Error al eliminar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 

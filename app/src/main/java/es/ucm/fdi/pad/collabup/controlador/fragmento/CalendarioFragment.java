@@ -21,7 +21,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import es.ucm.fdi.pad.collabup.R;
-import es.ucm.fdi.pad.collabup.controlador.CollabItemActivity;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItemAdapter;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
@@ -55,7 +54,7 @@ public class CalendarioFragment extends Fragment {
             bundle.putStringArrayList("miembros", new ArrayList<>());
             bundle.putStringArrayList("collabViews", new ArrayList<>());
 
-            Intent intent = new Intent(getContext(), CollabItemActivity.class);
+            Intent intent = new Intent(getContext(), CollabItemFragment.class);
             intent.putExtras(bundle);
             startActivity(intent);
         });
