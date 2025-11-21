@@ -115,30 +115,12 @@ public class CollabDetailFragment extends Fragment {
         btnViewAllTasks.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Navegando a Tareas...", Toast.LENGTH_SHORT).show();
 
-            //Para mostrar los nombres pero mantener la lógica con los ids
-            MiembrosData data = obtenerIdsYNombres(listaMiembros);
-            ArrayList<String> miembrosIds = data.ids;
-            ArrayList<String> miembrosNombres = data.nombres;
-
-            //todo faltan ids collab views del collab
-            ArrayList<String> cvIds = new ArrayList<>();
-            ArrayList<String> cvNombres = new ArrayList<>();
-
-            if (collabId != null) {
-                CollabItemsListFragment fragment = CollabItemsListFragment.newInstance(
-                        collabId,
-                        miembrosIds,
-                        miembrosNombres,
-                        cvIds,
-                        cvNombres
-                );
-
-                getParentFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragmentApp, fragment)
-                        .addToBackStack(null) // para poder volver atrás
-                        .commit();
-            }
+            CollabItemsListFragment fragment = CollabItemsListFragment.newInstance(collabId);
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentApp, fragment)
+                    .addToBackStack(null) // para poder volver atrás
+                    .commit();
         });
 
         btnAddCollabItem.setOnClickListener(v -> {
