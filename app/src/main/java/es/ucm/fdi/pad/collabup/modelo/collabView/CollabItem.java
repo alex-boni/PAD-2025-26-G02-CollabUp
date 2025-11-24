@@ -32,7 +32,6 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
     private String descripcion;
     private Timestamp fecha;
     private List<String> usuariosAsignados;
-    private List<Etiqueta> etiquetasItem; //lista de etiquetas asignadas al item
     private List<String> cvAsignadas; //collabViews a los que pertenece el item
     private String idC;
 
@@ -42,12 +41,11 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
     //--------------------- Métodos básicos
 
     public CollabItem(String nombre, String descripcion, Timestamp fecha,
-                      List<String> usuariosAsignados, List<Etiqueta> etiquetasItem, String idC, List<String> cvAsignadas) {
+                      List<String> usuariosAsignados, String idC, List<String> cvAsignadas) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.fecha = fecha;
         this.usuariosAsignados = usuariosAsignados;
-        this.etiquetasItem = etiquetasItem;
         this.cvAsignadas = cvAsignadas;
         this.idC = idC;
         db = FirebaseFirestore.getInstance();
@@ -109,14 +107,6 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         this.usuariosAsignados = usuariosAsignados;
     }
 
-    public List<Etiqueta> getEtiquetasItem() {
-        return etiquetasItem;
-    }
-
-    public void setEtiquetasItem(List<Etiqueta> etiquetasItem) {
-        this.etiquetasItem = etiquetasItem;
-    }
-
     public List<String> getcvAsignadas() {
         return cvAsignadas;
     }
@@ -141,7 +131,6 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         this.setDescripcion(documentSnapshot.getString("descripcion"));
-                        this.setEtiquetasItem((List<Etiqueta>) documentSnapshot.get("etiquetas"));
                         this.setFecha(documentSnapshot.getTimestamp("fecha"));
                         this.setNombre(documentSnapshot.getString("nombre"));
                         this.setUsuariosAsignados((List<String>) documentSnapshot.get("usuariosAsignados"));
@@ -175,7 +164,6 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         updates.put("descripcion", reemplazo.descripcion);
         updates.put("fecha", reemplazo.fecha);
         updates.put("usuariosAsignados", reemplazo.getUsuariosAsignados());
-        updates.put("etiquetasItem", reemplazo.getEtiquetasItem());
 
         db.collection("collabs")
                 .document(reemplazo.getIdC())
@@ -225,11 +213,9 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
                                     ? (List<String>) document.get("usuariosAsignados")
                                     : new ArrayList<>();
                             List<String> cvAsignadas = new ArrayList<>();
-                            //collabsAsignadas = (List<String>) document.get("collabsAsignadas"); //todo
-                            List<Etiqueta> etiquetasItem = (List<Etiqueta>) document.get("etiquetasItem");
 
                             // Creamos el objeto manualmente
-                            CollabItem item = new CollabItem(nombre, descripcion, fecha, usuariosAsignados, etiquetasItem, collabId, cvAsignadas);
+                            CollabItem item = new CollabItem(nombre, descripcion, fecha, usuariosAsignados, collabId, cvAsignadas);
                             item.setIdI(document.getId());
 
                             listaItems.add(item);
@@ -344,7 +330,6 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
                 descripcion,
                 fechaItem,
                 usuariosAsignados,
-                etiquetasItem,
                 collabId,
                 cvAsignadas
         );

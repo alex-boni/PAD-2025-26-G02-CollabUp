@@ -176,7 +176,7 @@ public class CreateCollabItemFragment extends Fragment {
         }
 
         CollabItem nuevo = new CollabItem(nombre, descripcion, fecha,
-                miembrosElegidos, null, idC, cvElegidas);
+                miembrosElegidos, idC, cvElegidas);
 
         nuevo.crear(new OnOperationCallback() {
             @Override

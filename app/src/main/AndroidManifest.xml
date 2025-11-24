@@ -40,15 +40,6 @@
             android:name=".controlador.AppController"
             android:exported="false" />
         <activity
-            android:name=".controlador.fragmento.CreateCollabItemFragment"
-            android:exported="false" />
-        <activity
-            android:name=".controlador.fragmento.CollabItemFragment"
-            android:exported="false" />
-        <activity
-            android:name=".controlador.fragmento.CollabItemsListFragment"
-            android:exported="false" />
-        <activity
             android:name=".controlador.EditProfileActivity"
             android:exported="false" />
         <activity
