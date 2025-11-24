@@ -154,11 +154,11 @@ public class CollabItemViewListFragment extends Fragment {
                 // Estamos en "Collab Items"
                 Toast.makeText(getContext(), "Crear nuevo Collab Item", Toast.LENGTH_SHORT).show();
                 if(collabId != null){
-//                    Fragment createItemFragment = CreateCollabItemFragment.newInstance();
-//                    getParentFragmentManager().beginTransaction()
-//                            .replace(R.id.fragmentApp, createItemFragment)
-//                            .addToBackStack("collab_item_view_list_tag")
-//                            .commit();
+                    Fragment createItemFragment = CreateCollabItemFragment.newInstance(collabId);
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.fragmentApp, createItemFragment)
+                            .addToBackStack("collab_item_view_list_tag")
+                            .commit();
                 }
             }
         });
