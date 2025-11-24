@@ -49,11 +49,41 @@
         android:hint="Fecha"
         android:inputType="date" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Usuarios asignados:"
+        android:textStyle="bold"
+        android:paddingTop="12dp" />
+
+    <ListView
+        android:id="@+id/lvUsrsAsigCollabItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"
+        android:paddingBottom="8dp" />
+
     <Button
         android:id="@+id/btnSeleccionMiembros"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Seleccionar miembros" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="CollabViews asignadas:"
+        android:textStyle="bold"
+        android:paddingTop="12dp" />
+
+    <ListView
+        android:id="@+id/lvCVAsigCollabItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"
+        android:paddingBottom="8dp" />
 
     <Button
         android:id="@+id/btnSeleccionCV"
