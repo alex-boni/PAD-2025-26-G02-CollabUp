@@ -1,5 +1,6 @@
 package es.ucm.fdi.pad.collabup.controlador.fragmento;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +19,8 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import es.ucm.fdi.pad.collabup.R;
+import es.ucm.fdi.pad.collabup.controlador.AddCollabViewActivity;
+import es.ucm.fdi.pad.collabup.modelo.adapters.TabCollabItemViewAdapter;
 
 public class CollabItemViewListFragment extends Fragment {
 
@@ -79,6 +82,17 @@ public class CollabItemViewListFragment extends Fragment {
         // Manejo del menú (Editar, Salir, eliminar, ver mas - Falta por terminar de implementar)
         detailToolbar.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
+            if(itemId == R.id.action_view_more){
+                Toast.makeText(getContext(), "Ver más información del Collab", Toast.LENGTH_SHORT).show();
+                if(collabId != null){
+                    Fragment infoFragment = CollabDetailFragment.newInstance(collabId);
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.fragmentApp, infoFragment)
+                            .addToBackStack("collab_item_view_list_tag")
+                            .commit();
+                }
+                return true;
+            }
             if (itemId == R.id.action_edit) {
                 // Lógica de edición
                 Toast.makeText(getContext(), "Editar Collab", Toast.LENGTH_SHORT).show();
@@ -86,7 +100,7 @@ public class CollabItemViewListFragment extends Fragment {
                     Fragment editFragment = CollabEditFragment.newInstance(collabId);
                     getParentFragmentManager().beginTransaction()
                             .replace(R.id.fragmentApp, editFragment)
-                            .addToBackStack("collab_item_view_listt_tag")
+                            .addToBackStack("collab_item_view_list_tag")
                             .commit();
                 }
                 return true;
@@ -105,10 +119,10 @@ public class CollabItemViewListFragment extends Fragment {
 
     private void setupTabs() {
         // Creo un nuevo adapter para el ViewPager2 (que maneja las pestañas del TabLayout)
-        ViewPagerAdapter adapter = new ViewPagerAdapter(this, collabId);
+        TabCollabItemViewAdapter adapter = new TabCollabItemViewAdapter(this, collabId);
         viewPager.setAdapter(adapter);
 
-        // Conecto el TabLayout con ViewPager2 donde ira collabViews y collabItems usando TabLayoutMediator
+        // Conecto mi TabLayout con ViewPager2 donde ira collabViews y collabItems usando TabLayoutMediator
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {
                 case 0:
@@ -128,57 +142,25 @@ public class CollabItemViewListFragment extends Fragment {
 
             if (currentTab == 0) {
                 // Estamos en "Collab Views"
-                Toast.makeText(getContext(), "Crear nueva Vista", Toast.LENGTH_SHORT).show();
-                //TODO: Lógica para abrir fragmento de crear vista...
+                Toast.makeText(getContext(), "Crear nuevo Collab View", Toast.LENGTH_SHORT).show();
+                if(collabId != null){
+                    Intent intent = new Intent(getActivity(), AddCollabViewActivity.class);
+
+                    intent.putExtra("COLLAB_ID", this.collabId);
+                    intent.putExtra("COLLAB_NAME", "Mi Collab");
+                    startActivity(intent);
+                }
             } else {
                 // Estamos en "Collab Items"
-                Toast.makeText(getContext(), "Crear nuevo Item", Toast.LENGTH_SHORT).show();
-                // TODO: Lógica para abrir fragmento de crear item...
+                Toast.makeText(getContext(), "Crear nuevo Collab Item", Toast.LENGTH_SHORT).show();
+                if(collabId != null){
+//                    Fragment createItemFragment = CreateCollabItemFragment.newInstance();
+//                    getParentFragmentManager().beginTransaction()
+//                            .replace(R.id.fragmentApp, createItemFragment)
+//                            .addToBackStack("collab_item_view_list_tag")
+//                            .commit();
+                }
             }
         });
-    }
-
-    // --- CLASE INTERNA: Adapter para las Pestañas ---
-    // Esta clase decide qué Fragmento mostrar en cada pestaña
-    private static class ViewPagerAdapter extends FragmentStateAdapter {
-        private final String collabId;
-
-        public ViewPagerAdapter(@NonNull Fragment fragment, String collabId) {
-            super(fragment);
-            this.collabId = collabId;
-        }
-
-        @NonNull
-        @Override
-        public Fragment createFragment(int position) {
-            // Aquí debes devolver el Fragmento correspondiente a cada pestaña
-            // Debes crear estos fragmentos (CollabViewsFragment y CollabItemsFragment)
-
-            switch (position) {
-                case 0:
-
-//                     return CollabViewsFragment.newInstance(collabId);
-                     return CollabItemsListFragment.newInstance(collabId);
-                case 1:
-                     return CollabItemsListFragment.newInstance(collabId);
-                default:
-                    return new PlaceholderFragment();
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return 2; // Contador de pestañas de mi tabLayout
-        }
-    }
-
-    // --- Fragmento temporal solo para evitar errores hasta que crees los reales ---
-    public static class PlaceholderFragment extends Fragment {
-        @Nullable
-        @Override
-        public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-            // Simplemente devuelve una vista vacía o un texto
-            return new View(container.getContext());
-        }
     }
 }

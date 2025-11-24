@@ -4,17 +4,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="16dp">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbarCollabItem"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:title="Nuevo CollabItem"
-        android:titleTextColor="@android:color/white"
-        app:navigationIcon="?attr/homeAsUpIndicator" />
 
     <ListView
         android:id="@+id/lvCollabItems"

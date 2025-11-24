@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_view_more"
+        android:title="Ver detalles"
+        android:icon="@drawable/ic_info"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/action_edit"
         android:title="Editar Collab"
         android:icon="@drawable/ic_edit"

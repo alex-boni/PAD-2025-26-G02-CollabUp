@@ -11,7 +11,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +26,6 @@ public class CollabItemsListFragment extends Fragment {
     private ArrayAdapter<String> adapter; // Adapter simple solo con nombres de items
     private String collabId;
 
-    private MaterialToolbar toolbar;
 
 
     public CollabItemsListFragment() {
@@ -51,10 +49,6 @@ public class CollabItemsListFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        toolbar = view.findViewById(R.id.toolbarCollabItem);
-        toolbar.setNavigationOnClickListener(v -> {
-            getParentFragmentManager().popBackStack();
-        });
 
         lvCollabItems = view.findViewById(R.id.lvCollabItems);
 
