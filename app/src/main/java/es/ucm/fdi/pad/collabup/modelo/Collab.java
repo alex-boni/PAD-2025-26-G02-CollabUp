@@ -234,6 +234,36 @@ public class Collab implements DAO<Collab> {
                 });
     }
 
+    public void removerMiembro(String usuarioId, OnOperationCallback callback) {
+        if (this.id == null || this.id.isEmpty()) {
+            callback.onFailure(new Exception("ID de Collab no válido"));
+            return;
+        }
+
+        if (!this.miembros.contains(usuarioId)) {
+            callback.onFailure(new Exception("El usuario no es miembro del Collab"));
+            return;
+        }
+
+        this.miembros.remove(usuarioId);
+
+        db.collection("collabs").document(this.id)
+                .update("miembros", this.miembros)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        callback.onSuccess();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        miembros.add(usuarioId);
+                        callback.onFailure(e);
+                    }
+                });
+    }
+
     // Getters y Setters
     public String getId() {
         return id;

@@ -1,12 +1,14 @@
 package es.ucm.fdi.pad.collabup.controlador.fragmento;
 
 import android.app.AlertDialog;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,7 +18,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.Firebase;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 
@@ -45,9 +51,8 @@ public class CollabDetailFragment extends Fragment {
     private TextView tvCollabDescription;
     private TextView tvCollabCreator;
     private RecyclerView rvMembers;
-    private Button btnViewAllTasks;
-    private FloatingActionButton btnAddCollabItem;
-    private FloatingActionButton fabAddMember;
+    private Button btnAddMember;
+    private ImageView ivCollabImage;
 
 
     public CollabDetailFragment() {
@@ -96,9 +101,9 @@ public class CollabDetailFragment extends Fragment {
         tvCollabDescription = view.findViewById(R.id.tvCollabDescription);
         tvCollabCreator = view.findViewById(R.id.tvCollabCreator);
         rvMembers = view.findViewById(R.id.rvMembers);
-        btnViewAllTasks = view.findViewById(R.id.btnViewAllCollabItems);
-        btnAddCollabItem = view.findViewById(R.id.btnAddCollabItem);
-        fabAddMember = view.findViewById(R.id.fabAddMember);
+        ivCollabImage = view.findViewById(R.id.ivCollabImage);
+
+        btnAddMember = view.findViewById(R.id.btnAddMember);
 
         listaMiembros = new ArrayList<>();
         memberAdapter = new MemberAdapter(listaMiembros);
@@ -110,31 +115,7 @@ public class CollabDetailFragment extends Fragment {
             cargarDetallesDelCollabDesdeFirestore(collabId);
         }
 
-
-        btnViewAllTasks.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Navegando a Tareas...", Toast.LENGTH_SHORT).show();
-
-            CollabItemsListFragment fragment = CollabItemsListFragment.newInstance(collabId);
-            getParentFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentApp, fragment)
-                    .addToBackStack(null) // para poder volver atrás
-                    .commit();
-        });
-
-        btnAddCollabItem.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Abriendo formulario Tarea...", Toast.LENGTH_SHORT).show();
-
-            CreateCollabItemFragment fragment = CreateCollabItemFragment.newInstance(currentCollab.getId());
-
-            getParentFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragmentApp, fragment)  // Ponemos nuestras cosas en el contenedor del fragment
-                    .addToBackStack(null) // para poder volver atrás
-                    .commit();
-        });
-
-        fabAddMember.setOnClickListener(v -> {
+        btnAddMember.setOnClickListener(v -> {
             mostrarDialogoAgregarMiembro();
         });
     }
@@ -164,33 +145,97 @@ public class CollabDetailFragment extends Fragment {
             } else if (itemId == R.id.action_delete) {
                 // Lógica de eliminación
                 Toast.makeText(getContext(), "Eliminar Collab", Toast.LENGTH_SHORT).show();
+                deleteCollab();
                 return true;
             } else if (itemId == R.id.action_exit) {
                 // Lógica para salir del Collab
                 Toast.makeText(getContext(), "Salir del Collab", Toast.LENGTH_SHORT).show();
+                exitCollab();
                 return true;
             }
             return false;
         });
     }
+    private void deleteCollab() {
+        if (currentCollab == null) {
+            Toast.makeText(getContext(), "Error: No se ha cargado el Collab", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        currentCollab.eliminar(new OnOperationCallback() {
+            @Override
+            public void onSuccess() {
+                if (isAdded()) {
+                    Toast.makeText(getContext(), "Collab eliminado", Toast.LENGTH_SHORT).show();
+                    getParentFragmentManager().popBackStack();
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                if (isAdded()) {
+                    Toast.makeText(getContext(), "Error al eliminar Collab: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+    private void exitCollab() {
+        if (currentCollab == null) {
+            Toast.makeText(getContext(), "Error: No se ha cargado el Collab", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        FirebaseAuth mAuth= FirebaseAuth.getInstance();
+        FirebaseUser usuarioActual = mAuth.getCurrentUser();
+        if (usuarioActual == null) {
+            Toast.makeText(getContext(), "Error: Usuario no autenticado", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        currentCollab.removerMiembro(usuarioActual.getUid(), new OnOperationCallback() {
+            @Override
+            public void onSuccess() {
+                if (isAdded()) {
+                    Toast.makeText(getContext(), "Has salido del Collab", Toast.LENGTH_SHORT).show();
+                    getParentFragmentManager().popBackStack();
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                if (isAdded()) {
+                    Toast.makeText(getContext(), "Error al salir del Collab: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
 
     private void cargarDetallesDelCollabDesdeFirestore(String id) {
         Collab dao = new Collab();
-            dao.obtener(id, new OnDataLoadedCallback<Collab>() {
-                @Override
-                public void onSuccess(Collab data) {
-                    if(isAdded()){
-                        currentCollab = data;
-                        tvCollabTitle.setText(currentCollab.getNombre());
-                        tvCollabDescription.setText(currentCollab.getDescripcion());
-                        Usuario daoUsuario = new Usuario();
-                        daoUsuario.obtener(data.getCreadorId(), new OnDataLoadedCallback<Usuario>() {
-                            @Override
-                            public void onSuccess(Usuario data) {
-                                if(isAdded()){
-                                    tvCollabCreator.setText("Creado por: " + data.getNombre());
-                                }
+        dao.obtener(id, new OnDataLoadedCallback<Collab>() {
+            @Override
+            public void onSuccess(Collab data) {
+                if (isAdded()) {
+                    currentCollab = data;
+                    tvCollabTitle.setText(currentCollab.getNombre());
+                    tvCollabDescription.setText(currentCollab.getDescripcion());
+                    if (currentCollab.getImageUri() != null && !currentCollab.getImageUri().isEmpty()) {
+                        try {
+                            ivCollabImage.setImageURI(Uri.parse(currentCollab.getImageUri()));
+                        } catch (Exception e) {
+                            ivCollabImage.setImageResource(R.drawable.logo); // Imagen por defecto
+                        }
+                    } else {
+                        ivCollabImage.setImageResource(R.drawable.logo); // Imagen por defecto
+                    }
+                    Usuario daoUsuario = new Usuario();
+                    daoUsuario.obtener(data.getCreadorId(), new OnDataLoadedCallback<Usuario>() {
+                        @Override
+                        public void onSuccess(Usuario data) {
+                            if (isAdded()) {
+                                tvCollabCreator.setText("Creado por: " + data.getNombre());
                             }
+                        }
 
                         @Override
                         public void onFailure(Exception e) {

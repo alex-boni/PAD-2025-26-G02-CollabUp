@@ -57,10 +57,10 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
             try {
                 holder.image.setImageURI(Uri.parse(item.getImageUri()));
             } catch (SecurityException e) {
-                holder.image.setImageResource(R.drawable.ic_launcher_foreground);
+                holder.image.setImageResource(R.drawable.logo);
             }
         } else {
-            holder.image.setImageResource(R.drawable.ic_launcher_foreground);
+            holder.image.setImageResource(R.drawable.logo);
         }
         if(item.estaEliminado()){
             holder.ivFavorite.setImageResource(R.drawable.ic_deleted);

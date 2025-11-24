@@ -4,13 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
     android:orientation="vertical"
     tools:context=".controlador.fragmento.CollabDetailFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="32dp">
+        android:background="?android:attr/colorBackground"
+        android:paddingTop="32dp"
+        app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/detailToolbar"
@@ -18,16 +21,14 @@
             android:layout_height="?attr/actionBarSize"
             app:menu="@menu/collab_datail_menu"
             app:navigationIcon="?attr/homeAsUpIndicator"
-            app:title="Detalle del Collab" />
-        <!--            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>-->
-        <!--            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"-->
-
-
+            app:title="Detalle del Collab"
+            app:titleTextColor="?android:attr/textColorPrimary" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -38,79 +39,110 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardElevation="2dp">
+                android:layout_margin="12dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/tvCollabTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        tools:text="Mi collab favorito" />
+                    <ImageView
+                        android:id="@+id/ivCollabImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:contentDescription="@string/collab_image_description"
+                        android:scaleType="centerCrop"
+                        tools:src="@drawable/ic_launcher_background" />
 
-                    <TextView
-                        android:id="@+id/tvCollabDescription"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        tools:text="Vamos a crear unos tareas chulasssssss." />
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
-                    <TextView
-                        android:id="@+id/tvCollabCreator"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="?android:attr/textColorSecondary"
-                        android:textSize="14sp"
-                        tools:text="Creado por: Alex B. (Tú)" />
+                        <TextView
+                            android:id="@+id/tvCollabTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="4dp"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+                            android:textStyle="bold"
+                            tools:text="Mi titulo de mi collab" />
+
+                        <TextView
+                            android:id="@+id/tvCollabCreator"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="16dp"
+                            android:drawablePadding="4dp"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+                            android:textColor="?android:attr/textColorSecondary"
+                            tools:text="Creado por: Alex B." />
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginBottom="12dp"
+                            android:background="?android:attr/listDivider" />
+
+                        <TextView
+                            android:id="@+id/tvCollabDescription"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lineSpacingExtra="4dp"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                            tools:text="Esta es la descripción detallada del Collab. Aquí explicamos que vamos a crear unas tareas muy chulas y gestionar el equipo de forma eficiente." />
+
+                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardElevation="2dp">
+                android:layout_margin="12dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0.5dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingLeft="16dp"
                     android:paddingTop="2dp"
-                    android:paddingRight="16dp"
-                    android:paddingBottom="2dp">
+                    android:paddingBottom="16dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
 
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="2dp"
+                        android:layout_marginBottom="12dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Miembros del Collab"
-                            android:textSize="18sp"
+                            android:text="Miembros"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                             android:textStyle="bold" />
 
-                        <com.google.android.material.floatingactionbutton.FloatingActionButton
-                            android:id="@+id/fabAddMember"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnAddMember"
+                            style="@style/Widget.MaterialComponents.Button.TextButton.Icon"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_margin="0dp"
-                            android:contentDescription="Añadir miembro"
-                            android:src="@android:drawable/ic_input_add"
-                            app:fabCustomSize="30dp" />
+                            android:minWidth="0dp"
+                            android:paddingHorizontal="12dp"
+                            android:text="Añadir"
+                            app:icon="@drawable/ic_add"
+                            app:iconPadding="4dp" />
 
                     </LinearLayout>
 
@@ -118,89 +150,17 @@
                         android:id="@+id/rvMembers"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:clipToPadding="false"
                         android:orientation="horizontal"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        tools:itemCount="5"
+                        tools:itemCount="4"
                         tools:listitem="@layout/item_member_circle" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.card.MaterialCardView
+            <Space
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="1dp"
-                        android:text="Collab Items"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/btnAddCollabItem"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:contentDescription="Añadir Collab Item"
-                        android:src="@android:drawable/ic_input_add"
-                        app:fabCustomSize="30dp" />
-
-                    <Button
-                        android:id="@+id/btnViewAllCollabItems"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:text="Ver Todos" />
-
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="1dp"
-                        android:text="Collab Views"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/btnAddCollabView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:contentDescription="Añadir Collab Item"
-                        android:src="@android:drawable/ic_input_add"
-                        app:fabCustomSize="30dp" />
-
-                    <Button
-                        android:id="@+id/btnViewAllCollabViews"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:text="Ver Todos" />
-
-
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                android:layout_height="32dp" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
