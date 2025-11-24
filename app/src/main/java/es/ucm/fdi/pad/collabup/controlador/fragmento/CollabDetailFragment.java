@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Collab;
@@ -126,22 +125,7 @@ public class CollabDetailFragment extends Fragment {
         btnAddCollabItem.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Abriendo formulario Tarea...", Toast.LENGTH_SHORT).show();
 
-            //Para mostrar los nombres pero mantener la lógica con los ids
-            MiembrosData data = obtenerIdsYNombres(listaMiembros);
-            ArrayList<String> miembrosIds = data.ids;
-            ArrayList<String> miembrosNombres = data.nombres;
-
-            //todo faltan ids collab views del collab
-            ArrayList<String> cvIds = new ArrayList<>();
-            ArrayList<String> cvNombres = new ArrayList<>();
-
-            CreateCollabItemFragment fragment = CreateCollabItemFragment.newInstance(
-                    currentCollab.getId(),
-                    miembrosIds,
-                    miembrosNombres,
-                    cvIds,
-                    cvNombres
-            );
+            CreateCollabItemFragment fragment = CreateCollabItemFragment.newInstance(currentCollab.getId());
 
             getParentFragmentManager()
                     .beginTransaction()
@@ -153,30 +137,6 @@ public class CollabDetailFragment extends Fragment {
         fabAddMember.setOnClickListener(v -> {
             mostrarDialogoAgregarMiembro();
         });
-    }
-
-    //Clase auxiliar para obtener ids y el nombre de la lista de miembros de forma general
-    public class MiembrosData {
-        public ArrayList<String> ids;
-        public ArrayList<String> nombres;
-
-        public MiembrosData(ArrayList<String> ids, ArrayList<String> nombres) {
-            this.ids = ids;
-            this.nombres = nombres;
-        }
-    }
-
-    //Función que obtiene una lista con los ids de los miembros y otra con sus nombres
-    private MiembrosData obtenerIdsYNombres(List<Usuario> listaMiembros) {
-        ArrayList<String> miembrosIds = new ArrayList<>();
-        ArrayList<String> miembrosNombres = new ArrayList<>();
-
-        for (Usuario u : listaMiembros) {
-            miembrosIds.add(u.getUID());
-            miembrosNombres.add(u.getNombre());
-        }
-
-        return new MiembrosData(miembrosIds, miembrosNombres);
     }
 
 

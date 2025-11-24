@@ -27,10 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import es.ucm.fdi.pad.collabup.R;
-import es.ucm.fdi.pad.collabup.modelo.Usuario;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
@@ -153,38 +151,32 @@ public class CollabItemFragment extends Fragment {
                     ci = ciRet;
                     miembros = ci.getUsuariosAsignados();
                     cv = ci.getcvAsignadas();
-                    AtomicInteger contador = new AtomicInteger(0);
-                    for (String idUsr : miembros) {
-                        obtenerNombreMiembroCollab(idUsr, () -> {
-                            if (contador.incrementAndGet() == miembros.size()) {
-                                mostrarDatosCollabItem(); //cuando todos los miembros están cargados
-                            }
-                        });
-                    }
-                } else eTxtNombreCollabItem.setText("Item no encontrado");
+
+                    ci.obtenerNombresMiembrosCollab(miembros, new OnDataLoadedCallback<Map<String, String>>() {
+                        @Override
+                        public void onSuccess(Map<String, String> data) {
+                            idNombreMiembros.putAll(data);
+                            mostrarDatosCollabItem();
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            Toast.makeText(requireContext(), "Error al cargar miembros: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                } else {
+                    Toast.makeText(requireContext(), "Item no encontrado", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             public void onFailure(Exception e) {
-                eTxtNombreCollabItem.setText("Error al cargar: " + e.getMessage());
+                Toast.makeText(requireContext(), "Error al cargar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void obtenerNombreMiembroCollab(String idU, Runnable callback) {
-        new Usuario().obtener(idU, new OnDataLoadedCallback<Usuario>() {
-            @Override
-            public void onSuccess(Usuario data) {
-                idNombreMiembros.put(data.getUID(), data.getNombre());
-                callback.run();
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                eTxtNombreCollabItem.setText("Error al cargar usuario: " + e.getMessage());
-            }
-        });
-    }
 
     private CollabItem obtenerCollabItemDePantalla() {
 
@@ -234,9 +226,7 @@ public class CollabItemFragment extends Fragment {
         builder.setMultiChoiceItems(nombres, seleccionados,
                 (dialog, which, isChecked) -> seleccionados[which] = isChecked);
         builder.setPositiveButton("OK", (dialog, which) -> {
-            miembrosElegidos.clear();
-            for (int i = 0; i < seleccionados.length; i++)
-                if (seleccionados[i]) miembrosElegidos.add(miembros.get(i));
+            miembrosElegidos = ci.obtenerIdsMiembrosSeleccionados(miembros, seleccionados);
             actualizarListaUsuarios();
         });
         builder.setNegativeButton("Cancelar", null);
@@ -297,11 +287,7 @@ public class CollabItemFragment extends Fragment {
 
     //---- ACTUALIZACIONES DE INFORMACION
     private void actualizarListaUsuarios() {
-        List<String> nombresAsignados = new ArrayList<>();
-        for (String id : miembrosElegidos) {
-            String nombre = idNombreMiembros.getOrDefault(id, id); // ponemos id en caso raro de que no haya nombre
-            nombresAsignados.add(nombre);
-        }
+        List<String> nombresAsignados = ci.obtenerNombresMiembros(idNombreMiembros, miembrosElegidos);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_list_item_1,

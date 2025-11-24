@@ -17,8 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import es.ucm.fdi.pad.collabup.modelo.Etiqueta;
+import es.ucm.fdi.pad.collabup.modelo.Usuario;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.DAO;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
@@ -337,4 +339,68 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
 
         return item;
     }
+
+
+    public void obtenerNombreMiembroCollab(String idU, OnDataLoadedCallback<Map<String, String>> callback) {
+        new Usuario().obtener(idU, new OnDataLoadedCallback<Usuario>() {
+            @Override
+            public void onSuccess(Usuario data) {
+                Map<String, String> result = new HashMap<>();
+                result.put(data.getUID(), data.getNombre());
+                callback.onSuccess(result);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
+    }
+
+    //Devuelve un mapa de los ids del usuario con su nombre
+    public void obtenerNombresMiembrosCollab(List<String> idsUsuarios, OnDataLoadedCallback<Map<String, String>> callback) {
+        Map<String, String> resultados = new HashMap<>();
+        AtomicInteger contador = new AtomicInteger(0);
+
+        if (idsUsuarios.isEmpty()) {
+            callback.onSuccess(resultados);
+            return;
+        }
+
+        for (String idU : idsUsuarios) {
+            new Usuario().obtener(idU, new OnDataLoadedCallback<Usuario>() {
+                @Override
+                public void onSuccess(Usuario usuario) {
+                    resultados.put(usuario.getUID(), usuario.getNombre());
+                    if (contador.incrementAndGet() == idsUsuarios.size()) {
+                        callback.onSuccess(resultados);
+                    }
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    callback.onFailure(e);
+                }
+            });
+        }
+    }
+
+    public List<String> obtenerIdsMiembrosSeleccionados(List<String> idsMiembros, boolean[] seleccionados) {
+        List<String> resultado = new ArrayList<>();
+        for (int i = 0; i < seleccionados.length; i++) {
+            if (seleccionados[i]) resultado.add(idsMiembros.get(i));
+        }
+        return resultado;
+    }
+
+    //Para las actualizaciones en pantalla
+    public List<String> obtenerNombresMiembros(Map<String, String> mapaIdsNombres, List<String> ids) {
+        List<String> nombres = new ArrayList<>();
+        for (String id : ids) {
+            nombres.add(mapaIdsNombres.getOrDefault(id, id));
+        }
+        return nombres;
+    }
+
+
 }
