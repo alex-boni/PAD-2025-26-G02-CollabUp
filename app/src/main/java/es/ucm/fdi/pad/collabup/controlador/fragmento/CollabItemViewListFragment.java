@@ -163,13 +163,10 @@ public class CollabItemViewListFragment extends Fragment {
 
             switch (position) {
                 case 0:
-                    // TODO: Reemplazar con tu fragmento real de lista de vistas
-                    // return CollabViewsFragment.newInstance(collabId);
-                    return new PlaceholderFragment(); // Temporal para que compile
+
+//                     return CollabViewsFragment.newInstance(collabId);
                 case 1:
-                    // TODO: Reemplazar con tu fragmento real de lista de items
-                    // return CollabItemsFragment.newInstance(collabId);
-                    return new PlaceholderFragment(); // Temporal para que compile
+                     return CollabItemsListFragment.newInstance();
                 default:
                     return new PlaceholderFragment();
             }
