@@ -133,20 +133,6 @@
 
 
         <!-- Etiquetas -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Etiquetas:"
-            android:textStyle="bold"
-            android:paddingTop="12dp" />
-
-        <ListView
-            android:id="@+id/lvEtiqCollabItem"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="@android:color/darker_gray"
-            android:dividerHeight="1dp"
-            android:paddingBottom="8dp" />
 
         <!-- Botones -->
         <LinearLayout

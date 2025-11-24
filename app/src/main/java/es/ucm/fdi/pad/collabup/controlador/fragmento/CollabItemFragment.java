@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import es.ucm.fdi.pad.collabup.R;
-import es.ucm.fdi.pad.collabup.modelo.Etiqueta;
 import es.ucm.fdi.pad.collabup.modelo.Usuario;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
@@ -43,7 +42,7 @@ public class CollabItemFragment extends Fragment {
     private EditText eTxtNombreCollabItem, eTxtDescripcionCollabItem, eTxtFechaCollabItem;
 
     private Button btnEditarCollabItem, btnGuardarCollabItem, btnEliminarCollabItem, btnSeleccionMiembros, btnSeleccionCV;
-    private ListView lvUsrsAsigCollabItem, lvEtiqCollabItem, lvCvAsigCollabItem;
+    private ListView lvUsrsAsigCollabItem, lvCvAsigCollabItem;
     private MaterialToolbar toolbar;
 
     //------------
@@ -91,7 +90,6 @@ public class CollabItemFragment extends Fragment {
 
         // Listas
         lvUsrsAsigCollabItem = view.findViewById(R.id.lvUsrsAsigCollabItem);
-        lvEtiqCollabItem = view.findViewById(R.id.lvEtiqCollabItem);
         lvCvAsigCollabItem = view.findViewById(R.id.lvCVAsigCollabItem);
 
         // Botones
@@ -207,14 +205,13 @@ public class CollabItemFragment extends Fragment {
 
         List<String> usrsAsig = new ArrayList<>(miembrosElegidos);
         List<String> collabAsig = new ArrayList<>(cvElegidas);
-        List<Etiqueta> etAsig = new ArrayList<>(); //todo etiquetas
 
         if (nombre.isEmpty()) {
             Toast.makeText(requireContext(), "Por favor ponle un nombre al CollabItem", Toast.LENGTH_SHORT).show();
             return null;
         }
 
-        CollabItem ci = new CollabItem(nombre, descripcion, fecha, usrsAsig, etAsig, idC, collabAsig);
+        CollabItem ci = new CollabItem(nombre, descripcion, fecha, usrsAsig, idC, collabAsig);
         ci.setIdI(idI);
 
         return ci;
@@ -357,14 +354,6 @@ public class CollabItemFragment extends Fragment {
                 cvseleccionados[i] = cvElegidas.contains(cv.get(i));
             }
             actualizarListaCV();
-        }
-        if (ci.getEtiquetasItem() != null) { //etiquetas
-            ArrayAdapter<Etiqueta> adapter = new ArrayAdapter<>(
-                    requireContext(),
-                    android.R.layout.simple_list_item_1,
-                    ci.getEtiquetasItem()
-            );
-            lvEtiqCollabItem.setAdapter(adapter);
         }
     }
 
