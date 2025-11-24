@@ -82,6 +82,14 @@ public class CollabViewsListFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (collabId != null) {
+            cargarCollabViewsDesdeFirestore();
+        }
+    }
+
     private void cargarCollabViewsDesdeFirestore() {
         if (collabId == null) {
             Toast.makeText(getContext(), "ERROR: collabId es NULO", Toast.LENGTH_LONG).show();
