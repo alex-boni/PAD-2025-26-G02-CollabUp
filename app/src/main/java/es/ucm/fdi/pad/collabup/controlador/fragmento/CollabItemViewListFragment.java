@@ -21,9 +21,7 @@ import es.ucm.fdi.pad.collabup.R;
 
 public class CollabItemViewListFragment extends Fragment {
 
-    // 1. Argumento necesario: ID del Collab
     private static final String ARG_COLLAB_ID = "collab_id";
-
     private String collabId;
 
     // Componentes de la UI
@@ -32,11 +30,8 @@ public class CollabItemViewListFragment extends Fragment {
     private ViewPager2 viewPager;
     private FloatingActionButton fabCreate;
 
-    public CollabItemViewListFragment() {
-        // Constructor vacío requerido
-    }
+    public CollabItemViewListFragment() {}
 
-    // Factory Method
     public static CollabItemViewListFragment newInstance(String collabId) {
         CollabItemViewListFragment fragment = new CollabItemViewListFragment();
         Bundle args = new Bundle();
@@ -70,7 +65,7 @@ public class CollabItemViewListFragment extends Fragment {
     }
 
     private void initializeViews(View view) {
-        detailToolbar = view.findViewById(R.id.detailToolbar);
+        detailToolbar = view.findViewById(R.id.collabViewListToolbar);
         tabLayout = view.findViewById(R.id.tabLayoutCollabItems);
         viewPager = view.findViewById(R.id.viewPager);
         fabCreate = view.findViewById(R.id.fabCreateCollabItem);
@@ -81,19 +76,17 @@ public class CollabItemViewListFragment extends Fragment {
             getParentFragmentManager().popBackStack();
         });
 
-        // Manejo del menú (Editar, Archivar, etc.) - Requiere implementar OnMenuItemClickListener
+        // Manejo del menú (Editar, Salir, eliminar, ver mas - Falta por terminar de implementar)
         detailToolbar.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.action_edit) {
                 // Lógica de edición
                 Toast.makeText(getContext(), "Editar Collab", Toast.LENGTH_SHORT).show();
                 if (collabId != null) {
-                    // Navegar al fragmento de edición, pasándole el ID
                     Fragment editFragment = CollabEditFragment.newInstance(collabId);
-
                     getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragmentApp, editFragment) // R.id.fragmentApp es el contenedor principal
-                            .addToBackStack("collab_detail_tag")
+                            .replace(R.id.fragmentApp, editFragment)
+                            .addToBackStack("collab_item_view_listt_tag")
                             .commit();
                 }
                 return true;
@@ -111,11 +104,11 @@ public class CollabItemViewListFragment extends Fragment {
     }
 
     private void setupTabs() {
-        // 1. Crear el Adapter para el ViewPager
+        // Creo un nuevo adapter para el ViewPager2 (que maneja las pestañas del TabLayout)
         ViewPagerAdapter adapter = new ViewPagerAdapter(this, collabId);
         viewPager.setAdapter(adapter);
 
-        // 2. Conectar TabLayout con ViewPager2 usando TabLayoutMediator
+        // Conecto el TabLayout con ViewPager2 donde ira collabViews y collabItems usando TabLayoutMediator
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {
                 case 0:
@@ -130,17 +123,17 @@ public class CollabItemViewListFragment extends Fragment {
 
     private void setupFab() {
         fabCreate.setOnClickListener(v -> {
-            // Detectar en qué pestaña estamos para saber qué crear
+            // Detectar en qué pestaña estamos para saber qué crear, o un nuevo Collab View o un nuevo Collab Item
             int currentTab = viewPager.getCurrentItem();
 
             if (currentTab == 0) {
                 // Estamos en "Collab Views"
                 Toast.makeText(getContext(), "Crear nueva Vista", Toast.LENGTH_SHORT).show();
-                // Lógica para abrir fragmento de crear vista...
+                //TODO: Lógica para abrir fragmento de crear vista...
             } else {
                 // Estamos en "Collab Items"
                 Toast.makeText(getContext(), "Crear nuevo Item", Toast.LENGTH_SHORT).show();
-                // Lógica para abrir fragmento de crear item...
+                // TODO: Lógica para abrir fragmento de crear item...
             }
         });
     }
@@ -165,8 +158,9 @@ public class CollabItemViewListFragment extends Fragment {
                 case 0:
 
 //                     return CollabViewsFragment.newInstance(collabId);
+                     return CollabItemsListFragment.newInstance(collabId);
                 case 1:
-                     return CollabItemsListFragment.newInstance();
+                     return CollabItemsListFragment.newInstance(collabId);
                 default:
                     return new PlaceholderFragment();
             }
@@ -174,7 +168,7 @@ public class CollabItemViewListFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            return 2; // Tenemos 2 pestañas
+            return 2; // Contador de pestañas de mi tabLayout
         }
     }
 
