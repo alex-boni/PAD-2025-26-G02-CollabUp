@@ -11,7 +11,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +24,6 @@ public class CollabItemsListFragment extends Fragment {
     private ArrayList<CollabItem> listaItems = new ArrayList<>();
     private ArrayAdapter<String> adapter; // Adapter simple solo con nombres de items
     private String collabId;
-
 
 
     public CollabItemsListFragment() {
@@ -69,7 +67,7 @@ public class CollabItemsListFragment extends Fragment {
                     itemSeleccionado.getIdI(),
                     collabId
             );
-            getParentFragmentManager()
+            requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragmentApp, fragment) // el contenedor donde lo vamos a mostrar
                     .addToBackStack(null) // para poder volver atrás
