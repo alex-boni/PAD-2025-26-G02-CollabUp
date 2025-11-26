@@ -4,26 +4,29 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
+import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItemAdapter;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 
 //Para ver todos los collabItems de una collab específica
 public class CollabItemsListFragment extends Fragment {
-    private ListView lvCollabItems;
+
     private ArrayList<CollabItem> listaItems = new ArrayList<>();
-    private ArrayAdapter<String> adapter; // Adapter simple solo con nombres de items
+    private CollabItemAdapter adapter;
     private String collabId;
+
+    RecyclerView rvCollabItems;
 
 
     public CollabItemsListFragment() {
@@ -47,32 +50,30 @@ public class CollabItemsListFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
-        lvCollabItems = view.findViewById(R.id.lvCollabItems);
-
         // Recuperamos los argumentos
         Bundle bundle = getArguments();
         if (bundle != null) {
             collabId = bundle.getString("collabId");
         }
 
-        adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, new ArrayList<>());
-        lvCollabItems.setAdapter(adapter);
+        rvCollabItems = view.findViewById(R.id.rvCollabItems);
+        rvCollabItems.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        cargarCollabItems();
-
-        lvCollabItems.setOnItemClickListener((parent, itemView, position, id) -> {
-            CollabItem itemSeleccionado = listaItems.get(position);
+        adapter = new CollabItemAdapter(listaItems, item -> {
             CollabItemFragment fragment = CollabItemFragment.newInstance(
-                    itemSeleccionado.getIdI(),
+                    item.getIdI(),
                     collabId
             );
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.fragmentApp, fragment) // el contenedor donde lo vamos a mostrar
-                    .addToBackStack(null) // para poder volver atrás
+                    .replace(R.id.fragmentApp, fragment)
+                    .addToBackStack(null)
                     .commit();
         });
+
+        rvCollabItems.setAdapter(adapter);
+
+        cargarCollabItems();
     }
 
 
@@ -87,13 +88,7 @@ public class CollabItemsListFragment extends Fragment {
                 if (items != null && !items.isEmpty()) {
                     listaItems.clear();
                     listaItems.addAll(items);
-
-                    ArrayList<String> nombres = new ArrayList<>();
-                    for (CollabItem ci : items) nombres.add(ci.getNombre());
-
-                    adapter.clear();
-                    adapter.addAll(nombres);
-                    adapter.notifyDataSetChanged();
+                    adapter.setItems(listaItems);
                 } else {
                     Toast.makeText(requireContext(), "No hay tareas para mostrar", Toast.LENGTH_SHORT).show();
                 }
@@ -106,10 +101,12 @@ public class CollabItemsListFragment extends Fragment {
         });
     }
 
-
+/* //todo revisar si es necesario
     @Override
     public void onResume() {
         super.onResume();
         cargarCollabItems(); // recargamos la lista siempre que se muestre el activity
     }
+
+ */
 }

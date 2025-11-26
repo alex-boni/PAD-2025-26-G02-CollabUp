@@ -29,6 +29,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import es.ucm.fdi.pad.collabup.R;
+import es.ucm.fdi.pad.collabup.modelo.Collab;
+import es.ucm.fdi.pad.collabup.modelo.collabView.AbstractCollabView;
+import es.ucm.fdi.pad.collabup.modelo.collabView.Calendario;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
@@ -144,30 +147,85 @@ public class CollabItemFragment extends Fragment {
         ci = new CollabItem();
         ci.setIdI(idI);
         ci.setIdC(idC);
-        ci.obtener(idI, new OnDataLoadedCallback<CollabItem>() {
+
+        Collab c = new Collab(); //Necesito saber los miembros que tiene la collab para poder enseñarlos.
+        c.obtener(idC, new OnDataLoadedCallback<Collab>() {
+
             @Override
-            public void onSuccess(CollabItem ciRet) {
-                if (ciRet != null) {
-                    ci = ciRet;
-                    miembros = ci.getUsuariosAsignados();
-                    cv = ci.getcvAsignadas();
+            public void onSuccess(Collab data) {
+                miembros = data.getMiembros();
 
-                    ci.obtenerNombresMiembrosCollab(miembros, new OnDataLoadedCallback<Map<String, String>>() {
-                        @Override
-                        public void onSuccess(Map<String, String> data) {
-                            idNombreMiembros.putAll(data);
-                            mostrarDatosCollabItem();
+                //Ahora si obtengo el collab item que estamos viendo
+                ci.obtener(idI, new OnDataLoadedCallback<CollabItem>() {
+                    @Override
+                    public void onSuccess(CollabItem ciRet) {
+                        if (ciRet != null) {
+                            ci = ciRet;
+
+                            ci.obtenerNombresMiembrosCollab(miembros, new OnDataLoadedCallback<Map<String, String>>() {
+                                @Override
+                                public void onSuccess(Map<String, String> data) {
+                                    idNombreMiembros.putAll(data);
+                                    mostrarDatosCollabItem(); //todo mover donde corresponda cuando funcionen views
+
+                                    //Saco lista de collab views del collab
+                                    AbstractCollabView aux = new Calendario();
+                                    aux.setCollabId(idC);
+                                    /*
+                                    aux.obtenerListado(new OnDataLoadedCallback<ArrayList<CollabView>>() {
+
+                                        @Override
+                                        public void onSuccess(ArrayList<CollabView> data) {
+                                            for (CollabView auxCV : data) {
+                                                cv.add(auxCV.getUid()); //lista con los ids de los collabViews
+                                            }
+
+                                            //ahora hago el map a el nombre
+                                            aux.obtenerNombresCollabViewdeCollab(cv, new OnDataLoadedCallback<Map<String, String>>() {
+                                                @Override
+                                                public void onSuccess(Map<String, String> data) {
+                                                    idNombreCv.putAll(data);
+
+                                                    btnSeleccionMiembros.setEnabled(true);
+                                                    btnCrearCollabItem.setEnabled(true);
+                                                    btnSeleccionCV.setEnabled(true);
+                                                    mostrarDatosCollabItem();
+                                                }
+
+                                                @Override
+                                                public void onFailure(Exception e) {
+                                                    Toast.makeText(requireContext(), "Error al cargar collabViews: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+
+
+                                        }
+
+                                        @Override
+                                        public void onFailure(Exception e) {
+                                            Toast.makeText(requireContext(), "Error al cargar collabViews: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+ */
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+                                    Toast.makeText(requireContext(), "Error al cargar miembros: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                        } else {
+                            Toast.makeText(requireContext(), "Item no encontrado", Toast.LENGTH_SHORT).show();
                         }
+                    }
 
-                        @Override
-                        public void onFailure(Exception e) {
-                            Toast.makeText(requireContext(), "Error al cargar miembros: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    @Override
+                    public void onFailure(Exception e) {
+                        Toast.makeText(requireContext(), "Error al cargar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
 
-                } else {
-                    Toast.makeText(requireContext(), "Item no encontrado", Toast.LENGTH_SHORT).show();
-                }
             }
 
             @Override
@@ -175,6 +233,8 @@ public class CollabItemFragment extends Fragment {
                 Toast.makeText(requireContext(), "Error al cargar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+
+
     }
 
 
@@ -226,7 +286,7 @@ public class CollabItemFragment extends Fragment {
         builder.setMultiChoiceItems(nombres, seleccionados,
                 (dialog, which, isChecked) -> seleccionados[which] = isChecked);
         builder.setPositiveButton("OK", (dialog, which) -> {
-            miembrosElegidos = ci.obtenerIdsMiembrosSeleccionados(miembros, seleccionados);
+            miembrosElegidos = ci.obtenerIdsObjSeleccionados(miembros, seleccionados);
             actualizarListaUsuarios();
         });
         builder.setNegativeButton("Cancelar", null);
@@ -287,7 +347,7 @@ public class CollabItemFragment extends Fragment {
 
     //---- ACTUALIZACIONES DE INFORMACION
     private void actualizarListaUsuarios() {
-        List<String> nombresAsignados = ci.obtenerNombresMiembros(idNombreMiembros, miembrosElegidos);
+        List<String> nombresAsignados = ci.obtenerNombresDeMapaId(idNombreMiembros, miembrosElegidos);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_list_item_1,

@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import es.ucm.fdi.pad.collabup.R;
+
 public class CollabItemAdapter extends RecyclerView.Adapter<CollabItemAdapter.ViewHolder> {
 
     public interface OnItemClickListener {
@@ -31,14 +33,20 @@ public class CollabItemAdapter extends RecyclerView.Adapter<CollabItemAdapter.Vi
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.collab_item_detail_list, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         CollabItem item = items.get(position);
-        holder.textView.setText(item.getNombre());
+        holder.tvNombre.setText(item.getNombre());
+        if (item.getDescripcion() != null) {
+            holder.tvDescripcion.setText(item.getDescripcion());
+            holder.tvDescripcion.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvDescripcion.setVisibility(View.GONE);
+        }
         holder.itemView.setOnClickListener(v -> listener.onItemClick(item));
     }
 
@@ -48,11 +56,14 @@ public class CollabItemAdapter extends RecyclerView.Adapter<CollabItemAdapter.Vi
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView textView;
+        TextView tvNombre;
+        TextView tvDescripcion;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            textView = itemView.findViewById(android.R.id.text1);
+            tvNombre = itemView.findViewById(R.id.tvItemNombre);
+            tvDescripcion = itemView.findViewById(R.id.tvItemDescripcion);
+
         }
     }
 }

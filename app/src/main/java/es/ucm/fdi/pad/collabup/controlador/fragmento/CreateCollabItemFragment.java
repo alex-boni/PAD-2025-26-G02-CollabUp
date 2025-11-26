@@ -27,6 +27,8 @@ import java.util.Map;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Collab;
+import es.ucm.fdi.pad.collabup.modelo.collabView.AbstractCollabView;
+import es.ucm.fdi.pad.collabup.modelo.collabView.Calendario;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
@@ -122,14 +124,63 @@ public class CreateCollabItemFragment extends Fragment {
             public void onSuccess(Collab data) {
                 c = data;
                 miembros = data.getMiembros();
-                //cv = data.get(); //todo arreglar cuando esté
+
                 new CollabItem().obtenerNombresMiembrosCollab(miembros, new OnDataLoadedCallback<Map<String, String>>() {
                     @Override
                     public void onSuccess(Map<String, String> data) {
                         idNombreMiembros.putAll(data);
+                        //Saco lista de collab views del collab
+                        AbstractCollabView aux = new Calendario();
+                        aux.setCollabId(idC);
+
                         btnSeleccionMiembros.setEnabled(true);
                         btnCrearCollabItem.setEnabled(true);
+                        btnSeleccionCV.setEnabled(true);
                         mostrarDatosCollabItem();
+/*
+                        aux.obtenerListado(new OnDataLoadedCallback<ArrayList<CollabView>>() {
+
+                            @Override
+                            public void onSuccess(ArrayList<CollabView> data) {
+                                for (CollabView auxCV : data) {
+                                    cv.add(auxCV.getUid()); //lista con los ids de los collabViews
+                                }
+
+                                btnSeleccionMiembros.setEnabled(true);
+                                btnCrearCollabItem.setEnabled(true);
+                                btnSeleccionCV.setEnabled(true);
+                                mostrarDatosCollabItem();
+
+                                //ahora hago el map a el nombre
+                                aux.obtenerNombresCollabViewdeCollab(cv, new OnDataLoadedCallback<Map<String, String>>() {
+                                    @Override
+                                    public void onSuccess(Map<String, String> data) {
+                                        idNombreCv.putAll(data);
+
+                                        btnSeleccionMiembros.setEnabled(true);
+                                        btnCrearCollabItem.setEnabled(true);
+                                        btnSeleccionCV.setEnabled(true);
+                                        mostrarDatosCollabItem();
+                                    }
+
+                                    @Override
+                                    public void onFailure(Exception e) {
+                                        Toast.makeText(requireContext(), "Error al cargar collabViews: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
+
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                Toast.makeText(requireContext(), "Error al cargar collabViews: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+ */
+
+
                     }
 
                     @Override
@@ -137,7 +188,6 @@ public class CreateCollabItemFragment extends Fragment {
                         Toast.makeText(requireContext(), "Error al cargar miembros: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-                //todo obtener nombre collabviews mapeados con su id
             }
 
             @Override
@@ -163,7 +213,7 @@ public class CreateCollabItemFragment extends Fragment {
         builder.setMultiChoiceItems(nombres, seleccionados,
                 (dialog, which, isChecked) -> seleccionados[which] = isChecked);
         builder.setPositiveButton("OK", (dialog, which) -> {
-            miembrosElegidos = new CollabItem().obtenerIdsMiembrosSeleccionados(miembros, seleccionados);
+            miembrosElegidos = new CollabItem().obtenerIdsObjSeleccionados(miembros, seleccionados);
             actualizarListaUsuarios();
         });
         builder.setNegativeButton("Cancelar", null);
@@ -176,11 +226,12 @@ public class CreateCollabItemFragment extends Fragment {
             seleccionados[i] = miembrosElegidos.contains(miembros.get(i));
         }
         actualizarListaUsuarios();
+        //todo actuwalizar lista cv
     }
 
 
     private void actualizarListaUsuarios() {
-        List<String> nombresAsignados = new CollabItem().obtenerNombresMiembros(idNombreMiembros, miembrosElegidos);
+        List<String> nombresAsignados = new CollabItem().obtenerNombresDeMapaId(idNombreMiembros, miembrosElegidos);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_list_item_1,
@@ -196,24 +247,37 @@ public class CreateCollabItemFragment extends Fragment {
         for (int i = 0; i < cv.size(); i++)
             cvseleccionados[i] = cvElegidas.contains(cv.get(i));
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Selecciona Collab Views");
 
         String[] nombres = cv.stream()
                 .map(id -> idNombreCv.getOrDefault(id, id))
                 .toArray(String[]::new);
 
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Selecciona Collab Views");
         builder.setMultiChoiceItems(nombres, cvseleccionados,
                 (dialog, which, isChecked) -> cvseleccionados[which] = isChecked);
         builder.setPositiveButton("OK", (dialog, which) -> {
-            cvElegidas.clear();
-            for (int i = 0; i < cvseleccionados.length; i++)
-                if (cvseleccionados[i]) cvElegidas.add(cv.get(i));
-            //actualizarListaCV();
+            cvElegidas = new CollabItem().obtenerIdsObjSeleccionados(cv, cvseleccionados);
+            actualizarListaCV();
         });
         builder.setNegativeButton("Cancelar", null);
         builder.show();
     }
+
+
+    private void actualizarListaCV() {
+        List<String> nombresAsignados = new CollabItem().obtenerNombresDeMapaId(idNombreCv, cvElegidas);
+
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
+                android.R.layout.simple_list_item_1,
+                nombresAsignados);
+        lvUsrsAsigCollabItem.setAdapter(adapter);
+        btnSeleccionMiembros.setText(nombresAsignados.isEmpty() ? "Seleccionar miembros" :
+                "Miembros: " + nombresAsignados.size());
+    }
+
 
     private void crearNuevoCollabItem() {
         String nombre = eTxtNombreCollabItem.getText().toString().trim();

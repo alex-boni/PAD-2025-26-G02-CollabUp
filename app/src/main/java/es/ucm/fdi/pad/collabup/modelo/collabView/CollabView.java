@@ -19,6 +19,16 @@ public interface CollabView extends DAO<CollabView> {
     void setUid(String uid);
 
     /**
+     * Obtiene el id del Collab al que pertenece.
+     *
+     * @return el id del Collab al que pertenece
+     */
+
+    String getCollabId();
+
+    void setCollabId(String collabId);
+
+    /**
      * Obtiene el nombre del CollabView.
      *
      * @return el nombre del CollabView

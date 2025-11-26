@@ -256,6 +256,7 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
                 .addOnFailureListener(callback::onFailure);
     }
 
+
     //Obtiene los collabItems asignados a un usuario que tienen fecha (para el calendario general)
     public void obtenerCollabItemsAsigUsrFecha(String collabId, String usuarioId,
                                                OnDataLoadedCallback<List<CollabItem>> callback) {
@@ -341,6 +342,8 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
     }
 
 
+    //---------- SACAR NOMBRES A PARTIR DE IDS
+
     public void obtenerNombreMiembroCollab(String idU, OnDataLoadedCallback<Map<String, String>> callback) {
         new Usuario().obtener(idU, new OnDataLoadedCallback<Usuario>() {
             @Override
@@ -385,7 +388,8 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         }
     }
 
-    public List<String> obtenerIdsMiembrosSeleccionados(List<String> idsMiembros, boolean[] seleccionados) {
+    //Obtiene los ids de un array de seleccionados (miembros y collab views)
+    public List<String> obtenerIdsObjSeleccionados(List<String> idsMiembros, boolean[] seleccionados) {
         List<String> resultado = new ArrayList<>();
         for (int i = 0; i < seleccionados.length; i++) {
             if (seleccionados[i]) resultado.add(idsMiembros.get(i));
@@ -393,8 +397,9 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         return resultado;
     }
 
-    //Para las actualizaciones en pantalla
-    public List<String> obtenerNombresMiembros(Map<String, String> mapaIdsNombres, List<String> ids) {
+
+    //Para las actualizaciones en pantalla (sirve para los miembros y las collabviews)
+    public List<String> obtenerNombresDeMapaId(Map<String, String> mapaIdsNombres, List<String> ids) {
         List<String> nombres = new ArrayList<>();
         for (String id : ids) {
             nombres.add(mapaIdsNombres.getOrDefault(id, id));
