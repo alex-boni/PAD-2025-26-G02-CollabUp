@@ -60,12 +60,12 @@ public interface CollabView extends DAO<CollabView> {
     /**
      * Popula la CollabView con el CollabItem proporcionado.
      *
-     * @param item                el CollabItem que contiene los datos para poblar la vista
-     * @param onOperationCallback
+     * @param item     el CollabItem que contiene los datos para poblar la vista
+     * @param callback
      */
-    void populate(CollabItem item, OnOperationCallback onOperationCallback);
+    void populate(CollabItem item, OnOperationCallback callback);
 
-    void remove(CollabItem item, OnOperationCallback onOperationCallback);
+    void remove(CollabItem item, OnOperationCallback callback);
 
     /**
      * Obtiene la actividad que muestra la vista completa de la CollabView.

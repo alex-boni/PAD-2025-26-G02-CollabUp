@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
-import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.lang.reflect.InvocationTargetException;
@@ -22,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
@@ -34,7 +32,7 @@ public abstract class AbstractCollabView implements CollabView {
     private String uid; //id del collabview
     protected String nombre;
     private Map<CollabViewSetting, Object> settings; //ajustes del collabview
-    private List<CollabItem> listaCollabItems = new ArrayList<>(); //lista de eventos
+    protected List<CollabItem> listaCollabItems = new ArrayList<>(); //lista de eventos
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -53,13 +51,13 @@ public abstract class AbstractCollabView implements CollabView {
         this.uid = uid;
     }
 
-    @Exclude
+
     @Override
     public String getCollabId() {
         return collabId;
     }
 
-    @Exclude
+
     @Override
     public void setCollabId(String collabId) {
         this.collabId = collabId;
@@ -249,7 +247,7 @@ public abstract class AbstractCollabView implements CollabView {
             settings.put(entry.getKey().getName(), entry.getValue());
         }
 
-        CollabViewTransfer t = new CollabViewTransfer(null, nombre, this.getClass().getSimpleName(), settings);
+        CollabViewTransfer t = new CollabViewTransfer(nombre, this.getClass().getSimpleName(), settings);
 
         db.collection("collabs")
                 .document(collabId)
@@ -270,7 +268,6 @@ public abstract class AbstractCollabView implements CollabView {
             settings.put(entry.getKey().getName(), entry.getValue());
         }
         CollabViewTransfer t = new CollabViewTransfer(
-                reemplazo.getUid(),
                 reemplazo.getName(),
                 reemplazo.getClass().getSimpleName(),
                 settings
@@ -326,43 +323,16 @@ public abstract class AbstractCollabView implements CollabView {
                 );
     }
 
-    public void obtenerNombresCollabViewdeCollab(List<String> idsCV, OnDataLoadedCallback<Map<String, String>> callback) {
-        Map<String, String> resultados = new HashMap<>();
-        AtomicInteger contador = new AtomicInteger(0);
-
-        if (idsCV.isEmpty()) {
-            callback.onSuccess(resultados);
-            return;
-        }
-
-        for (String id : idsCV) {
-            CollabView aux = new Calendario();
-            aux.obtener(id, new OnDataLoadedCallback<CollabView>() {
-                @Override
-                public void onSuccess(CollabView cv) {
-                    resultados.put(id, cv.getName());
-                    if (contador.incrementAndGet() == idsCV.size()) {
-                        callback.onSuccess(resultados);
-                    }
-                }
-
-                @Override
-                public void onFailure(Exception e) {
-                    callback.onFailure(e);
-                }
-            });
-        }
-    }
-
     public static class CollabViewTransfer {
-        public CollabViewTransfer(String uid, String name, String type, Map<String, Object> settings) {
-            this.uid = uid;
+        public CollabViewTransfer() {
+        }
+
+        public CollabViewTransfer(String name, String type, Map<String, Object> settings) {
             this.name = name;
             this.type = type;
             this.settings = settings;
         }
 
-        public String uid;
         public String name;
         public String type;
         public Map<String, Object> settings;

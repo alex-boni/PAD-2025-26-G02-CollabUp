@@ -135,22 +135,10 @@ public class CreateCollabItemFragment extends Fragment {
                         AbstractCollabView aux = new Calendario();
                         aux.setCollabId(idC);
 
-                        btnSeleccionMiembros.setEnabled(true);
-                        btnCrearCollabItem.setEnabled(true);
-                        btnSeleccionCV.setEnabled(true);
-                        mostrarDatosCollabItem();
-/*
                         aux.obtenerListado(new OnDataLoadedCallback<ArrayList<CollabView>>() {
 
                             @Override
                             public void onSuccess(ArrayList<CollabView> data) {
-                                if(data.isEmpty()){
-                                    btnSeleccionMiembros.setEnabled(true);
-                                    btnCrearCollabItem.setEnabled(true);
-                                    btnSeleccionCV.setEnabled(true);
-                                    mostrarDatosCollabItem();
-                                    //todo salir de esto no?
-                                }
                                 for (CollabView auxCV : data) {
                                     cv.add(auxCV.getUid()); //lista con los ids de los collabViews
                                     idCv.put(auxCV.getUid(), auxCV);
@@ -168,10 +156,6 @@ public class CreateCollabItemFragment extends Fragment {
                                 Toast.makeText(requireContext(), "Error al cargar collabViews: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         });
-
- */
-
-
                     }
 
                     @Override
@@ -266,9 +250,9 @@ public class CreateCollabItemFragment extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_list_item_1,
                 nombresAsignados);
-        lvUsrsAsigCollabItem.setAdapter(adapter);
-        btnSeleccionMiembros.setText(nombresAsignados.isEmpty() ? "Seleccionar miembros" :
-                "Miembros: " + nombresAsignados.size());
+        lvCvAsigCollabItem.setAdapter(adapter);
+        btnSeleccionCV.setText(nombresAsignados.isEmpty() ? "Seleccionar Collab Views" :
+                "CollabViews: " + nombresAsignados.size());
     }
 
 
@@ -300,9 +284,11 @@ public class CreateCollabItemFragment extends Fragment {
                 Toast.makeText(requireContext(), "CollabItem creado", Toast.LENGTH_SHORT).show();
                 //Necesito añadirlo a la lista de collabItems asignados a cada view.
                 // Actualizar cada CollabView
+
                 AtomicInteger contador = new AtomicInteger(0); //por firebase
                 if (cvElegidas.isEmpty()) {
                     requireActivity().getSupportFragmentManager().popBackStack();
+                    return;
                 }
                 for (String cvId : cvElegidas) {
                     CollabView cvaux = idCv.get(cvId);

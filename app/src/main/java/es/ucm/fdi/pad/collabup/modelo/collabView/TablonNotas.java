@@ -49,12 +49,12 @@ public class TablonNotas extends AbstractCollabView {
     }
 
     @Override
-    public void populate(CollabItem item, OnOperationCallback onOperationCallback) {
+    public void populate(CollabItem item, OnOperationCallback callback) {
 
     }
 
     @Override
-    public void remove(CollabItem item, OnOperationCallback onOperationCallback) {
+    public void remove(CollabItem item, OnOperationCallback callback) {
 
     }
 

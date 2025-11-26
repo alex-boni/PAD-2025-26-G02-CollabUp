@@ -167,11 +167,10 @@ public class CollabItemFragment extends Fragment {
                                 @Override
                                 public void onSuccess(Map<String, String> data) {
                                     idNombreMiembros.putAll(data);
-                                    mostrarDatosCollabItem(); //todo borrar cuando funcione
                                     //Saco lista de collab views del collab
                                     AbstractCollabView aux = new Calendario();
                                     aux.setCollabId(idC);
-/*
+
                                     aux.obtenerListado(new OnDataLoadedCallback<ArrayList<CollabView>>() {
 
                                         @Override
@@ -188,9 +187,6 @@ public class CollabItemFragment extends Fragment {
                                             Toast.makeText(requireContext(), "Error al cargar collabViews: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                         }
                                     });
-
- */
-
                                 }
 
                                 @Override
@@ -344,12 +340,13 @@ public class CollabItemFragment extends Fragment {
 
     private void actualizarListaCV() {
         List<String> nombresAsignados = new CollabItem().obtenerNombresDeMapaCVId(idCv, cvElegidas);
+
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_list_item_1,
                 nombresAsignados);
         lvCvAsigCollabItem.setAdapter(adapter);
-
-        btnSeleccionCV.setText(nombresAsignados.isEmpty() ? "Seleccionar Collab Views" : "Collab Views: " + nombresAsignados.size());
+        btnSeleccionCV.setText(nombresAsignados.isEmpty() ? "Seleccionar Collab Views" :
+                "CollabViews: " + nombresAsignados.size());
     }
 
 
@@ -387,13 +384,12 @@ public class CollabItemFragment extends Fragment {
 
     private void modificarCollabItem() {
 
+        List<String> prevCV = new ArrayList<>(ci.getcvAsignadas()); //saco las que había asignadas antes
+
         CollabItem ciActualizado = obtenerCollabItemDePantalla();
+        List<String> nuevasCV = new ArrayList<>(ciActualizado.getcvAsignadas());//saco las nuevas
 
-        // Guardamos la lista anterior de CollabViews asignadas al item
-        List<String> prevCV = new ArrayList<>(ciActualizado.getcvAsignadas() != null ? ciActualizado.getcvAsignadas() : new ArrayList<>());
-        List<String> nuevasCV = new ArrayList<>(cvElegidas != null ? cvElegidas : new ArrayList<>());
-
-        // Calculamos diferencias
+        // Calculamos diferencias para actualizar el collabitem
         List<String> cvAañadir = new ArrayList<>(nuevasCV);
         cvAañadir.removeAll(prevCV);
         List<String> cvAEliminar = new ArrayList<>(prevCV);
