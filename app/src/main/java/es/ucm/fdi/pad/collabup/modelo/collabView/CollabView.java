@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import es.ucm.fdi.pad.collabup.modelo.interfaz.DAO;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
 //Interfaz collabViews
 public interface CollabView extends DAO<CollabView> {
@@ -59,11 +60,12 @@ public interface CollabView extends DAO<CollabView> {
     /**
      * Popula la CollabView con el CollabItem proporcionado.
      *
-     * @param item el CollabItem que contiene los datos para poblar la vista
+     * @param item                el CollabItem que contiene los datos para poblar la vista
+     * @param onOperationCallback
      */
-    void populate(CollabItem item);
+    void populate(CollabItem item, OnOperationCallback onOperationCallback);
 
-    void remove(CollabItem item);
+    void remove(CollabItem item, OnOperationCallback onOperationCallback);
 
     /**
      * Obtiene la actividad que muestra la vista completa de la CollabView.

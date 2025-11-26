@@ -21,18 +21,19 @@ import com.google.firebase.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Collab;
 import es.ucm.fdi.pad.collabup.modelo.collabView.AbstractCollabView;
 import es.ucm.fdi.pad.collabup.modelo.collabView.Calendario;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
+import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
@@ -58,7 +59,7 @@ public class CollabItemFragment extends Fragment {
     private List<String> miembrosElegidos = new ArrayList<>(); //los asignados actualmente
     private List<String> cvElegidas = new ArrayList<>();
     private Map<String, String> idNombreMiembros = new HashMap<>(); //para los nombres
-    private Map<String, String> idNombreCv = new HashMap<>();
+    private Map<String, CollabView> idCv = new HashMap<>();
 
 
     public CollabItemFragment() {
@@ -166,39 +167,20 @@ public class CollabItemFragment extends Fragment {
                                 @Override
                                 public void onSuccess(Map<String, String> data) {
                                     idNombreMiembros.putAll(data);
-                                    mostrarDatosCollabItem(); //todo mover donde corresponda cuando funcionen views
-
+                                    mostrarDatosCollabItem(); //todo borrar cuando funcione
                                     //Saco lista de collab views del collab
                                     AbstractCollabView aux = new Calendario();
                                     aux.setCollabId(idC);
-                                    /*
+/*
                                     aux.obtenerListado(new OnDataLoadedCallback<ArrayList<CollabView>>() {
 
                                         @Override
                                         public void onSuccess(ArrayList<CollabView> data) {
                                             for (CollabView auxCV : data) {
                                                 cv.add(auxCV.getUid()); //lista con los ids de los collabViews
+                                                idCv.put(auxCV.getUid(), auxCV);
+                                                mostrarDatosCollabItem();
                                             }
-
-                                            //ahora hago el map a el nombre
-                                            aux.obtenerNombresCollabViewdeCollab(cv, new OnDataLoadedCallback<Map<String, String>>() {
-                                                @Override
-                                                public void onSuccess(Map<String, String> data) {
-                                                    idNombreCv.putAll(data);
-
-                                                    btnSeleccionMiembros.setEnabled(true);
-                                                    btnCrearCollabItem.setEnabled(true);
-                                                    btnSeleccionCV.setEnabled(true);
-                                                    mostrarDatosCollabItem();
-                                                }
-
-                                                @Override
-                                                public void onFailure(Exception e) {
-                                                    Toast.makeText(requireContext(), "Error al cargar collabViews: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-
-
                                         }
 
                                         @Override
@@ -206,7 +188,9 @@ public class CollabItemFragment extends Fragment {
                                             Toast.makeText(requireContext(), "Error al cargar collabViews: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                         }
                                     });
+
  */
+
                                 }
 
                                 @Override
@@ -298,19 +282,19 @@ public class CollabItemFragment extends Fragment {
         for (int i = 0; i < cv.size(); i++)
             cvseleccionados[i] = cvElegidas.contains(cv.get(i));
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Selecciona Collab Views");
-
         String[] nombres = cv.stream()
-                .map(id -> idNombreCv.getOrDefault(id, id))
+                .map(id -> {
+                    CollabView cvObj = idCv.get(id);
+                    return (cvObj != null) ? cvObj.getName() : null;
+                })
                 .toArray(String[]::new);
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Selecciona Collab Views");
         builder.setMultiChoiceItems(nombres, cvseleccionados,
                 (dialog, which, isChecked) -> cvseleccionados[which] = isChecked);
         builder.setPositiveButton("OK", (dialog, which) -> {
-            cvElegidas.clear();
-            for (int i = 0; i < cvseleccionados.length; i++)
-                if (cvseleccionados[i]) cvElegidas.add(cv.get(i));
+            cvElegidas = new CollabItem().obtenerIdsObjSeleccionados(cv, cvseleccionados);
             actualizarListaCV();
         });
         builder.setNegativeButton("Cancelar", null);
@@ -359,17 +343,13 @@ public class CollabItemFragment extends Fragment {
     }
 
     private void actualizarListaCV() {
-        List<String> nombrescvAsignados = new ArrayList<>();
-        for (String id : cvElegidas) {
-            String nombre = idNombreCv.getOrDefault(id, id); // ponemos id en caso raro de que no haya nombre
-            nombrescvAsignados.add(nombre);
-        }
+        List<String> nombresAsignados = new CollabItem().obtenerNombresDeMapaCVId(idCv, cvElegidas);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_list_item_1,
-                nombrescvAsignados);
+                nombresAsignados);
         lvCvAsigCollabItem.setAdapter(adapter);
 
-        btnSeleccionCV.setText(nombrescvAsignados.isEmpty() ? "Seleccionar Collab Views" : "Collab Views: " + nombrescvAsignados.size());
+        btnSeleccionCV.setText(nombresAsignados.isEmpty() ? "Seleccionar Collab Views" : "Collab Views: " + nombresAsignados.size());
     }
 
 
@@ -408,34 +388,124 @@ public class CollabItemFragment extends Fragment {
     private void modificarCollabItem() {
 
         CollabItem ciActualizado = obtenerCollabItemDePantalla();
+
+        // Guardamos la lista anterior de CollabViews asignadas al item
+        List<String> prevCV = new ArrayList<>(ciActualizado.getcvAsignadas() != null ? ciActualizado.getcvAsignadas() : new ArrayList<>());
+        List<String> nuevasCV = new ArrayList<>(cvElegidas != null ? cvElegidas : new ArrayList<>());
+
+        // Calculamos diferencias
+        List<String> cvAañadir = new ArrayList<>(nuevasCV);
+        cvAañadir.removeAll(prevCV);
+        List<String> cvAEliminar = new ArrayList<>(prevCV);
+        cvAEliminar.removeAll(nuevasCV);
+
+        //actualizamos collab item de firebase
         ciActualizado.modificar(ciActualizado, new OnOperationCallback() {
             @Override
             public void onSuccess() {
                 Toast.makeText(requireContext(), "CollabItem actualizado correctamente", Toast.LENGTH_SHORT).show();
-                setEditable(false);
-                btnGuardarCollabItem.setVisibility(View.GONE);
-                btnEditarCollabItem.setVisibility(View.VISIBLE);
+
+                AtomicInteger operacionesPendientes = new AtomicInteger(cvAañadir.size() + cvAEliminar.size());
+
+                if (operacionesPendientes.get() == 0) { //no hay nada que actualizar
+                    finalizarModificacion(ciActualizado);
+                    return;
+                }
+
+                //Añadimos los items a nuevas
+                for (String cvId : cvAañadir) {
+                    CollabView cvaux = idCv.get(cvId);
+                    cvaux.populate(ciActualizado, new OnOperationCallback() {
+                        @Override
+                        public void onSuccess() {
+                            if (operacionesPendientes.decrementAndGet() == 0) { //todos los cv han sido actualziados
+                                finalizarModificacion(ciActualizado);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            Toast.makeText(requireContext(), "Error al actualizar CV: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            if (operacionesPendientes.decrementAndGet() == 0) { //todos los cv han sido actualziados
+                                finalizarModificacion(ciActualizado);
+                            }
+                        }
+                    });
+                }
+
+                //Eliminamos los collab views que se han quitado
+                for (String cvId : cvAEliminar) {
+                    CollabView cvaux = idCv.get(cvId);
+                    cvaux.remove(ciActualizado, new OnOperationCallback() {
+                        @Override
+                        public void onSuccess() {
+                            if (operacionesPendientes.decrementAndGet() == 0) { //todos los cv han sido actualziados
+                                finalizarModificacion(ciActualizado);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            Toast.makeText(requireContext(), "Error al actualizar CV: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            if (operacionesPendientes.decrementAndGet() == 0) { //todos los cv han sido actualziados
+                                finalizarModificacion(ciActualizado);
+                            }
+                        }
+                    });
+                }
             }
 
             @Override
             public void onFailure(Exception e) {
                 Toast.makeText(requireContext(), "Error al actualizar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                finalizarModificacion(ciActualizado);
             }
         });
     }
 
+    private void finalizarModificacion(CollabItem ciActualizado) {
+        Toast.makeText(requireContext(), "CollabItem actualizado correctamente", Toast.LENGTH_SHORT).show();
+        setEditable(false);
+        btnGuardarCollabItem.setVisibility(View.GONE);
+        btnEditarCollabItem.setVisibility(View.VISIBLE);
+        requireActivity().getSupportFragmentManager().popBackStack();
+    }
+
 
     private void eliminarCollabItem() {
-        CollabItem ciEliminar = new CollabItem();
+        CollabItem ciEliminar = obtenerCollabItemDePantalla();
         ciEliminar.setIdI(this.idI);
         ciEliminar.setIdC(this.idC);
-        ciEliminar.setcvAsignadas(Arrays.asList(idC));
 
         ciEliminar.eliminar(new OnOperationCallback() {
             @Override
             public void onSuccess() {
                 Toast.makeText(requireContext(), "CollabItem eliminado correctamente", Toast.LENGTH_SHORT).show();
-                getParentFragmentManager().popBackStack(); // cierro el fragment y vuelvo a la lista
+
+                AtomicInteger operacionesPendientes = new AtomicInteger(ciEliminar.getcvAsignadas().size());
+                if (ciEliminar.getcvAsignadas().isEmpty()) {
+                    getParentFragmentManager().popBackStack(); // cierro el fragment y vuelvo a la lista
+                    return;
+                }
+                for (String cvId : ciEliminar.getcvAsignadas()) {
+                    CollabView cvaux = idCv.get(cvId);
+                    cvaux.remove(ciEliminar, new OnOperationCallback() {
+                        @Override
+                        public void onSuccess() {
+                            if (operacionesPendientes.decrementAndGet() == 0) { //todos los cv han sido actualziados
+                                getParentFragmentManager().popBackStack(); // cierro el fragment y vuelvo a la lista
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            Toast.makeText(requireContext(), "Error al actualizar CV: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            if (operacionesPendientes.decrementAndGet() == 0) { //todos los cv han sido actualziados
+                                getParentFragmentManager().popBackStack(); // cierro el fragment y vuelvo a la lista
+                            }
+                        }
+                    });
+                }
             }
 
             @Override

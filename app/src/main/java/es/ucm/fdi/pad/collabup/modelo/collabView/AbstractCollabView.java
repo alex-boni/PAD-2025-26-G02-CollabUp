@@ -34,7 +34,7 @@ public abstract class AbstractCollabView implements CollabView {
     private String uid; //id del collabview
     protected String nombre;
     private Map<CollabViewSetting, Object> settings; //ajustes del collabview
-    private List<CollabItem> listaCollabItems; //lista de eventos
+    private List<CollabItem> listaCollabItems = new ArrayList<>(); //lista de eventos
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 

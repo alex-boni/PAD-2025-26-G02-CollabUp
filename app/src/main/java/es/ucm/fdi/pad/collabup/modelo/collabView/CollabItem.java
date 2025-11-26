@@ -113,11 +113,6 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         return cvAsignadas;
     }
 
-    @Exclude
-    public String getEjCollabAsignada() { //saco cualquier collab que tenga este item
-        if (cvAsignadas == null || cvAsignadas.isEmpty()) return null;
-        return cvAsignadas.get(0);
-    }
 
     public void setcvAsignadas(List<String> collabsAsignadas) {
         this.cvAsignadas = collabsAsignadas;
@@ -184,7 +179,7 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         }
 
         db.collection("collabs")
-                .document(getEjCollabAsignada())
+                .document(idC)
                 .collection("collabItems")
                 .document(idI)
                 .delete()
@@ -403,6 +398,19 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         List<String> nombres = new ArrayList<>();
         for (String id : ids) {
             nombres.add(mapaIdsNombres.getOrDefault(id, id));
+        }
+        return nombres;
+    }
+
+    public List<String> obtenerNombresDeMapaCVId(Map<String, CollabView> mapaIdsCV, List<String> ids) {
+        List<String> nombres = new ArrayList<>();
+        for (String id : ids) {
+            CollabView cv = mapaIdsCV.get(id);
+            if (cv != null) {
+                nombres.add(cv.getName());
+            } else {
+                nombres.add(id); //por si no se encuentra el collabview
+            }
         }
         return nombres;
     }

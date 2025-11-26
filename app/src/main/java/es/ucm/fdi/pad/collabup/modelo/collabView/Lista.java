@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import es.ucm.fdi.pad.collabup.R;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
 public class Lista extends AbstractCollabView {
 
@@ -48,12 +49,12 @@ public class Lista extends AbstractCollabView {
     }
 
     @Override
-    public void populate(CollabItem item) {
+    public void populate(CollabItem item, OnOperationCallback onOperationCallback) {
 
     }
 
     @Override
-    public void remove(CollabItem item) {
+    public void remove(CollabItem item, OnOperationCallback onOperationCallback) {
 
     }
 
