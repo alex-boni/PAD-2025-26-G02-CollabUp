@@ -100,13 +100,5 @@ public class CollabItemsListFragment extends Fragment {
             }
         });
     }
-
-/* //todo revisar si es necesario
-    @Override
-    public void onResume() {
-        super.onResume();
-        cargarCollabItems(); // recargamos la lista siempre que se muestre el activity
-    }
-
- */
+    
 }
