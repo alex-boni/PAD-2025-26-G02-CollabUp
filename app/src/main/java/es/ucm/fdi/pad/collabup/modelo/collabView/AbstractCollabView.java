@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
-import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.lang.reflect.InvocationTargetException;
@@ -59,18 +58,6 @@ public abstract class AbstractCollabView implements CollabView {
     @Override
     public void setUid(String uid) {
         this.uid = uid;
-    }
-
-    @Exclude
-    @Override
-    public String getCollabId() {
-        return collabId;
-    }
-
-    @Exclude
-    @Override
-    public void setCollabId(String collabId) {
-        this.collabId = collabId;
     }
 
     @Override
@@ -257,7 +244,7 @@ public abstract class AbstractCollabView implements CollabView {
             settings.put(entry.getKey().getName(), entry.getValue());
         }
 
-        CollabViewTransfer t = new CollabViewTransfer( nombre, this.getClass().getSimpleName(), settings);
+        CollabViewTransfer t = new CollabViewTransfer(nombre, this.getClass().getSimpleName(), settings);
 
         db.collection("collabs")
                 .document(collabId)
@@ -362,7 +349,9 @@ public abstract class AbstractCollabView implements CollabView {
     }
 
     public static class CollabViewTransfer {
-        public CollabViewTransfer() { }
+        public CollabViewTransfer() {
+        }
+
         public CollabViewTransfer(String name, String type, Map<String, Object> settings) {
             this.name = name;
             this.type = type;
