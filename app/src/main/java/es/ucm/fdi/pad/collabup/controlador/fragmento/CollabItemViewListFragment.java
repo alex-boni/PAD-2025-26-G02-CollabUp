@@ -115,7 +115,6 @@ public class CollabItemViewListFragment extends Fragment {
                 return true;
             } else if (itemId == R.id.action_edit) {
                 // Lógica de edición
-                Toast.makeText(getContext(), "Editar Collab", Toast.LENGTH_SHORT).show();
                 if (collabId != null) {
                     Fragment editFragment = CollabEditFragment.newInstance(collabId);
                     getParentFragmentManager().beginTransaction()
@@ -126,12 +125,10 @@ public class CollabItemViewListFragment extends Fragment {
                 return true;
             } else if (itemId == R.id.action_delete) {
                 // Lógica de eliminación
-                Toast.makeText(getContext(), "Eliminar Collab", Toast.LENGTH_SHORT).show();
                 deleteCollab();
                 return true;
             } else if (itemId == R.id.action_exit) {
                 // Lógica para salir del Collab
-                Toast.makeText(getContext(), "Salir del Collab", Toast.LENGTH_SHORT).show();
                 exitCollab();
                 return true;
             }
@@ -207,9 +204,8 @@ public class CollabItemViewListFragment extends Fragment {
         if(currentCollab.getCreadorId().equals(usuarioActual.getUid())){
             Toast.makeText(getContext(), "Eres el creador, se asignara a otro creador al collab", Toast.LENGTH_SHORT).show();
             newCreatorAssignment(usuarioActual.getUid());
-            showExitConfirmationDialog();
-            return;
         }
+        showExitConfirmationDialog();
     }
 
     private void showExitConfirmationDialog() {
