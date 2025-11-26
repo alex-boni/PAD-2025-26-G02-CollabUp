@@ -48,13 +48,38 @@ public class Calendario extends AbstractCollabView {
     }
 
     @Override
-    public void populate(CollabItem item, OnOperationCallback onOperationCallback) {
+    public void populate(CollabItem item, OnOperationCallback callback) {
+        //lega un item a este view -> añadir el collab item a la lista correspondiente
+        this.listaCollabItems.add(item);
+        //Actualizar firebase
+        this.modificar(this, new OnOperationCallback() {
+            @Override
+            public void onSuccess() {
+                callback.onSuccess();
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
 
     }
 
     @Override
-    public void remove(CollabItem item, OnOperationCallback onOperationCallback) {
+    public void remove(CollabItem item, OnOperationCallback callback) {
+        this.listaCollabItems.remove(item);
+        this.modificar(this, new OnOperationCallback() {
+            @Override
+            public void onSuccess() {
+                callback.onSuccess();
+            }
 
+            @Override
+            public void onFailure(Exception e) {
+                callback.onFailure(e);
+            }
+        });
     }
 
     @Override

@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
@@ -33,21 +32,13 @@ public abstract class AbstractCollabView implements CollabView {
     private String uid; //id del collabview
     protected String nombre;
     private Map<CollabViewSetting, Object> settings; //ajustes del collabview
-    private List<CollabItem> listaCollabItems = new ArrayList<>(); //lista de eventos
+    protected List<CollabItem> listaCollabItems = new ArrayList<>(); //lista de eventos
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public AbstractCollabView() {
         this.settings = new HashMap<>();
         getStaticCreationSettings().forEach((s) -> this.settings.put(s, null));
-    }
-
-    public String getCollabId() {
-        return collabId;
-    }
-
-    public void setCollabId(String collabId) {
-        this.collabId = collabId;
     }
 
     @Override
@@ -58,6 +49,18 @@ public abstract class AbstractCollabView implements CollabView {
     @Override
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+
+    @Override
+    public String getCollabId() {
+        return collabId;
+    }
+
+
+    @Override
+    public void setCollabId(String collabId) {
+        this.collabId = collabId;
     }
 
     @Override
@@ -318,34 +321,6 @@ public abstract class AbstractCollabView implements CollabView {
                 .addOnFailureListener(e ->
                         callback.onFailure(e)
                 );
-    }
-
-    public void obtenerNombresCollabViewdeCollab(List<String> idsCV, OnDataLoadedCallback<Map<String, String>> callback) {
-        Map<String, String> resultados = new HashMap<>();
-        AtomicInteger contador = new AtomicInteger(0);
-
-        if (idsCV.isEmpty()) {
-            callback.onSuccess(resultados);
-            return;
-        }
-
-        for (String id : idsCV) {
-            CollabView aux = new Calendario();
-            aux.obtener(id, new OnDataLoadedCallback<CollabView>() {
-                @Override
-                public void onSuccess(CollabView cv) {
-                    resultados.put(id, cv.getName());
-                    if (contador.incrementAndGet() == idsCV.size()) {
-                        callback.onSuccess(resultados);
-                    }
-                }
-
-                @Override
-                public void onFailure(Exception e) {
-                    callback.onFailure(e);
-                }
-            });
-        }
     }
 
     public static class CollabViewTransfer {

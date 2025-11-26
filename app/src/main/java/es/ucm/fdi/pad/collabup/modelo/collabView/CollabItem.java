@@ -161,6 +161,7 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         updates.put("descripcion", reemplazo.descripcion);
         updates.put("fecha", reemplazo.fecha);
         updates.put("usuariosAsignados", reemplazo.getUsuariosAsignados());
+        updates.put("cvAsignadas", reemplazo.getcvAsignadas());
 
         db.collection("collabs")
                 .document(reemplazo.getIdC())
