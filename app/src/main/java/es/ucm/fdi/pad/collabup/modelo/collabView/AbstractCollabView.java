@@ -43,6 +43,14 @@ public abstract class AbstractCollabView implements CollabView {
         getStaticCreationSettings().forEach((s) -> this.settings.put(s, null));
     }
 
+    public String getCollabId() {
+        return collabId;
+    }
+
+    public void setCollabId(String collabId) {
+        this.collabId = collabId;
+    }
+
     @Override
     public String getUid() {
         return uid;
@@ -249,7 +257,7 @@ public abstract class AbstractCollabView implements CollabView {
             settings.put(entry.getKey().getName(), entry.getValue());
         }
 
-        CollabViewTransfer t = new CollabViewTransfer(null, nombre, this.getClass().getSimpleName(), settings);
+        CollabViewTransfer t = new CollabViewTransfer( nombre, this.getClass().getSimpleName(), settings);
 
         db.collection("collabs")
                 .document(collabId)
@@ -270,7 +278,6 @@ public abstract class AbstractCollabView implements CollabView {
             settings.put(entry.getKey().getName(), entry.getValue());
         }
         CollabViewTransfer t = new CollabViewTransfer(
-                reemplazo.getUid(),
                 reemplazo.getName(),
                 reemplazo.getClass().getSimpleName(),
                 settings
@@ -355,14 +362,13 @@ public abstract class AbstractCollabView implements CollabView {
     }
 
     public static class CollabViewTransfer {
-        public CollabViewTransfer(String uid, String name, String type, Map<String, Object> settings) {
-            this.uid = uid;
+        public CollabViewTransfer() { }
+        public CollabViewTransfer(String name, String type, Map<String, Object> settings) {
             this.name = name;
             this.type = type;
             this.settings = settings;
         }
 
-        public String uid;
         public String name;
         public String type;
         public Map<String, Object> settings;

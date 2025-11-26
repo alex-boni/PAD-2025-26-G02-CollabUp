@@ -38,6 +38,10 @@ public interface CollabView extends DAO<CollabView> {
 
     void setName(String name);
 
+    String getCollabId();
+
+    void setCollabId(String collabId);
+
     /**
      * Devuelve una nueva instancia estática de un CollabView.
      * para invocar metodos pseudo-estaticos
