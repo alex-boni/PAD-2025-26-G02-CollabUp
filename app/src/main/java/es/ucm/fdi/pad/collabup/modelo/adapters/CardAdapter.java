@@ -62,19 +62,14 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
         } else {
             holder.image.setImageResource(R.drawable.logo);
         }
-        if(item.estaEliminado()){
-            holder.ivFavorite.setImageResource(R.drawable.ic_deleted);
-        }else if(item.esFavorito()){
+        if (item.esFavorito()) {
             holder.ivFavorite.setImageResource(R.drawable.ic_favorite_filled);
-        }else{
+        } else {
             holder.ivFavorite.setImageResource(R.drawable.ic_favorite);
         }
         holder.ivFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(item.estaEliminado()){
-                    return;
-                }
                 if (listener != null) {
                     int actualPosition = holder.getBindingAdapterPosition();
                     listener.onFavoriteClick(item, actualPosition);

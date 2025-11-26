@@ -21,7 +21,7 @@ import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 public class Collab implements DAO<Collab> {
 
     private transient FirebaseFirestore db;
-    
+
     private String id;
     private String nombre;
     private String descripcion;
@@ -264,6 +264,35 @@ public class Collab implements DAO<Collab> {
                 });
     }
 
+    public void setCreadorId(String nuevoCreadorId, OnOperationCallback callback) {
+        if (this.id == null || this.id.isEmpty()) {
+            callback.onFailure(new Exception("ID de Collab no válido"));
+            return;
+        }
+
+        if (!this.miembros.contains(nuevoCreadorId)) {
+            callback.onFailure(new Exception("El nuevo creador debe ser miembro del Collab"));
+            return;
+        }
+
+        this.creadorId = nuevoCreadorId;
+
+        db.collection("collabs").document(this.id)
+                .update("creadorId", this.creadorId)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        callback.onSuccess();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        callback.onFailure(e);
+                    }
+                });
+    }
+
     // Getters y Setters
     public String getId() {
         return id;
@@ -320,9 +349,11 @@ public class Collab implements DAO<Collab> {
     public void setMiembros(ArrayList<String> miembros) {
         this.miembros = miembros;
     }
+
     public String getEstado() {
         return estado;
     }
+
     public void setEstado(String estado) {
         this.estado = estado;
     }
@@ -330,13 +361,15 @@ public class Collab implements DAO<Collab> {
     public boolean esFavorito() {
         return "favorito".equalsIgnoreCase(this.estado);
     }
-    public boolean estaEliminado() {
-        return "eliminado".equalsIgnoreCase(this.estado);
+
+    public boolean estaArchivado() {
+        return "archivado".equalsIgnoreCase(this.estado);
     }
+
     public boolean estaActivo() {
         return !"eliminado".equalsIgnoreCase(this.estado);
     }
-    
+
     @Override
     public String toString() {
         return "Collab{" +

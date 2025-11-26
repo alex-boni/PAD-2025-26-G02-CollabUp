@@ -64,11 +64,18 @@
                     android:text="@string/chip_all" />
 
                 <com.google.android.material.chip.Chip
-                    android:id="@+id/chipActives"
+                    android:id="@+id/chipCreations"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/chip_actives" />
+                    android:text="@string/chip_creations" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipInvitations"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/chip_invitations" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipFavorites"
@@ -76,13 +83,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/chip_favorites" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipDeleted"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/chip_deleted" />
             </com.google.android.material.chip.ChipGroup>
         </HorizontalScrollView>
 

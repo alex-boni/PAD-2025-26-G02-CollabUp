@@ -35,7 +35,6 @@ import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
 public class CollabDetailFragment extends Fragment {
 
-    // 1. RENOMBRAR la clave del argumento
     private static final String ARG_COLLAB_ID = "collab_id";
     private static final String RESULT_KEY = "collab_updated";
 
@@ -126,18 +125,25 @@ public class CollabDetailFragment extends Fragment {
             getParentFragmentManager().popBackStack();
         });
 
-        // Manejo del menú (Editar, Archivar, etc.) - Requiere implementar OnMenuItemClickListener
+        // Manejo del menú (Editar, Archivar, etc.)
         detailToolbar.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
-            if (itemId == R.id.action_edit) {
+            if(itemId == R.id.action_view_more){
+                if(currentCollab != null){
+                    CollabDetailFragment detailFragment = CollabDetailFragment.newInstance(collabId);
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.fragmentApp, detailFragment)
+                            .addToBackStack("collab_detail_tag")
+                            .commit();
+                }
+                return true;
+            } else if (itemId == R.id.action_edit) {
                 // Lógica de edición
                 Toast.makeText(getContext(), "Editar Collab", Toast.LENGTH_SHORT).show();
                 if (collabId != null) {
-                    // Navegar al fragmento de edición, pasándole el ID
                     Fragment editFragment = CollabEditFragment.newInstance(collabId);
-
                     getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragmentApp, editFragment) // R.id.fragmentApp es el contenedor principal
+                            .replace(R.id.fragmentApp, editFragment)
                             .addToBackStack("collab_detail_tag")
                             .commit();
                 }
@@ -162,23 +168,49 @@ public class CollabDetailFragment extends Fragment {
             return;
         }
 
-        currentCollab.eliminar(new OnOperationCallback() {
-            @Override
-            public void onSuccess() {
-                if (isAdded()) {
-                    Toast.makeText(getContext(), "Collab eliminado", Toast.LENGTH_SHORT).show();
-                    getParentFragmentManager().popBackStack();
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                if (isAdded()) {
-                    Toast.makeText(getContext(), "Error al eliminar Collab: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+        FirebaseAuth mAuth= FirebaseAuth.getInstance();
+        FirebaseUser usuarioActual = mAuth.getCurrentUser();
+        if (usuarioActual == null) return;
+        if (!currentCollab.getCreadorId().equals(usuarioActual.getUid())) {
+            Toast.makeText(getContext(), "Error: Solo el creador puede eliminar el Collab", Toast.LENGTH_SHORT).show();
+        }else{
+            showDeleteConfirmationDialog();
+        }
     }
+
+    private void showDeleteConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Eliminar Collab");
+        builder.setMessage("¿Estás seguro de que deseas eliminar este Collab? Esta acción no se puede deshacer.");
+
+        builder.setPositiveButton("Eliminar", (dialog, which) -> {
+            // Lógica para eliminar el Collab
+            currentCollab.eliminar(new OnOperationCallback() {
+                @Override
+                public void onSuccess() {
+                    if (isAdded()) {
+                        Toast.makeText(getContext(), "Collab eliminado", Toast.LENGTH_SHORT).show();
+                        getParentFragmentManager().popBackStack();
+                    }
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    if (isAdded()) {
+                        Toast.makeText(getContext(), "Error al eliminar Collab: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        });
+
+        builder.setNegativeButton("Cancelar", (dialog, which) -> {
+            dialog.dismiss();
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     private void exitCollab() {
         if (currentCollab == null) {
             Toast.makeText(getContext(), "Error: No se ha cargado el Collab", Toast.LENGTH_SHORT).show();
@@ -191,23 +223,78 @@ public class CollabDetailFragment extends Fragment {
             Toast.makeText(getContext(), "Error: Usuario no autenticado", Toast.LENGTH_SHORT).show();
             return;
         }
+        if(currentCollab.getMiembros().size()==1 && currentCollab.getMiembros().contains(usuarioActual.getUid())){
+            Toast.makeText(getContext(), "Eres el último miembro. Si sales, el Collab se eliminará.", Toast.LENGTH_SHORT).show();
+            showDeleteConfirmationDialog();
+            return;
+        }
+        if(currentCollab.getCreadorId().equals(usuarioActual.getUid())){
+            Toast.makeText(getContext(), "Eres el creador, se asignara a otro creador al collab", Toast.LENGTH_SHORT).show();
+            newCreatorAssignment(usuarioActual.getUid());
+            showExitConfirmationDialog();
+            return;
+        }
+    }
 
-        currentCollab.removerMiembro(usuarioActual.getUid(), new OnOperationCallback() {
-            @Override
-            public void onSuccess() {
-                if (isAdded()) {
-                    Toast.makeText(getContext(), "Has salido del Collab", Toast.LENGTH_SHORT).show();
-                    getParentFragmentManager().popBackStack();
-                }
-            }
+    private void showExitConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Salir del Collab");
+        builder.setMessage("¿Estás seguro de que deseas salir de este Collab?");
 
-            @Override
-            public void onFailure(Exception e) {
-                if (isAdded()) {
-                    Toast.makeText(getContext(), "Error al salir del Collab: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        builder.setPositiveButton("Salir", (dialog, which) -> {
+            // Lógica para salir del Collab
+            FirebaseAuth mAuth= FirebaseAuth.getInstance();
+            FirebaseUser usuarioActual = mAuth.getCurrentUser();
+            if (usuarioActual == null) return;
+            currentCollab.removerMiembro(usuarioActual.getUid(), new OnOperationCallback() {
+                @Override
+                public void onSuccess() {
+                    if (isAdded()) {
+                        Toast.makeText(getContext(), "Has salido del Collab", Toast.LENGTH_SHORT).show();
+                        getParentFragmentManager().popBackStack();
+                    }
                 }
-            }
+
+                @Override
+                public void onFailure(Exception e) {
+                    if (isAdded()) {
+                        Toast.makeText(getContext(), "Error al salir del Collab: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         });
+
+        builder.setNegativeButton("Cancelar", (dialog, which) -> {
+            dialog.dismiss();
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+    private void newCreatorAssignment(String exitingCreatorId) {
+        ArrayList<String> miembros = currentCollab.getMiembros();
+        String newCreatorId = null;
+        for (String miembroId : miembros) {
+            if (!miembroId.equals(exitingCreatorId)) {
+                newCreatorId = miembroId;
+                break;
+            }
+        }
+        if (newCreatorId != null) {
+            currentCollab.setCreadorId(newCreatorId, new OnOperationCallback() {
+                @Override
+                public void onSuccess() {
+                    // Creador asignado correctamente
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    if (isAdded()) {
+                        Toast.makeText(getContext(), "Error al asignar nuevo creador: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
     }
 
     private void cargarDetallesDelCollabDesdeFirestore(String id) {

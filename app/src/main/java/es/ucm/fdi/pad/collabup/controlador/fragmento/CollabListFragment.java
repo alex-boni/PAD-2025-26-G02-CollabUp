@@ -1,6 +1,7 @@
 package es.ucm.fdi.pad.collabup.controlador.fragmento;
 
 import android.os.Bundle;
+
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -60,14 +61,14 @@ public class CollabListFragment extends Fragment implements OnCollabClickListene
         View view = inflater.inflate(R.layout.fragment_collab_list_layout, container, false);
 
         mAuth = FirebaseAuth.getInstance();
-        
+
         searchEditText = view.findViewById(R.id.searchEditText);
         filterChipGroup = view.findViewById(R.id.filterChipGroup);
         recyclerView = view.findViewById(R.id.recyclerViewCollab);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         collabs = new ArrayList<>();
-        originalCollabs= new ArrayList<>();
+        originalCollabs = new ArrayList<>();
         adapter = new CardAdapter(collabs, this);
         recyclerView.setAdapter(adapter);
 
@@ -78,10 +79,10 @@ public class CollabListFragment extends Fragment implements OnCollabClickListene
 
         FloatingActionButton fab = view.findViewById(R.id.fabCreateCollab);
         fab.setOnClickListener(v ->
-            getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragmentApp, CreateCollabFragment.newInstance())
-                .addToBackStack(null)
-                .commit()
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragmentApp, CreateCollabFragment.newInstance())
+                        .addToBackStack(null)
+                        .commit()
         );
         return view;
     }
@@ -105,7 +106,7 @@ public class CollabListFragment extends Fragment implements OnCollabClickListene
                 originalCollabs.clear();
                 originalCollabs.addAll(collabs);
                 adapter.notifyDataSetChanged();
-                
+
                 if (collabs.isEmpty()) {
                     Toast.makeText(getContext(), "No tienes Collabs aún. ¡Crea uno!", Toast.LENGTH_SHORT).show();
                 }
@@ -121,7 +122,7 @@ public class CollabListFragment extends Fragment implements OnCollabClickListene
     private void setupFragmentResultListener() {
         getParentFragmentManager().setFragmentResultListener(RESULT_KEY, this, (requestKey, result) -> {
             String collabId = result.getString("collabId");
-            
+
             if (collabId != null) {
                 cargarCollabsDesdeFirestore();
             }
@@ -132,15 +133,6 @@ public class CollabListFragment extends Fragment implements OnCollabClickListene
     public void onCollabClick(Collab collab) {
         Bundle args = new Bundle();
         args.putString("collab_id", collab.getId());
-
-//        CollabDetailFragment detailFragment = new CollabDetailFragment();
-//        detailFragment.setArguments(args);
-//
-//        getParentFragmentManager().beginTransaction()
-//                .replace(R.id.fragmentApp, detailFragment)
-//                .addToBackStack("collab_list")
-//                .commit();
-//        Toast.makeText(getContext(), "Abriendo Collab: " + collab.getNombre(), Toast.LENGTH_SHORT).show();
         CollabItemViewListFragment collabItemViewFragment = new CollabItemViewListFragment();
         collabItemViewFragment.setArguments(args);
 
@@ -150,34 +142,33 @@ public class CollabListFragment extends Fragment implements OnCollabClickListene
                 .commit();
         Toast.makeText(getContext(), "Abriendo Collab: " + collab.getNombre(), Toast.LENGTH_SHORT).show();
     }
+
     @Override
     public void onFavoriteClick(Collab collab, int position) {
-        if(!collab.estaEliminado()){
-            boolean noEraFavorito = !collab.esFavorito();
-            String nuevoEstado = (noEraFavorito) ? "favorito" : "activo";
-            collab.setEstado(nuevoEstado);
-            collab.modificar(collab, new OnOperationCallback() {
-                @Override
-                public void onSuccess() {
-                    adapter.notifyItemChanged(position);
-                    String mensaje = noEraFavorito ? "Marcado como favorito" : "Desmarcado como favorito";
-                    Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
-                }
+        boolean noEraFavorito = !collab.esFavorito();
+        String nuevoEstado = (noEraFavorito) ? "favorito" : "activo";
+        collab.setEstado(nuevoEstado);
+        collab.modificar(collab, new OnOperationCallback() {
+            @Override
+            public void onSuccess() {
+                adapter.notifyItemChanged(position);
+                String mensaje = noEraFavorito ? "Marcado como favorito" : "Desmarcado como favorito";
+                Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+            }
 
-                @Override
-                public void onFailure(Exception e) {
-                    Toast.makeText(getContext(), "Error al actualizar favorito: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
-        }else {
-            Toast.makeText(getContext(), "No se puede cambiar favorito de un Collab eliminado.", Toast.LENGTH_SHORT).show();
-        }
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getContext(), "Error al actualizar favorito: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     private void setupSearchListener() {
         searchEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -186,7 +177,8 @@ public class CollabListFragment extends Fragment implements OnCollabClickListene
             }
 
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
         });
     }
 
@@ -205,16 +197,17 @@ public class CollabListFragment extends Fragment implements OnCollabClickListene
                 currentFilter = "all";
             } else if (checkedId == R.id.chipFavorites) {
                 currentFilter = "favorites";
-            } else if (checkedId == R.id.chipActives) {
-                currentFilter = "actives";
-            } else if (checkedId == R.id.chipDeleted) {
-                currentFilter = "deleted";
+            } else if (checkedId == R.id.chipCreations) {
+                currentFilter = "creations";
+            } else if (checkedId == R.id.chipInvitations) {
+                currentFilter = "invitations";
             }
 
             String query = searchEditText.getText() != null ? searchEditText.getText().toString() : "";
             applyFilterAndSearch(query, currentFilter);
         });
     }
+
     private void applyFilterAndSearch(String query, String filterType) {
         List<Collab> filteredList = new ArrayList<>();
 
@@ -224,14 +217,14 @@ public class CollabListFragment extends Fragment implements OnCollabClickListene
                 case "all":
                     matchesFilter = true; // El filtro "todos" no excluye nada
                     break;
-                case "actives":
-                    matchesFilter = !collab.estaEliminado();
+                case "creations":
+                    matchesFilter = collab.getCreadorId().equals(mAuth.getCurrentUser().getUid());
+                    break;
+                case "invitations":
+                    matchesFilter = !collab.getCreadorId().equals(mAuth.getCurrentUser().getUid());
                     break;
                 case "favorites":
                     matchesFilter = collab.getEstado().toLowerCase().contains("favorito");
-                    break;
-                case "deleted":
-                    matchesFilter = collab.getEstado().toLowerCase().contains("eliminado");
                     break;
             }
 

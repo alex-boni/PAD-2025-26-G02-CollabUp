@@ -23,8 +23,8 @@
     <string name="search_collabs_hint">Buscar Collabs</string>
     <string name="chip_all">Todos</string>
     <string name="chip_favorites">Favoritos</string>
-    <string name="chip_actives">Activos</string>
-    <string name="chip_deleted">Eliminados</string>
+    <string name="chip_creations">Creados</string>
+    <string name="chip_invitations">Invitado</string>
     <string name="no_collabs_found">No se encontraron collabs.</string>
     <string name="create_new_collab_fab">Crear nuevo Collab</string>
     <string name="add_collab_title">Añadir Collab</string>

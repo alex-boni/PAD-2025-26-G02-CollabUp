@@ -144,9 +144,7 @@ public class HomeFragment extends Fragment implements OnCollabClickListener {
                 collabList.clear();
                 // Filtrar para mostrar solo activos
                 for (Collab collab : collabs) {
-                    if (!collab.estaEliminado()) {
                         collabList.add(collab);
-                    }
                 }
 
                 // TODO: Ordenar por fecha más reciente (si 'Collab' tiene fecha)
@@ -185,7 +183,6 @@ public class HomeFragment extends Fragment implements OnCollabClickListener {
     @Override
     public void onFavoriteClick(Collab collab, int position) {
         // Marcar como favorito (copiado de CollabListFragment)
-        if (!collab.estaEliminado()) {
             boolean noEraFavorito = !collab.esFavorito();
             String nuevoEstado = (noEraFavorito) ? "favorito" : "activo";
             collab.setEstado(nuevoEstado);
@@ -203,6 +200,5 @@ public class HomeFragment extends Fragment implements OnCollabClickListener {
                     Toast.makeText(getContext(), "Error al actualizar", Toast.LENGTH_SHORT).show();
                 }
             });
-        }
     }
 }
