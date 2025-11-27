@@ -1,6 +1,7 @@
 package es.ucm.fdi.pad.collabup.controlador.fragmento;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,6 +53,7 @@ public class CollabItemFragment extends Fragment {
     private CollabItem ci; //collabitem seleccionado
 
     private String idC; //la collab del item
+    private boolean editable = false; //modo de edición o no.
 
     //ATRIBUTOS DE SELECCIÓN (miembros y collab views)
     private List<String> miembros = new ArrayList<>(); //elementos posibles
@@ -89,6 +91,11 @@ public class CollabItemFragment extends Fragment {
         eTxtNombreCollabItem = view.findViewById(R.id.eTxtNombreCollabItem);
         eTxtDescripcionCollabItem = view.findViewById(R.id.eTxtDescripcionCollabItem);
         eTxtFechaCollabItem = view.findViewById(R.id.eTxtFechaCollabItem);
+        eTxtFechaCollabItem.setOnClickListener(v -> {
+            if (editable) { //quiero que se abra el picker solo si estamos en modo de edición
+                mostrarDatePicker();
+            }
+        });
 
         // Listas
         lvUsrsAsigCollabItem = view.findViewById(R.id.lvUsrsAsigCollabItem);
@@ -102,19 +109,20 @@ public class CollabItemFragment extends Fragment {
         btnSeleccionCV = view.findViewById(R.id.btnSeleccionCV);
 
         toolbar = view.findViewById(R.id.toolbarCollabItem);
+        toolbar.setTitle("Detalles del Collab Item");
         toolbar.setNavigationOnClickListener(v -> {
             getParentFragmentManager().popBackStack(); //para poder volver atrás
         });
 
 
-        // Recuperar argumentos
+        // Recupero argumentos
         Bundle bundle = getArguments();
         if (bundle != null) {
             idI = bundle.getString("idI");
             idC = bundle.getString("idC");
         }
 
-        // Configuramos botones y listas (igual que antes)
+        // Botones:
         btnEditarCollabItem.setOnClickListener(v -> {
             setEditable(true);
             btnEditarCollabItem.setVisibility(View.GONE);
@@ -140,6 +148,31 @@ public class CollabItemFragment extends Fragment {
 
         //cargamos el item y se muestra en la pantalla
         cargarCollabItem();
+        setEditable(false); //para que en principio no se puedan editar
+    }
+
+    private void mostrarDatePicker() {
+        final java.util.Calendar calendar = java.util.Calendar.getInstance();
+        int year = calendar.get(java.util.Calendar.YEAR);
+        int month = calendar.get(java.util.Calendar.MONTH);
+        int day = calendar.get(java.util.Calendar.DAY_OF_MONTH);
+
+        android.app.DatePickerDialog datePicker = new android.app.DatePickerDialog(
+                requireContext(),
+                (view, yearSelected, monthSelected, daySelected) -> {
+                    // +1 porque los meses van del 0–11
+                    String fecha = String.format(Locale.getDefault(),
+                            "%02d/%02d/%04d",
+                            daySelected,
+                            monthSelected + 1,
+                            yearSelected
+                    );
+                    eTxtFechaCollabItem.setText(fecha);
+                },
+                year, month, day
+        );
+
+        datePicker.show();
     }
 
     //--------------- FUNCIONES DE CARGAR DATOS
@@ -213,8 +246,6 @@ public class CollabItemFragment extends Fragment {
                 Toast.makeText(requireContext(), "Error al cargar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
-
     }
 
 
@@ -298,32 +329,23 @@ public class CollabItemFragment extends Fragment {
     }
 
 
-    //Funcion para hacer los elementos generales de forma eficiente y escalable
+    //Funcion para poder editar los elementos SOLO cuando corresponda
     private void setEditable(boolean editable) {
-        View root = requireView().findViewById(R.id.rootLayoutCollabItem); // el id del layout raíz de activity_collabitem.xml
-        setEditableRecursive(root, editable);
+        this.editable = editable;
 
-        //mostramos o ocultamos botones de la selección
-        if (editable) {
-            btnSeleccionMiembros.setVisibility(View.VISIBLE);
-            btnSeleccionCV.setVisibility(View.VISIBLE);
-        } else {
-            btnSeleccionMiembros.setVisibility(View.GONE);
-            btnSeleccionCV.setVisibility(View.GONE);
-        }
+        setFieldEditable(eTxtNombreCollabItem, editable);
+        setFieldEditable(eTxtDescripcionCollabItem, editable);
+        setFieldEditable(eTxtFechaCollabItem, editable);
+
+        btnSeleccionMiembros.setVisibility(editable ? View.VISIBLE : View.GONE);
+        btnSeleccionCV.setVisibility(editable ? View.VISIBLE : View.GONE);
     }
 
-    private void setEditableRecursive(View view, boolean editable) {
-        if (view instanceof EditText) {
-            view.setEnabled(editable);
-        } else if (view instanceof ViewGroup) {
-            ViewGroup group = (ViewGroup) view;
-            for (int i = 0; i < group.getChildCount(); i++) {
-                setEditableRecursive(group.getChildAt(i), editable);
-            }
-        }
+    private void setFieldEditable(EditText editText, boolean editable) {
+        editText.setFocusable(editable);
+        editText.setFocusableInTouchMode(editable);
+        editText.setClickable(editable);
     }
-
 
     //---- ACTUALIZACIONES DE INFORMACION
     private void actualizarListaUsuarios() {
@@ -353,6 +375,7 @@ public class CollabItemFragment extends Fragment {
     //Función que se usa para mostrar los datos del item al que estamos viendo una vez ya tenemos
     //la información
     private void mostrarDatosCollabItem() {
+        Log.d("Calendario", "en mostrar item");
         eTxtNombreCollabItem.setText(ci.getNombre());
         eTxtDescripcionCollabItem.setText(ci.getDescripcion());
         if (ci.getFecha() != null) {

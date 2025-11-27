@@ -1,101 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:padding="20dp">
+    android:fillViewport="true">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbarCollabItem"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:title="Nuevo CollabItem"
-        android:titleTextColor="@android:color/white"
-        app:navigationIcon="?attr/homeAsUpIndicator" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Crear nuevo CollabItem"
-        android:textSize="24sp"
-        android:textColor="@android:color/black"
-        android:layout_marginBottom="24dp" />
-
-    <EditText
-        android:id="@+id/eTxtNombreCollabItem"
-        android:layout_width="391dp"
-        android:layout_height="58dp"
-        android:layout_marginBottom="16dp"
-        android:hint="Nombre del CollabItem"
-        android:inputType="textCapSentences" />
-
-    <EditText
-        android:id="@+id/eTxtDescripcionCollabItem"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Descripción breve"
-        android:inputType="textMultiLine"
-        android:minLines="3"
-        android:gravity="top"
-        android:layout_marginBottom="24dp" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <EditText
-        android:id="@+id/eTxtFechaCollabItem"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Fecha"
-        android:inputType="date" />
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbarCollabItem"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/white"
+            android:title="Crear nuevo Collab Item"
+            android:titleTextColor="@android:color/black"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:navigationIconTint="@android:color/black" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Usuarios asignados:"
-        android:textStyle="bold"
-        android:paddingTop="12dp" />
 
-    <ListView
-        android:id="@+id/lvUsrsAsigCollabItem"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dp"
-        android:paddingBottom="8dp" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nombre del CollabItem">
 
-    <Button
-        android:id="@+id/btnSeleccionMiembros"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Seleccionar miembros" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/eTxtNombreCollabItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapSentences" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="CollabViews asignadas:"
-        android:textStyle="bold"
-        android:paddingTop="12dp" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Descripción breve"
+            android:layout_marginTop="12dp">
 
-    <ListView
-        android:id="@+id/lvCVAsigCollabItem"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="1dp"
-        android:paddingBottom="8dp" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/eTxtDescripcionCollabItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minLines="3"
+                android:gravity="top"
+                android:inputType="textMultiLine" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
-        android:id="@+id/btnSeleccionCV"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Seleccionar Collab Views a los que pertenecera" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Fecha (dd/MM/yyyy)"
+            android:layout_marginTop="12dp">
 
-    <Button
-        android:id="@+id/btnCrearCollabItem"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Crear"
-        android:textSize="18sp" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/eTxtFechaCollabItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="date"
+                android:focusable="false"
+                android:clickable="true" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-</LinearLayout>
+        <!-- BLOQUE MIEMBROS -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="2dp"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Miembros asignados"
+                    android:textStyle="bold"
+                    android:textSize="16sp" />
+
+                <ListView
+                    android:id="@+id/lvUsrsAsigCollabItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:divider="@android:color/darker_gray"
+                    android:dividerHeight="1dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSeleccionMiembros"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Seleccionar miembros"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- BLOQUE COLLAB VIEWS -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="2dp"
+            android:layout_marginTop="20dp"
+            app:cardCornerRadius="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CollabViews asignadas"
+                    android:textStyle="bold"
+                    android:textSize="16sp" />
+
+                <ListView
+                    android:id="@+id/lvCVAsigCollabItem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:divider="@android:color/darker_gray"
+                    android:dividerHeight="1dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSeleccionCV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Seleccionar CollabViews"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Botón para crear -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCrearCollabItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Crear"
+            android:textSize="18sp"
+            style="?attr/materialButtonOutlinedStyle" />
+
+    </LinearLayout>
+</ScrollView>

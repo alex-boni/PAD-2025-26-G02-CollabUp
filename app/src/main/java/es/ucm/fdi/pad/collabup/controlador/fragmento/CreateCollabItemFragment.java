@@ -86,6 +86,7 @@ public class CreateCollabItemFragment extends Fragment {
         eTxtNombreCollabItem = view.findViewById(R.id.eTxtNombreCollabItem);
         eTxtDescripcionCollabItem = view.findViewById(R.id.eTxtDescripcionCollabItem);
         eTxtFechaCollabItem = view.findViewById(R.id.eTxtFechaCollabItem);
+        eTxtFechaCollabItem.setOnClickListener(v -> mostrarDatePicker());
         btnCrearCollabItem = view.findViewById(R.id.btnCrearCollabItem);
         btnSeleccionMiembros = view.findViewById(R.id.btnSeleccionMiembros);
         btnSeleccionCV = view.findViewById(R.id.btnSeleccionCV);
@@ -95,7 +96,7 @@ public class CreateCollabItemFragment extends Fragment {
         lvCvAsigCollabItem = view.findViewById(R.id.lvCVAsigCollabItem);
 
         toolbar = view.findViewById(R.id.toolbarCollabItem);
-
+        toolbar.setTitle("Crear nuevo Collab Item");
         toolbar.setNavigationOnClickListener(v -> {
             getParentFragmentManager().popBackStack();
         });
@@ -115,6 +116,30 @@ public class CreateCollabItemFragment extends Fragment {
         btnCrearCollabItem.setEnabled(false);
 
         cargarDatos();
+    }
+
+    private void mostrarDatePicker() {
+        final java.util.Calendar calendar = java.util.Calendar.getInstance();
+        int year = calendar.get(java.util.Calendar.YEAR);
+        int month = calendar.get(java.util.Calendar.MONTH);
+        int day = calendar.get(java.util.Calendar.DAY_OF_MONTH);
+
+        android.app.DatePickerDialog datePicker = new android.app.DatePickerDialog(
+                requireContext(),
+                (view, yearSelected, monthSelected, daySelected) -> {
+                    // +1 porque los meses van del 0–11
+                    String fecha = String.format(Locale.getDefault(),
+                            "%02d/%02d/%04d",
+                            daySelected,
+                            monthSelected + 1,
+                            yearSelected
+                    );
+                    eTxtFechaCollabItem.setText(fecha);
+                },
+                year, month, day
+        );
+
+        datePicker.show();
     }
 
     private void cargarDatos() {

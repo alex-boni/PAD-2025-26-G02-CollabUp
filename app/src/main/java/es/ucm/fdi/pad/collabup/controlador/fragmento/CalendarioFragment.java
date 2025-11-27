@@ -1,6 +1,8 @@
 package es.ucm.fdi.pad.collabup.controlador.fragmento;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +22,7 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import es.ucm.fdi.pad.collabup.R;
@@ -50,6 +53,8 @@ public class CalendarioFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        configurarIdiomaCalendario();
+        
         //Layouts (orden importante)
         calendarView = view.findViewById(R.id.calendarView);
         recyclerView = view.findViewById(R.id.recyclerItemsDia);
@@ -73,6 +78,9 @@ public class CalendarioFragment extends Fragment {
                     cal.set(year, month, dayOfMonth);
                     cargarItemsDia(cal);
                 });
+
+                ajustesCalendario(); //importante que esto esté dentro de este onSucess.
+
             }
 
             @Override
@@ -88,14 +96,12 @@ public class CalendarioFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new CollabItemAdapter(new ArrayList<>(), item -> {
             //Pasamos los parámetros necesarios
-            Bundle bundle = new Bundle();
-            bundle.putString("idI", item.getIdI());
-            bundle.putString("idC", item.getIdC());
-            CollabItemFragment fragment = new CollabItemFragment();
-            fragment.setArguments(bundle);
-
-            requireActivity()
-                    .getSupportFragmentManager()
+            Log.d("Calendario", "abriendo item");
+            CollabItemFragment fragment = CollabItemFragment.newInstance(
+                    item.getIdI(),
+                    item.getIdC()
+            );
+            requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragmentApp, fragment)
                     .addToBackStack(null)
@@ -123,6 +129,7 @@ public class CalendarioFragment extends Fragment {
                         public void onSuccess(List<CollabItem> result) {
                             todosItems.addAll(result);
                             if (contador.incrementAndGet() == listaCollabs.size()) {
+                                Log.d("Calendario", "terminando items");
                                 adapter.setItems(todosItems); //porque sino se carga raro
                             }
                         }
@@ -142,5 +149,19 @@ public class CalendarioFragment extends Fragment {
             }
         });
 
+    }
+
+    private void ajustesCalendario() {
+        calendarView.setFirstDayOfWeek(Calendar.MONDAY);
+        calendarView.setWeekDayTextAppearance(R.style.CalendarWeekDay);
+        calendarView.setDateTextAppearance(R.style.CalendarDate);
+    }
+
+    private void configurarIdiomaCalendario() {
+        Locale locale = new Locale("es", "ES");
+        Locale.setDefault(locale);
+        Configuration config = getResources().getConfiguration();
+        config.setLocale(locale);
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
     }
 }
