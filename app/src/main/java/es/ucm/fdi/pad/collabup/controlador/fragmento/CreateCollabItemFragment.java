@@ -300,6 +300,17 @@ public class CreateCollabItemFragment extends Fragment {
             }
         }
 
+        //Comprobamos que, si se ha elegido algún collab view que sea calendario, la fecha no es null
+        for (String cvId : cvElegidas) {
+            CollabView cvaux = idCv.get(cvId);
+            if (cvaux instanceof Calendario && fecha == null) {
+                Toast.makeText(requireContext(),
+                        "No puedes añadir un CollabItem sin fecha a un Calendario",
+                        Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
+
         CollabItem nuevo = new CollabItem(nombre, descripcion, fecha,
                 miembrosElegidos, idC, cvElegidas);
 

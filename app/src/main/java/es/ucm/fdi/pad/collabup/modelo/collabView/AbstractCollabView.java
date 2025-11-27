@@ -323,6 +323,29 @@ public abstract class AbstractCollabView implements CollabView {
                 );
     }
 
+    public void obtenerCollabItemsDeCollabView(String collabId, String collabViewId,
+                                               OnDataLoadedCallback<List<CollabItem>> callback) {
+        db.collection("collabs")
+                .document(collabId)
+                .collection("collabViews")
+                .document(collabViewId)
+                .collection("collabItems")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<CollabItem> items = new ArrayList<>();
+                    for (var doc : queryDocumentSnapshots.getDocuments()) {
+                        CollabItem item = doc.toObject(CollabItem.class);
+                        if (item != null) {
+                            item.setIdI(doc.getId());
+                            item.setIdC(collabViewId);
+                            items.add(item);
+                        }
+                    }
+                    callback.onSuccess(items);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
     public static class CollabViewTransfer {
         public CollabViewTransfer() {
         }

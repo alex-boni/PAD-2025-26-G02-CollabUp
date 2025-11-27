@@ -131,7 +131,6 @@ public class CollabItemFragment extends Fragment {
 
         btnGuardarCollabItem.setOnClickListener(v -> {
             modificarCollabItem();
-            setEditable(false);
         });
 
         btnEliminarCollabItem.setOnClickListener(v -> {
@@ -406,10 +405,21 @@ public class CollabItemFragment extends Fragment {
     //-------------- FUNCIONES EDITAR Y ELIMINAR
 
     private void modificarCollabItem() {
-
         List<String> prevCV = new ArrayList<>(ci.getcvAsignadas()); //saco las que había asignadas antes
 
         CollabItem ciActualizado = obtenerCollabItemDePantalla();
+        //Si se ha seleccionado algún collabView y el item no tiene fecha no puede ser.
+        Timestamp fecha = ciActualizado.getFecha();
+        for (String cvId : ciActualizado.getcvAsignadas()) {
+            CollabView cvaux = idCv.get(cvId);
+            if (cvaux instanceof Calendario && fecha == null) {
+                Toast.makeText(requireContext(),
+                        "No puedes asignar este CollabItem a un Calendario sin fecha",
+                        Toast.LENGTH_LONG).show();
+                return; // se detiene la edición
+            }
+        }
+
         List<String> nuevasCV = new ArrayList<>(ciActualizado.getcvAsignadas());//saco las nuevas
 
         // Calculamos diferencias para actualizar el collabitem
@@ -477,7 +487,6 @@ public class CollabItemFragment extends Fragment {
             @Override
             public void onFailure(Exception e) {
                 Toast.makeText(requireContext(), "Error al actualizar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                finalizarModificacion(ciActualizado);
             }
         });
     }
