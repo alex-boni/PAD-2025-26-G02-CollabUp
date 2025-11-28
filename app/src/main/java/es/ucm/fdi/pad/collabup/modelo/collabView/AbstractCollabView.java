@@ -33,6 +33,7 @@ public abstract class AbstractCollabView implements CollabView {
     private String uid; //id del collabview
     protected String nombre;
     private Map<CollabViewSetting, Object> settings; //ajustes del collabview
+    private Map<String, Object> settingsById; //índice por id para acceso O(1)
     private List<CollabItem> listaCollabItems; //lista de eventos
     protected RecyclerView.Adapter<?> adapter; //adapter singleton que se reutiliza en los fragments
 
@@ -40,8 +41,12 @@ public abstract class AbstractCollabView implements CollabView {
 
     public AbstractCollabView() {
         this.settings = new HashMap<>();
+        this.settingsById = new HashMap<>();
         this.listaCollabItems = new ArrayList<>();
-        getStaticCreationSettings().forEach((s) -> this.settings.put(s, null));
+        getStaticCreationSettings().forEach((s) -> {
+            this.settings.put(s, null);
+            this.settingsById.put(s.getId(), null);
+        });
     }
 
     public String getCollabId() {
@@ -279,6 +284,16 @@ public abstract class AbstractCollabView implements CollabView {
 
     protected abstract Fragment getFragmentAjustes();
 
+    /**
+     * Obtiene el valor de un setting de forma eficiente por su id en O(1).
+     *
+     * @param settingId El id único del setting
+     * @return El valor del setting o null si no existe
+     */
+    protected Object getSettingValue(String settingId) {
+        return settingsById.get(settingId);
+    }
+
     @Override
     public Map<CollabViewSetting, Object> getSettings() {
         return new HashMap<>(settings);
@@ -296,7 +311,9 @@ public abstract class AbstractCollabView implements CollabView {
         cv.uid = uid;
         cv.nombre = name;
         for (CollabViewSetting s : cv.settings.keySet()) {
-            cv.settings.put(s, settings.getOrDefault(s.getName(), null));
+            Object value = settings.getOrDefault(s.getName(), null);
+            cv.settings.put(s, value);
+            cv.settingsById.put(s.getId(), value);
         }
         if (items != null) {
             cv.listaCollabItems.addAll(items);

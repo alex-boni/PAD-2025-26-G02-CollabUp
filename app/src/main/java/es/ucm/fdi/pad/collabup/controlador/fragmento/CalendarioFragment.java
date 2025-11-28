@@ -92,9 +92,8 @@ public class CalendarioFragment extends Fragment {
 
         Toolbar toolbar = view.findViewById(R.id.toolbar);
 
-        ajustesCalendario();
         lecturaArgumentos();
-
+        ajustesCalendario();
 
         if (general) {
             toolbar.setVisibility(View.GONE);

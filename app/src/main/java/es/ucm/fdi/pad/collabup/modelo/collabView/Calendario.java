@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import es.ucm.fdi.pad.collabup.R;
@@ -36,7 +36,13 @@ public class Calendario extends AbstractCollabView {
             ids.add(item.getIdI());
         }
 
-        CalendarioFragment cal = CalendarioFragment.newInstance(getCollabId(), getUid(), ids, "Monday");
+        // Obtener el día de inicio de semana desde los settings (en español)
+        String diaInicio = (String) getSettingValue("calendario_dia_inicio_semana");
+        if (diaInicio == null) {
+            diaInicio = "Lunes";
+        }
+
+        CalendarioFragment cal = CalendarioFragment.newInstance(getCollabId(), getUid(), ids, diaInicio);
         cal.setAdapter(adapter);
         if (adapter instanceof CollabItemAdapter) {
             ((CollabItemAdapter) adapter).setListener(cal.cambiarAItem());
@@ -44,6 +50,7 @@ public class Calendario extends AbstractCollabView {
         cal.setTitulo(this.nombre);
         return cal; //abro el calendario
     }
+
 
     @Override
     protected RecyclerView.Adapter<?> obtenerAdapter() {
@@ -66,10 +73,9 @@ public class Calendario extends AbstractCollabView {
         return null;
     }
 
-
     @Override
     public Set<CollabViewSetting> getStaticCreationSettings() {
-        return Collections.emptySet();
+        return Set.of(new CollabViewSetting("calendario_dia_inicio_semana", CollabViewSetting.CollabViewSettingsType.LISTA_OPCIONES, "Dia de inicio de semana", true, List.of("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")));
     }
 
 

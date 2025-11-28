@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".controlador.AppController"
-    android:background="#FFf5f5f5">
+    android:background="#FFf5f5f5"
+    android:fitsSystemWindows="true">
 
     <FrameLayout
         android:id="@+id/fragmentApp"
@@ -24,4 +25,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/bottom_menu" /> </androidx.constraintlayout.widget.ConstraintLayout>
+        app:menu="@menu/bottom_menu" />
+</androidx.constraintlayout.widget.ConstraintLayout>
