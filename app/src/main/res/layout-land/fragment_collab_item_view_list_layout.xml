@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:colorBackground"
-    tools:context=".controlador.fragmento.CollabItemViewListFragment">
+    android:background="?android:colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,28 +14,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?android:colorBackground"
-            app:elevation="0dp">
+            app:elevation="4dp">
 
-            <!-- Toolbar actualizada a Material 3 -->
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/collabViewListToolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:menu="@menu/collab_datail_menu"
-                app:navigationIcon="?attr/homeAsUpIndicator"
-                app:title="@string/title_collab_item_detail"
-                app:titleCentered="true" />
-
-            <!-- Tabs integradas en el AppBar -->
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/tabLayoutCollabItems"
+            <!-- LinearLayout horizontal para Toolbar + Tabs -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:tabIndicatorColor="?attr/colorPrimary"
-                app:tabSelectedTextColor="?attr/colorPrimary"
-                app:tabTextColor="?attr/colorOnSurfaceVariant"
-                app:tabMode="fixed" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/collabViewListToolbar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="?attr/actionBarSize"
+                    android:minWidth="200dp"
+                    app:menu="@menu/collab_datail_menu"
+                    app:navigationIcon="?attr/homeAsUpIndicator"
+                    app:title="@string/title_collab_item_detail" />
+
+                <!-- Tabs a la derecha de la toolbar para ahorrar altura -->
+                <com.google.android.material.tabs.TabLayout
+                    android:id="@+id/tabLayoutCollabItems"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    app:tabMode="fixed"
+                    app:tabGravity="center" />
+            </LinearLayout>
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.viewpager2.widget.ViewPager2
@@ -45,17 +48,18 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1" />
-
     </LinearLayout>
 
+    <!-- FAB pequeño (Mini) para no tapar contenido en landscape -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabCreateCollabItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="24dp"
+        android:layout_margin="16dp"
         android:contentDescription="@string/add_item_description"
         android:src="@drawable/ic_add"
+        app:fabSize="mini"
         app:backgroundTint="?attr/colorPrimaryContainer"
         app:tint="?attr/colorOnPrimaryContainer" />
 

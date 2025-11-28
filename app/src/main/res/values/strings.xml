@@ -97,9 +97,26 @@
     <string name="button_delete">Eliminar</string>
     <string name="add_collabview_title">Añadir CollabView</string>
     <string name="setting_label">%1$s%2$s</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="add_item_description">Añadir item</string>
     <string name="empty_list_message">No hay items. Toca + para añadir uno.</string>
+    <string name="create_collab_item_title">Crear nuevo Collab Item</string>
+    <string name="collab_item_name_hint">Nombre del CollabItem</string>
+    <string name="collab_item_desc_hint">Descripción breve</string>
+    <string name="collab_item_date_hint">Fecha (dd/MM/yyyy)</string>
+    <string name="assigned_members_title">Miembros asignados</string>
+    <string name="select_members_button">Seleccionar miembros</string>
+    <string name="assigned_views_title">CollabViews asignadas</string>
+    <string name="select_views_button">Seleccionar CollabViews</string>
+    <string name="create_button">Crear</string>
+    <string name="list_screen_title">Lista</string>
+    <string name="list_empty_state">No hay elementos para mostrar</string>
+    <string name="title_collab_detail">Detalles del Collab</string>
+    <string name="created_by_prefix">Creado por:</string>
+    <string name="button_add">Añadir</string>
+
+
+
+
 
 </resources>

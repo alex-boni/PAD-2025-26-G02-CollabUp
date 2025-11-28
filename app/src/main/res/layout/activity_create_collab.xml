@@ -1,14 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="?android:colorBackground">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:elevation="0dp"
+        android:background="?android:colorBackground"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.appbar.MaterialToolbar
@@ -40,6 +44,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/header_create_collab"
                 android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -50,6 +55,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:hint="@string/hint_collab_name_required"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 app:errorEnabled="true"
                 app:layout_constraintTop_toBottomOf="@id/tvFormHeader"
                 app:layout_constraintStart_toStartOf="parent"
@@ -69,6 +75,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:hint="@string/hint_description_required"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 app:errorEnabled="true"
                 app:layout_constraintTop_toBottomOf="@id/tilCollabName"
                 app:layout_constraintStart_toStartOf="parent"
@@ -80,8 +87,8 @@
                     android:layout_height="wrap_content"
                     android:gravity="top"
                     android:inputType="textCapSentences|textMultiLine"
-                    android:minLines="3"
-                    android:maxLines="5"/>
+                    android:minLines="4"
+                    android:maxLines="8"/>
             </com.google.android.material.textfield.TextInputLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -95,6 +102,7 @@
         android:orientation="horizontal"
         android:padding="16dp"
         android:gravity="end"
+        android:background="?android:colorBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -105,10 +113,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:textColor="?attr/colorError"
             android:text="@string/button_cancel" />
 
         <Button
             android:id="@+id/btnCrearCollab"
+            style="@style/Widget.Material3.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/button_create_collab" />

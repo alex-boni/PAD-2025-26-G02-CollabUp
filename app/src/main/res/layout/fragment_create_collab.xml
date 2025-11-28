@@ -1,29 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="?android:colorBackground"
+    android:fillViewport="true">
 
-    <com.google.android.material.appbar.AppBarLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:paddingTop="32dp"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/createCollabToolbar"
+        <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="?attr/homeAsUpIndicator"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:title="Crear Nuevo Collab" />
+            android:layout_height="wrap_content"
+            android:background="?android:colorBackground"
+            app:elevation="0dp">
 
-    </com.google.android.material.appbar.AppBarLayout>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/createCollabToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:navigationIcon="?attr/homeAsUpIndicator"
+                app:navigationIconTint="?attr/colorOnSurface"
+                app:title="@string/title_create_collab"
+                app:titleTextColor="?attr/colorOnSurface" />
+        </com.google.android.material.appbar.AppBarLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -35,34 +38,37 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                android:text="Crear Nuevo Collab"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+                android:text="@string/header_create_collab"
+                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnSurface" />
 
-            <!-- nombre collab obligado-->
+            <!-- Nombre Collab -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilCollabName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:hint="Nombre del Collab *"
+                android:hint="@string/hint_collab_name_required"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:errorEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etCollabName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text"
+                    android:inputType="textCapSentences"
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Descripción (Obligatorio) -->
+            <!-- Descripción -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilCollabDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:hint="Descripción *"
+                android:layout_marginBottom="24dp"
+                android:hint="@string/hint_description_required"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:errorEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -71,50 +77,66 @@
                     android:layout_height="wrap_content"
                     android:gravity="top"
                     android:inputType="textMultiLine"
-                    android:maxLines="5"
                     android:minLines="3" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Imagen (Opcional) -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="Imagen (Opcional)"
-                android:textSize="14sp" />
-
-            <LinearLayout
+            <!-- Sección Imagen -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:orientation="horizontal">
+                android:layout_marginBottom="24dp"
+                style="?attr/materialCardViewOutlinedStyle">
 
-                <ImageView
-                    android:id="@+id/ivCollabImage"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:background="@android:color/darker_gray"
-                    android:contentDescription="Imagen del Collab"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_launcher_foreground" />
-
-                <Button
-                    android:id="@+id/btnSelectImage"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginStart="16dp"
-                    android:text="Seleccionar Imagen" />
-            </LinearLayout>
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-            <!-- Invitar Usuario (Opcional) -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        android:text="@string/label_image_optional"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="?attr/colorOnSurface" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/ivCollabImage"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:background="?attr/colorSurfaceContainerHigh"
+                            android:contentDescription="@string/collab_image_description"
+                            android:scaleType="centerCrop"
+                            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Medium"
+                            android:src="@drawable/ic_launcher_foreground" />
+
+                        <Button
+                            android:id="@+id/btnSelectImage"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="24dp"
+                            android:text="@string/button_select_image" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Invitar Usuario -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilInviteUser"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:hint="Invitar usuario (Opcional)">
+                android:layout_marginBottom="8dp"
+                android:hint="@string/hint_invite_user_optional"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:endIconMode="clear_text">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etInviteUser"
@@ -127,10 +149,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:text="* Campos obligatorios"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="12sp" />
+                android:layout_marginBottom="32dp"
+                android:text="@string/info_required_fields"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textAppearance="?attr/textAppearanceBodySmall" />
 
             <!-- Botones -->
             <LinearLayout
@@ -141,18 +163,20 @@
 
                 <Button
                     android:id="@+id/btnCancel"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    android:text="Cancelar" />
+                    android:text="@string/button_cancel"
+                    android:textColor="?attr/colorError" />
 
                 <Button
                     android:id="@+id/btnCreate"
+                    style="@style/Widget.Material3.Button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Crear Collab" />
+                    android:text="@string/button_create_collab" />
             </LinearLayout>
         </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
