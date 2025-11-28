@@ -45,8 +45,10 @@ public class AppController extends AppCompatActivity {
 
         bottomNavigationViewApp = findViewById(R.id.bottomNavigationViewApp);
 
-        // Carga el fragmento inicial (Home)
-        replaceFragment(homeFragment);
+        if (savedInstanceState == null) {
+            replaceFragment(homeFragment);
+        }
+
 
         // Listener para la barra de navegación inferior
         bottomNavigationViewApp.setOnItemSelectedListener(item -> {
@@ -55,13 +57,10 @@ public class AppController extends AppCompatActivity {
                 replaceFragment(homeFragment);
             } else if (itemId == R.id.nav_colabs) {
                 replaceFragment(collabListFragment);
-                // Toast.makeText(this, "Collabs (próximamente)", Toast.LENGTH_SHORT).show();
             } else if (itemId == R.id.nav_calendar) {
                 replaceFragment(amigosFragment);
-                // Toast.makeText(this, "Amigos (próximamente)", Toast.LENGTH_SHORT).show();
             } else if (itemId == R.id.nav_ajustes) {
                 replaceFragment(ajustesFragment);
-                // Toast.makeText(this, "Ajustes (próximamente)", Toast.LENGTH_SHORT).show();
             }
             return true;
         });

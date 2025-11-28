@@ -1,13 +1,14 @@
 package es.ucm.fdi.pad.collabup.controlador;
 
-import android.content.Intent; // Importado
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton; // Import necesario
 import android.widget.Toast;
 
-import androidx.annotation.NonNull; // Importado
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import es.ucm.fdi.pad.collabup.R;
 
@@ -26,6 +27,7 @@ public class LoginController extends AppCompatActivity implements View.OnClickLi
     private EditText eTxtEmail;
     private EditText eTxtPass;
     private Button btnLogin;
+    private ImageButton imgBack; // Variable para el botón de atrás
 
     // Variable para emplear Firebase Authentication
     private FirebaseAuth mAuth;
@@ -40,11 +42,17 @@ public class LoginController extends AppCompatActivity implements View.OnClickLi
         eTxtPass = findViewById(R.id.eTxtPass);
         btnLogin = findViewById(R.id.btnLogin);
 
+        // Instancio el botón de la flecha
+        imgBack = findViewById(R.id.imgBack);
+
         // Inicializo Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
         // ClickListener al unico boton
         btnLogin.setOnClickListener(this);
+
+        // ClickListener a la flecha para volver atrás
+        imgBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
     }
 
     @Override

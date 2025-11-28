@@ -25,8 +25,7 @@
                 android:layout_height="?attr/actionBarSize"
                 app:menu="@menu/collab_datail_menu"
                 app:navigationIcon="?attr/homeAsUpIndicator"
-                app:title="@string/title_collab_item_detail"
-                app:titleCentered="true" />
+                app:title="@string/title_collab_item_detail"/>
 
             <!-- Tabs integradas en el AppBar -->
             <com.google.android.material.tabs.TabLayout

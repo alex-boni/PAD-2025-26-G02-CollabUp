@@ -7,19 +7,33 @@
     android:padding="24dp"
     tools:context=".controlador.SingupController">
 
+    <ImageButton
+        android:id="@+id/imgBack"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/back_button_description"
+        android:padding="8dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_arrow_back_tinted"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="?attr/colorOnSurface" />
+
     <TextView
         android:id="@+id/txtSignupTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginStart="8dp"
         android:text="@string/signup_title"
         android:textColor="?attr/colorPrimary"
-        android:textSize="34sp"
+        android:textSize="28sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@id/imgBack"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/imgBack"
+        app:layout_constraintTop_toTopOf="@id/imgBack" />
 
-    <!-- CAMPO "NOMBRE" -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layoutFullName"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -29,7 +43,7 @@
         android:hint="@string/name_label"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txtSignupTitle">
+        app:layout_constraintTop_toBottomOf="@id/imgBack">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/eTxtNombre"
@@ -38,7 +52,6 @@
             android:inputType="textPersonName" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- CAMPO "USUARIO" -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layoutUsername"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -57,7 +70,6 @@
             android:inputType="textPersonName" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- CAMPO "EMAIL" -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layoutEmail"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -76,7 +88,6 @@
             android:inputType="textEmailAddress" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- CAMPO "CONTRASEÑA" -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layoutPassword"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"

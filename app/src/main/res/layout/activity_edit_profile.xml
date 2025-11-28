@@ -100,48 +100,46 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tilPresentation"/>
 
-            <!-- Spinner Provincia -->
-            <TextView
-                android:id="@+id/lblProvincia"
-                android:layout_width="wrap_content"
+            <!-- AUTOCOMPLETE PROVINCIA -->
+            <!-- Usamos style ExposedDropdownMenu para que parezca un menú pero permita escribir -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilProvincia"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="@string/hint_province"
-                android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvLocationLabel"/>
-
-            <Spinner
-                android:id="@+id/spinnerProvincia"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/abc_spinner_textfield_background_material"
+                android:hint="@string/hint_province"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/lblProvincia" />
+                app:layout_constraintTop_toBottomOf="@id/tvLocationLabel">
 
-            <TextView
-                android:id="@+id/lblLocalidad"
-                android:layout_width="wrap_content"
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    android:id="@+id/autoCompleteProvincia"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- AUTOCOMPLETE LOCALIDAD -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilLocalidad"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/hint_city"
-                android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/spinnerProvincia"/>
-
-            <Spinner
-                android:id="@+id/spinnerLocalidad"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginTop="4dp"
-                android:background="@drawable/abc_spinner_textfield_background_material"
+                android:hint="@string/hint_city"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/lblLocalidad" />
+                app:layout_constraintTop_toBottomOf="@id/tilProvincia">
+
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    android:id="@+id/autoCompleteLocalidad"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
