@@ -183,7 +183,6 @@ public class CollabItemFragment extends Fragment {
 
         Collab c = new Collab(); //Necesito saber los miembros que tiene la collab para poder enseñarlos.
         c.obtener(idC, new OnDataLoadedCallback<Collab>() {
-
             @Override
             public void onSuccess(Collab data) {
                 miembros = data.getMiembros();
@@ -194,7 +193,6 @@ public class CollabItemFragment extends Fragment {
                     public void onSuccess(CollabItem ciRet) {
                         if (ciRet != null) {
                             ci = ciRet;
-
                             ci.obtenerNombresMiembrosCollab(miembros, new OnDataLoadedCallback<Map<String, String>>() {
                                 @Override
                                 public void onSuccess(Map<String, String> data) {
@@ -210,8 +208,8 @@ public class CollabItemFragment extends Fragment {
                                             for (CollabView auxCV : data) {
                                                 cv.add(auxCV.getUid()); //lista con los ids de los collabViews
                                                 idCv.put(auxCV.getUid(), auxCV);
-                                                mostrarDatosCollabItem();
                                             }
+                                            mostrarDatosCollabItem();
                                         }
 
                                         @Override
@@ -354,7 +352,7 @@ public class CollabItemFragment extends Fragment {
                 android.R.layout.simple_list_item_1,
                 nombresAsignados);
         lvUsrsAsigCollabItem.setAdapter(adapter);
-
+        setListViewHeightBasedOnItems(lvUsrsAsigCollabItem);
         btnSeleccionMiembros.setText(nombresAsignados.isEmpty() ? "Seleccionar miembros" :
                 "Miembros: " + nombresAsignados.size());
     }
@@ -366,6 +364,7 @@ public class CollabItemFragment extends Fragment {
                 android.R.layout.simple_list_item_1,
                 nombresAsignados);
         lvCvAsigCollabItem.setAdapter(adapter);
+        setListViewHeightBasedOnItems(lvCvAsigCollabItem);
         btnSeleccionCV.setText(nombresAsignados.isEmpty() ? "Seleccionar Collab Views" :
                 "CollabViews: " + nombresAsignados.size());
     }
@@ -400,6 +399,26 @@ public class CollabItemFragment extends Fragment {
             }
             actualizarListaCV();
         }
+    }
+
+    //Por la vista
+    private void setListViewHeightBasedOnItems(ListView listView) {
+        ArrayAdapter adapter = (ArrayAdapter) listView.getAdapter();
+        if (adapter == null) return;
+
+        int totalHeight = 0;
+        for (int i = 0; i < adapter.getCount(); i++) {
+            View listItem = adapter.getView(i, null, listView);
+            listItem.measure(
+                    View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (adapter.getCount() - 1));
+        listView.setLayoutParams(params);
+        listView.requestLayout();
     }
 
     //-------------- FUNCIONES EDITAR Y ELIMINAR

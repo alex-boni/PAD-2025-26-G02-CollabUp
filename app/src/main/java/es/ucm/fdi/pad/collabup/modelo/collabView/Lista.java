@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import es.ucm.fdi.pad.collabup.R;
+import es.ucm.fdi.pad.collabup.controlador.fragmento.CollabItemFragment;
 
 public class Lista extends AbstractCollabView {
 
@@ -74,6 +75,21 @@ public class Lista extends AbstractCollabView {
             recyclerView.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(requireContext()));
             if (adapter != null) {
                 recyclerView.setAdapter(adapter);
+
+                if (adapter instanceof ListaAdapter) {
+                    ((ListaAdapter) adapter).setOnItemClickListener(item -> {
+                        // Crear fragmento de detalle
+                        CollabItemFragment fragment = CollabItemFragment.newInstance(
+                                item.getIdI(),
+                                item.getIdC()
+                        );
+                        getParentFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.fragmentApp, fragment)
+                                .addToBackStack(null)
+                                .commit();
+                    });
+                }
             }
         }
     }

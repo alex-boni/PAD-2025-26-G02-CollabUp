@@ -237,6 +237,7 @@ public class CreateCollabItemFragment extends Fragment {
                 android.R.layout.simple_list_item_1,
                 nombresAsignados);
         lvUsrsAsigCollabItem.setAdapter(adapter);
+        setListViewHeightBasedOnItems(lvUsrsAsigCollabItem); //para la vista
         btnSeleccionMiembros.setText(nombresAsignados.isEmpty() ? "Seleccionar miembros" :
                 "Miembros: " + nombresAsignados.size());
     }
@@ -276,6 +277,7 @@ public class CreateCollabItemFragment extends Fragment {
                 android.R.layout.simple_list_item_1,
                 nombresAsignados);
         lvCvAsigCollabItem.setAdapter(adapter);
+        setListViewHeightBasedOnItems(lvCvAsigCollabItem);
         btnSeleccionCV.setText(nombresAsignados.isEmpty() ? "Seleccionar Collab Views" :
                 "CollabViews: " + nombresAsignados.size());
     }
@@ -353,6 +355,26 @@ public class CreateCollabItemFragment extends Fragment {
                 Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    //Las listas de miembros y collab views hacen que el scroll no funcione bien, necesito esto.
+    private void setListViewHeightBasedOnItems(ListView listView) {
+        ArrayAdapter adapter = (ArrayAdapter) listView.getAdapter();
+        if (adapter == null) return;
+
+        int totalHeight = 0;
+        for (int i = 0; i < adapter.getCount(); i++) {
+            View listItem = adapter.getView(i, null, listView);
+            listItem.measure(
+                    View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (adapter.getCount() - 1));
+        listView.setLayoutParams(params);
+        listView.requestLayout();
     }
 }
 

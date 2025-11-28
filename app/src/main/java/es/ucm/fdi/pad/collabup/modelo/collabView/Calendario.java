@@ -9,10 +9,12 @@ import android.widget.ImageView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 
 import es.ucm.fdi.pad.collabup.R;
+import es.ucm.fdi.pad.collabup.controlador.fragmento.CalendarioFragment;
 
 public class Calendario extends AbstractCollabView {
 
@@ -26,7 +28,16 @@ public class Calendario extends AbstractCollabView {
 
     @Override
     protected Fragment getVistaGrande(RecyclerView.Adapter<?> adapter) {
-        return null;
+        //el calendario es un poco diferente y no puede definir el adapter aqui
+        ArrayList<String> ids = new ArrayList<>();
+        for (CollabItem item : getListaCollabItems()) {
+            ids.add(item.getIdI());
+        }
+
+        CalendarioFragment cal = CalendarioFragment.newInstance(getCollabId(), getUid(), ids);
+        cal.setAdapter(adapter);
+        cal.setTitulo(this.nombre);
+        return cal; //abro el calendario
     }
 
     @Override

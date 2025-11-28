@@ -6,10 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,7 +29,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Collab;
 import es.ucm.fdi.pad.collabup.modelo.Usuario;
-import es.ucm.fdi.pad.collabup.modelo.collabView.Calendario;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItemAdapter;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
@@ -41,8 +42,10 @@ public class CalendarioFragment extends Fragment {
     //Argumentos opcionales (para poder reutilizar este fragment)
     private static final String ARG_COLLAB_ID = "idC";
     private static final String ARG_COLLABVIEW_ID = "idCV";
+    private static final String ARG_ITEMS_ID = "idItems";
     private String idC;
     private String idCV;
+    private List<String> idItems;
     private boolean general = true; //para saber si estamos en el calendario general o no
 
 
@@ -50,16 +53,18 @@ public class CalendarioFragment extends Fragment {
     private FirebaseAuth mAuth;
     private FirebaseUser usuarioFirebase;
     private Usuario usuario;
+    private String titulo;
 
     public static CalendarioFragment newInstance() {
         return new CalendarioFragment();
     }
 
-    public static CalendarioFragment newInstance(String collabId, String collabViewId) {
+    public static CalendarioFragment newInstance(String collabId, String collabViewId, ArrayList<String> itemIds) {
         CalendarioFragment fragment = new CalendarioFragment();
         Bundle args = new Bundle();
         args.putString(ARG_COLLAB_ID, collabId);
         args.putString(ARG_COLLABVIEW_ID, collabViewId);
+        args.putStringArrayList(ARG_ITEMS_ID, itemIds);
         fragment.setArguments(args);
         return fragment;
     }
@@ -76,9 +81,27 @@ public class CalendarioFragment extends Fragment {
 
         //Layouts (orden importante)
         calendarView = view.findViewById(R.id.calendarView);
+        TextView tvTitulo = view.findViewById(R.id.tituloCalendario);
+        TextView tvSubtitulo = view.findViewById(R.id.subtituloCalendario);
         recyclerView = view.findViewById(R.id.recyclerItemsDia);
 
+        ajustesCalendario();
         lecturaArgumentos();
+
+        if (!general) {
+            Toolbar toolbar = view.findViewById(R.id.toolbar);
+
+            //Oculto estos, que solo quiero que se enseñen en el modo general.
+            tvTitulo.setVisibility(View.GONE);
+            tvSubtitulo.setVisibility(View.GONE);
+
+            toolbar.setTitle(titulo != null ? titulo : "Calendario CV");
+            toolbar.setNavigationOnClickListener(v -> { //para volver atrás
+                if (getParentFragmentManager() != null) {
+                    getParentFragmentManager().popBackStack();
+                }
+            });
+        }
 
         if (general) cargarCalendarioGeneral();
         else cargarCalendarioCV();
@@ -98,16 +121,17 @@ public class CalendarioFragment extends Fragment {
                     .addToBackStack(null)
                     .commit();
         });
-        recyclerView.setAdapter(adapter);
 
+        recyclerView.setAdapter(adapter);
     }
 
     private void lecturaArgumentos() {
         if (getArguments() != null) {
             idC = getArguments().getString(ARG_COLLAB_ID);
             idCV = getArguments().getString(ARG_COLLABVIEW_ID);
+            idItems = getArguments().getStringArrayList(ARG_ITEMS_ID);
 
-            if (idC != null && idCV != null) { //si no son nulos, estamos en el modo collab view
+            if (idC != null && idCV != null && idItems != null) { //si no son nulos, estamos en el modo collab view
                 general = false;
             }
         }
@@ -133,9 +157,6 @@ public class CalendarioFragment extends Fragment {
                     cal.set(year, month, dayOfMonth);
                     cargarItemsDiaGeneral(cal);
                 });
-
-                ajustesCalendario(); //importante que esto esté dentro de este onSucess.
-
             }
 
             @Override
@@ -148,27 +169,37 @@ public class CalendarioFragment extends Fragment {
     }
 
     private void cargarCalendarioCV() {
-        //Saco la lista de collabItems que tiene el collab View.
-        new Calendario().obtenerCollabItemsDeCollabView(idC, idCV, new OnDataLoadedCallback<List<CollabItem>>() {
-            @Override
-            public void onSuccess(List<CollabItem> data) {
-                Calendar hoy = Calendar.getInstance();
-                cargarItemsDiaCV(data, hoy);
+        //Me llega la lista de los ids de los collab items
+        List<CollabItem> lci = new ArrayList<>();
+        AtomicInteger contador = new AtomicInteger(0); //por firebase
 
-                calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
-                    Calendar cal = Calendar.getInstance();
-                    cal.set(year, month, dayOfMonth);
-                    cargarItemsDiaCV(data, cal);
+        for (String idItem : idItems) {
+            CollabItem item = new CollabItem();
+            item.setIdI(idItem);
+            item.setIdC(idC);
+            item.obtener(idItem, new OnDataLoadedCallback<CollabItem>() {
+                @Override
+                public void onSuccess(CollabItem data) {
+                    lci.add(data);
+                    if (contador.incrementAndGet() == idItems.size()) {
+                        Toast.makeText(getContext(), "Items cargados ", Toast.LENGTH_SHORT).show();
+                        Calendar hoy = Calendar.getInstance();
+                        cargarItemsDiaCV(lci, hoy);
 
-                    ajustesCalendario();
-                });
-            }
+                        calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
+                            Calendar cal = Calendar.getInstance();
+                            cal.set(year, month, dayOfMonth);
+                            cargarItemsDiaCV(lci, cal);
+                        });
+                    }
+                }
 
-            @Override
-            public void onFailure(Exception e) {
-
-            }
-        });
+                @Override
+                public void onFailure(Exception e) {
+                    Toast.makeText(getContext(), "Error al cargar items: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     private void cargarItemsDiaGeneral(Calendar cal) {
@@ -210,7 +241,7 @@ public class CalendarioFragment extends Fragment {
 
     }
 
-    private List<CollabItem> cargarItemsDiaCV(List<CollabItem> lci, Calendar fSel) {
+    private void cargarItemsDiaCV(List<CollabItem> lci, Calendar fSel) {
         List<CollabItem> filtrados = new ArrayList<>();
         for (CollabItem item : lci) {
             if (item.getFecha() != null) {
@@ -223,7 +254,7 @@ public class CalendarioFragment extends Fragment {
                 }
             }
         }
-        return filtrados;
+        adapter.setItems(filtrados);
     }
 
     private void ajustesCalendario() {
@@ -238,5 +269,13 @@ public class CalendarioFragment extends Fragment {
         Configuration config = getResources().getConfiguration();
         config.setLocale(locale);
         getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+    }
+
+    public void setAdapter(RecyclerView.Adapter<?> adapter) {
+        this.adapter = (CollabItemAdapter) adapter;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
     }
 }

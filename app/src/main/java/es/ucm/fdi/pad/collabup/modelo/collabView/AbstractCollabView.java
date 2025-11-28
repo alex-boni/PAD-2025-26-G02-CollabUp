@@ -159,7 +159,6 @@ public abstract class AbstractCollabView implements CollabView {
     }
 
 
-
     @Override
     public Fragment getFullViewFragment() {
         // Crear el adapter si aún no existe (singleton)
@@ -341,7 +340,8 @@ public abstract class AbstractCollabView implements CollabView {
                                 CollabView cv = cvStatic.build(collabId, documentSnapshot.getId(), t.name, t.settings, new ArrayList<>());
                                 callback.onSuccess(cv);
                             }
-                        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                        } catch (IllegalAccessException | InvocationTargetException |
+                                 NoSuchMethodException e) {
                             throw new RuntimeException(e);
                         }
                     } else {
@@ -456,7 +456,8 @@ public abstract class AbstractCollabView implements CollabView {
                                         callback.onSuccess(collabViews);
                                     }
                                 }
-                            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                            } catch (IllegalAccessException | InvocationTargetException |
+                                     NoSuchMethodException e) {
                                 throw new RuntimeException(e);
                             }
                         } else {
@@ -465,57 +466,6 @@ public abstract class AbstractCollabView implements CollabView {
                             }
                         }
                     }
-                })
-                .addOnFailureListener(callback::onFailure);
-    }
-
-    public void obtenerNombresCollabViewdeCollab(List<String> idsCV, OnDataLoadedCallback<Map<String, String>> callback) {
-        Map<String, String> resultados = new HashMap<>();
-        AtomicInteger contador = new AtomicInteger(0);
-
-        if (idsCV.isEmpty()) {
-            callback.onSuccess(resultados);
-            return;
-        }
-
-        for (String id : idsCV) {
-            CollabView aux = new Calendario();
-            aux.obtener(id, new OnDataLoadedCallback<CollabView>() {
-                @Override
-                public void onSuccess(CollabView cv) {
-                    resultados.put(id, cv.getName());
-                    if (contador.incrementAndGet() == idsCV.size()) {
-                        callback.onSuccess(resultados);
-                    }
-                }
-
-                @Override
-                public void onFailure(Exception e) {
-                    callback.onFailure(e);
-                }
-            });
-        }
-    }
-
-    public void obtenerCollabItemsDeCollabView(String collabId, String collabViewId,
-                                               OnDataLoadedCallback<List<CollabItem>> callback) {
-        db.collection("collabs")
-                .document(collabId)
-                .collection("collabViews")
-                .document(collabViewId)
-                .collection("collabItems")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<CollabItem> items = new ArrayList<>();
-                    for (var doc : queryDocumentSnapshots.getDocuments()) {
-                        CollabItem item = doc.toObject(CollabItem.class);
-                        if (item != null) {
-                            item.setIdI(doc.getId());
-                            item.setIdC(collabViewId);
-                            items.add(item);
-                        }
-                    }
-                    callback.onSuccess(items);
                 })
                 .addOnFailureListener(callback::onFailure);
     }

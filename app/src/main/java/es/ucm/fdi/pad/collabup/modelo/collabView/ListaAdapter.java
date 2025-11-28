@@ -22,7 +22,7 @@ public class ListaAdapter extends RecyclerView.Adapter<ListaAdapter.ViewHolder> 
     }
 
     private List<CollabItem> items;
-    private final OnItemClickListener listener;
+    private OnItemClickListener listener;
 
     public ListaAdapter(List<CollabItem> items, OnItemClickListener listener) {
         this.items = items;
@@ -68,6 +68,10 @@ public class ListaAdapter extends RecyclerView.Adapter<ListaAdapter.ViewHolder> 
             tvNombre = itemView.findViewById(R.id.tvItemNombre);
             tvDescripcion = itemView.findViewById(R.id.tvItemDescripcion);
         }
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
     }
 }
 
