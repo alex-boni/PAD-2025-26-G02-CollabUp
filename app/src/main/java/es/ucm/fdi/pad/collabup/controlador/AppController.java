@@ -5,17 +5,30 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import es.ucm.fdi.pad.collabup.R;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-// Imports de los nuevos fragmentos
-import es.ucm.fdi.pad.collabup.controlador.fragmento.CalendarioFragment;
+import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.controlador.fragmento.AjustesFragment;
+import es.ucm.fdi.pad.collabup.controlador.fragmento.CalendarioFragment;
 import es.ucm.fdi.pad.collabup.controlador.fragmento.CollabListFragment;
 import es.ucm.fdi.pad.collabup.controlador.fragmento.HomeFragment;
+import es.ucm.fdi.pad.collabup.modelo.collabView.Calendario;
+import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
+import es.ucm.fdi.pad.collabup.modelo.collabView.Lista;
+import es.ucm.fdi.pad.collabup.modelo.collabView.Registry;
+import es.ucm.fdi.pad.collabup.modelo.collabView.TablonNotas;
 
 
 public class AppController extends AppCompatActivity {
+
+    static {
+        // Registrar los tipos de CollabView disponibles
+        Registry<CollabView> reg = Registry.getOrCreateRegistry(CollabView.class);
+        reg.register(Lista.class);
+        reg.register(Calendario.class);
+        reg.register(TablonNotas.class);
+    }
 
     // Variables que controlarán a los fragmentos
     private final HomeFragment homeFragment = new HomeFragment();

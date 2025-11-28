@@ -16,20 +16,10 @@ import androidx.core.view.WindowCompat;
 import java.lang.reflect.InvocationTargetException;
 
 import es.ucm.fdi.pad.collabup.R;
-import es.ucm.fdi.pad.collabup.modelo.collabView.Calendario;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
-import es.ucm.fdi.pad.collabup.modelo.collabView.Lista;
 import es.ucm.fdi.pad.collabup.modelo.collabView.Registry;
-import es.ucm.fdi.pad.collabup.modelo.collabView.TablonNotas;
 
 public class AddCollabViewActivity extends AppCompatActivity {
-
-    static {
-        Registry<CollabView> registry = Registry.getOrCreateRegistry(CollabView.class);
-        registry.register(TablonNotas.class);
-        registry.register(Calendario.class);
-        registry.register(Lista.class);
-    }
 
     // Launcher para abrir ConfigurarNuevoCollabViewActivity y recibir su resultado
     private ActivityResultLauncher<Intent> configureLauncher;
@@ -77,7 +67,7 @@ public class AddCollabViewActivity extends AppCompatActivity {
         int thumbMargin = (int) (6 * density);
         int defaultItemHeight = (int) (72 * density);
 
-        Registry<CollabView> registry = Registry.getOrCreateRegistry(CollabView.class);
+        Registry<CollabView> registry = Registry.getRegistry(CollabView.class);
         for (Class<? extends CollabView> cvClass : registry.getAll()) {
             try {
                 CollabView cvInstance = (CollabView) cvClass.getMethod("getStaticInstance").invoke(null);
@@ -103,7 +93,7 @@ public class AddCollabViewActivity extends AppCompatActivity {
                 mini.setOnClickListener(v -> {
                     Intent resultIntent = new Intent(this, ConfigurarNuevoCollabViewActivity.class);
                     resultIntent.putExtra("COLLAB_ID", collabId);
-                    resultIntent.putExtra("COLLABVIEW", cvClass);
+                    resultIntent.putExtra("COLLABVIEW", cvClass.getSimpleName());
                     configureLauncher.launch(resultIntent);
                 });
 
@@ -111,7 +101,7 @@ public class AddCollabViewActivity extends AppCompatActivity {
 
             } catch (IllegalAccessException |
                      NoSuchMethodException | InvocationTargetException e) {
-                throw new RuntimeException("Error al instanciar CollabView: " + cvClass.getName(), e);
+                throw new RuntimeException("Error al instanciar CollabView: " + cvClass.getSimpleName(), e);
             }
         }
     }

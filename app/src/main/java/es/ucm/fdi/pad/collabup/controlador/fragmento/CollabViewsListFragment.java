@@ -18,11 +18,7 @@ import java.util.List;
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.adapters.CollabViewListAdapter;
 import es.ucm.fdi.pad.collabup.modelo.collabView.AbstractCollabView;
-import es.ucm.fdi.pad.collabup.modelo.collabView.Calendario;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
-import es.ucm.fdi.pad.collabup.modelo.collabView.Lista;
-import es.ucm.fdi.pad.collabup.modelo.collabView.Registry;
-import es.ucm.fdi.pad.collabup.modelo.collabView.TablonNotas;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 
 public class CollabViewsListFragment extends Fragment {
@@ -34,7 +30,8 @@ public class CollabViewsListFragment extends Fragment {
     private CollabViewListAdapter adapter;
     private List<CollabView> items;
 
-    public CollabViewsListFragment() {}
+    public CollabViewsListFragment() {
+    }
 
     public static CollabViewsListFragment newInstance(String collabId) {
         CollabViewsListFragment fragment = new CollabViewsListFragment();
@@ -50,11 +47,6 @@ public class CollabViewsListFragment extends Fragment {
         if (getArguments() != null) {
             collabId = getArguments().getString(ARG_COLLAB_ID);
         }
-        // Registrar los tipos de CollabView disponibles
-        Registry<CollabView> reg = Registry.getOrCreateRegistry(CollabView.class);
-        reg.register(Lista.class);
-        reg.register(Calendario.class);
-        reg.register(TablonNotas.class);
     }
 
     @Override
@@ -101,12 +93,22 @@ public class CollabViewsListFragment extends Fragment {
                 // Dummy fragment - nunca se usa porque solo necesitamos obtenerListado()
                 return new Fragment();
             }
+
             @Override
-            protected RecyclerView.Adapter<?> obtenerAdapter() { return null; }
+            protected RecyclerView.Adapter<?> obtenerAdapter() {
+                return null;
+            }
+
             @Override
-            protected View getPrevisualizacion(android.content.Context context) { return null; }
+            protected View getPrevisualizacion(android.content.Context context) {
+                return null;
+            }
+
             @Override
-            protected Fragment getFragmentAjustes() { return null; }
+            protected Fragment getFragmentAjustes() {
+                return null;
+            }
+
             @Override
             public java.util.Set<es.ucm.fdi.pad.collabup.modelo.collabView.CollabViewSetting> getStaticCreationSettings() {
                 return java.util.Collections.emptySet();

@@ -30,6 +30,7 @@ import java.util.Set;
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabViewSetting;
+import es.ucm.fdi.pad.collabup.modelo.collabView.Registry;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
 public class ConfigurarNuevoCollabViewActivity extends AppCompatActivity {
@@ -49,14 +50,8 @@ public class ConfigurarNuevoCollabViewActivity extends AppCompatActivity {
         Intent intent = getIntent();
         collabId = intent.getStringExtra("COLLAB_ID");
 
-        Object extra = intent.getSerializableExtra("COLLABVIEW");
-        Class<? extends CollabView> clazz;
-        if (extra instanceof Class) {
-            //noinspection unchecked
-            clazz = (Class<? extends CollabView>) extra;
-        } else {
-            throw new IllegalArgumentException("COLLAB_VIEW extra missing or wrong type");
-        }
+        String collabViewType = intent.getStringExtra("COLLABVIEW");
+        Class<? extends CollabView> clazz = Registry.getRegistry(CollabView.class).get(collabViewType);
 
         try {
             instance = (CollabView) clazz.getMethod("getStaticInstance").invoke(null);

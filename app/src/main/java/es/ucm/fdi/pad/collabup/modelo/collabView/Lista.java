@@ -77,20 +77,23 @@ public class Lista extends AbstractCollabView {
                 recyclerView.setAdapter(adapter);
 
                 if (adapter instanceof ListaAdapter) {
-                    ((ListaAdapter) adapter).setOnItemClickListener(item -> {
-                        // Crear fragmento de detalle
-                        CollabItemFragment fragment = CollabItemFragment.newInstance(
-                                item.getIdI(),
-                                item.getIdC()
-                        );
-                        getParentFragmentManager()
-                                .beginTransaction()
-                                .replace(R.id.fragmentApp, fragment)
-                                .addToBackStack(null)
-                                .commit();
-                    });
+                    ((ListaAdapter) adapter).setOnItemClickListener(cambiarAItem());
                 }
             }
+        }
+
+        public ListaAdapter.OnItemClickListener cambiarAItem() {
+            return item1 -> {
+                CollabItemFragment fragment = CollabItemFragment.newInstance(
+                        item1.getIdI(),
+                        item1.getIdC()
+                );
+                getParentFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.fragmentApp, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            };
         }
     }
 
