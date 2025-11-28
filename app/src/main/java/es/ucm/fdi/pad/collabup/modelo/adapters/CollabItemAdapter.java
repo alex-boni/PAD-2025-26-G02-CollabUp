@@ -21,6 +21,10 @@ public class CollabItemAdapter extends RecyclerView.Adapter<CollabItemAdapter.Vi
     private List<CollabItem> items;
     private OnItemClickListener listener;
 
+    public CollabItemAdapter(List<CollabItem> items) {
+        this.items = items;
+    }
+
     public CollabItemAdapter(List<CollabItem> items, OnItemClickListener listener) {
         this.items = items;
         this.listener = listener;
@@ -31,6 +35,9 @@ public class CollabItemAdapter extends RecyclerView.Adapter<CollabItemAdapter.Vi
         notifyDataSetChanged();
     }
 
+    public void setListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

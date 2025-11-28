@@ -87,12 +87,16 @@ public class CalendarioFragment extends Fragment {
         TextView tvSubtitulo = view.findViewById(R.id.subtituloCalendario);
         recyclerView = view.findViewById(R.id.recyclerItemsDia);
 
+        Toolbar toolbar = view.findViewById(R.id.toolbar);
+
         ajustesCalendario();
         lecturaArgumentos();
 
-        if (!general) {
-            Toolbar toolbar = view.findViewById(R.id.toolbar);
 
+        if (general) {
+            toolbar.setVisibility(View.GONE);
+            cargarCalendarioGeneral();
+        } else {
             //Oculto estos, que solo quiero que se enseñen en el modo general.
             tvTitulo.setVisibility(View.GONE);
             tvSubtitulo.setVisibility(View.GONE);
@@ -103,14 +107,13 @@ public class CalendarioFragment extends Fragment {
                     getParentFragmentManager().popBackStack();
                 }
             });
+            cargarCalendarioCV();
         }
-
-        if (general) cargarCalendarioGeneral();
-        else cargarCalendarioCV();
 
 
         //Creamos el adapter de la lista de items
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
         adapter = new CollabItemAdapter(new ArrayList<>(), item -> {
             //Pasamos los parámetros necesarios
             CollabItemFragment fragment = CollabItemFragment.newInstance(
@@ -123,6 +126,7 @@ public class CalendarioFragment extends Fragment {
                     .addToBackStack(null)
                     .commit();
         });
+
 
         recyclerView.setAdapter(adapter);
     }
@@ -280,5 +284,19 @@ public class CalendarioFragment extends Fragment {
 
     public void setTitulo(String titulo) {
         this.titulo = titulo;
+    }
+
+    public CollabItemAdapter.OnItemClickListener cambiarAItem() {
+        return item -> {
+            CollabItemFragment fragment = CollabItemFragment.newInstance(
+                    item.getIdI(),
+                    item.getIdC()
+            );
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragmentApp, fragment)
+                    .addToBackStack(null)
+                    .commit();
+        };
     }
 }

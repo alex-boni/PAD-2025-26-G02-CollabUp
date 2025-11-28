@@ -16,6 +16,7 @@ import java.util.Set;
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.controlador.fragmento.CalendarioFragment;
 import es.ucm.fdi.pad.collabup.modelo.CollabItem;
+import es.ucm.fdi.pad.collabup.modelo.adapters.CollabItemAdapter;
 
 public class Calendario extends AbstractCollabView {
 
@@ -37,13 +38,16 @@ public class Calendario extends AbstractCollabView {
 
         CalendarioFragment cal = CalendarioFragment.newInstance(getCollabId(), getUid(), ids);
         cal.setAdapter(adapter);
+        if (adapter instanceof CollabItemAdapter) {
+            ((CollabItemAdapter) adapter).setListener(cal.cambiarAItem());
+        }
         cal.setTitulo(this.nombre);
         return cal; //abro el calendario
     }
 
     @Override
     protected RecyclerView.Adapter<?> obtenerAdapter() {
-        return null;
+        return new CollabItemAdapter(new ArrayList<>());
     }
 
     @Override
