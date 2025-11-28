@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.WindowCompat;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -254,7 +255,7 @@ public class ConfigurarNuevoCollabViewActivity extends AppCompatActivity {
                     nombre.setError("El nombre no puede estar vacío");
                     return;
                 }
-                CollabView actualInstance = instance.build(collabId, null, collabViewName, getSettingsFromUI());
+                CollabView actualInstance = instance.build(collabId, null, collabViewName, getSettingsFromUI(), new ArrayList<>());
                 actualInstance.crear(new OnOperationCallback() {
                     @Override
                     public void onSuccess() {

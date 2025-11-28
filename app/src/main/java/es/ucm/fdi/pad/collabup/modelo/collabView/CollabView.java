@@ -6,6 +6,7 @@ import android.view.View;
 
 import androidx.fragment.app.Fragment;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -53,9 +54,10 @@ public interface CollabView extends DAO<CollabView> {
      * Construye una instancia usable de CollabView a partir de un collabId y mapa de configuraciones.
      *
      * @param settings especificas para cada CollabView.
+     * @param items lista de CollabItems a poblar en la vista
      * @return una nueva instancia de CollabView configurada.
      */
-    CollabView build(String collabId, String uid, String name, Map<String, Object> settings);
+    CollabView build(String collabId, String uid, String name, Map<String, Object> settings, List<CollabItem> items);
 
     /**
      * Popula la CollabView con el CollabItem proporcionado.
@@ -66,13 +68,6 @@ public interface CollabView extends DAO<CollabView> {
     void populate(CollabItem item, OnOperationCallback callback);
 
     void remove(CollabItem item, OnOperationCallback callback);
-
-    /**
-     * Obtiene la actividad que muestra la vista completa de la CollabView.
-     *
-     * @return la actividad de vista completa
-     */
-    Activity getFullViewActivity();
 
     /**
      * Obtiene la vista a añadir a la lista de CollabViews cuando se quiere agregar
@@ -92,11 +87,18 @@ public interface CollabView extends DAO<CollabView> {
     Fragment getInCollabFragment();
 
     /**
-     * Obtiene la actividad que permite editar los ajustes de una instancia de CollabView.
+     * Obtiene el fragmento que muestra la vista completa de la CollabView.
      *
-     * @return la actividad de edición de ajustes
+     * @return el fragmento de vista completa
      */
-    Activity getEditSettingsActivity();
+    Fragment getFullViewFragment();
+
+    /**
+     * Obtiene el fragment que permite editar los ajustes de una instancia de CollabView.
+     *
+     * @return el fragment de edición de ajustes
+     */
+    Fragment getEditSettingsFragment();
 
     /**
      * Obtiene los ajustes disponibles para la creación de una nueva instancia de CollabView.

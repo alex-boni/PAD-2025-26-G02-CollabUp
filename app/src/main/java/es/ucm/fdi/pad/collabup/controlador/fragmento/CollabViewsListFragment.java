@@ -12,8 +12,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +23,7 @@ import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
 import es.ucm.fdi.pad.collabup.modelo.collabView.Lista;
 import es.ucm.fdi.pad.collabup.modelo.collabView.Registry;
 import es.ucm.fdi.pad.collabup.modelo.collabView.TablonNotas;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 
 public class CollabViewsListFragment extends Fragment {
 
@@ -34,7 +33,6 @@ public class CollabViewsListFragment extends Fragment {
     private RecyclerView recyclerView;
     private CollabViewListAdapter adapter;
     private List<CollabView> items;
-    private FirebaseFirestore db;
 
     public CollabViewsListFragment() {}
 
@@ -52,7 +50,7 @@ public class CollabViewsListFragment extends Fragment {
         if (getArguments() != null) {
             collabId = getArguments().getString(ARG_COLLAB_ID);
         }
-        db = FirebaseFirestore.getInstance();
+        // Registrar los tipos de CollabView disponibles
         Registry<CollabView> reg = Registry.getOrCreateRegistry(CollabView.class);
         reg.register(Lista.class);
         reg.register(Calendario.class);
@@ -96,61 +94,45 @@ public class CollabViewsListFragment extends Fragment {
             return;
         }
 
-        db.collection("collabs")
-                .document(collabId)
-                .collection("collabViews")
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    int totalDocs = queryDocumentSnapshots.size();
-                    items.clear();
-                    Registry<CollabView> reg = Registry.getOrCreateRegistry(CollabView.class);
-                    int itemsAdded = 0; // Contador de éxitos
+        // Crear una instancia estatica de CollabView para usar obtenerListado
+        AbstractCollabView tempCollabView = new AbstractCollabView() {
+            @Override
+            protected Fragment getVistaGrande(RecyclerView.Adapter<?> adapter) {
+                // Dummy fragment - nunca se usa porque solo necesitamos obtenerListado()
+                return new Fragment();
+            }
+            @Override
+            protected RecyclerView.Adapter<?> obtenerAdapter() { return null; }
+            @Override
+            protected View getPrevisualizacion(android.content.Context context) { return null; }
+            @Override
+            protected Fragment getFragmentAjustes() { return null; }
+            @Override
+            public java.util.Set<es.ucm.fdi.pad.collabup.modelo.collabView.CollabViewSetting> getStaticCreationSettings() {
+                return java.util.Collections.emptySet();
+            }
+        };
+        tempCollabView.setCollabId(collabId);
 
-                    for (var doc : queryDocumentSnapshots.getDocuments()) {
-                        String uid = doc.getId();
-                        String name = doc.getString("name");
+        // Usar el método obtenerListado de AbstractCollabView
+        tempCollabView.obtenerListado(new OnDataLoadedCallback<>() {
+            @Override
+            public void onSuccess(ArrayList<CollabView> collabViews) {
+                items.clear();
+                items.addAll(collabViews);
+                adapter.notifyDataSetChanged();
 
-                        String type = doc.getString("type");
-                        java.util.Map<String, Object> settings = (java.util.Map<String, Object>) doc.get("settings");
-                        if (settings == null) settings = new java.util.HashMap<>();
+                if (collabViews.isEmpty()) {
+                    Toast.makeText(getContext(), "No hay CollabViews en este Collab", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Éxito: Se han cargado " + collabViews.size() + " Collab Views", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-                        if (type == null && settings.containsKey("type")) {
-                            type = (String) settings.get("type");
-                        }
-
-                        if (type == null) {
-                            System.out.println("Documento " + uid + " ignorado: No tiene 'type'");
-                            continue;
-                        }
-
-                        try {
-                            Class<? extends CollabView> viewClass = reg.get(type);
-                            if (viewClass != null) {
-                                CollabView cvStatic = (CollabView) viewClass.getMethod("getStaticInstance").invoke(null);
-                                if (cvStatic != null) {
-                                    CollabView cv = cvStatic.build(collabId, uid, name, settings);
-                                    items.add(cv);
-                                    itemsAdded++;
-                                }
-                            } else {
-                                // 4. ERROR ESPECÍFICO: Tipo desconocido
-                                System.out.println("Tipo desconocido en Registry: " + type);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    adapter.notifyDataSetChanged();
-
-                    if (totalDocs > 0 && itemsAdded == 0) {
-                        Toast.makeText(getContext(), "Error: Hay docs pero falló el parseo (Clases/Registry)", Toast.LENGTH_LONG).show();
-                    } else if (itemsAdded > 0) {
-                        Toast.makeText(getContext(), "Éxito: Se han cargado " + itemsAdded + " Collab Views", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Fallo Firestore: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                });
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getContext(), "Error al cargar CollabViews: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

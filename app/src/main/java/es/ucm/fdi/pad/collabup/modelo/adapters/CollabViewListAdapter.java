@@ -1,19 +1,19 @@
 package es.ucm.fdi.pad.collabup.modelo.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-//import es.ucm.fdi.pad.collabup.controlador.CollabViewDetailActivity;
-import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
+import es.ucm.fdi.pad.collabup.R;
+import es.ucm.fdi.pad.collabup.modelo.collabView.AbstractCollabView;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
 
 public class CollabViewListAdapter extends RecyclerView.Adapter<CollabViewListAdapter.ViewHolder> {
@@ -65,14 +65,18 @@ public class CollabViewListAdapter extends RecyclerView.Adapter<CollabViewListAd
 
         // 4. Gestionar el clic para abrir el detalle de esa vista
         holder.container.setOnClickListener(v -> {
-            // Aquí abrimos la actividad contenedora que creamos antes
-//            Intent intent = new Intent(context, CollabViewDetailActivity.class);
-//            intent.putExtra(CollabViewDetailActivity.EXTRA_COLLAB_ID, item.getCollabId()); // Asegúrate de tener este getter
-//            intent.putExtra(CollabViewDetailActivity.EXTRA_VIEW_ID, item.getUid());
-//            intent.putExtra(CollabViewDetailActivity.EXTRA_VIEW_TYPE, item.getClass().getSimpleName()); // Ej: "Lista"
-//            intent.putExtra(CollabViewDetailActivity.EXTRA_VIEW_NAME, item.getName());
+            if (item instanceof AbstractCollabView) {
+                AbstractCollabView abstractView = (AbstractCollabView) item;
+                Fragment fragment = abstractView.getFullViewFragment();
 
-//            context.startActivity(intent);
+                if (fragment != null && context instanceof AppCompatActivity) {
+                    AppCompatActivity activity = (AppCompatActivity) context;
+                    activity.getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragmentApp, fragment)
+                            .addToBackStack(null)
+                            .commit();
+                }
+            }
         });
     }
 

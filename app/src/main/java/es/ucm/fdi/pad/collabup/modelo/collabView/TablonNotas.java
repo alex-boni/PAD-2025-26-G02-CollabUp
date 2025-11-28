@@ -7,12 +7,12 @@ import android.view.View;
 import android.widget.ImageView;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.Collections;
 import java.util.Set;
 
 import es.ucm.fdi.pad.collabup.R;
-import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
 public class TablonNotas extends AbstractCollabView {
 
@@ -25,16 +25,19 @@ public class TablonNotas extends AbstractCollabView {
     }
 
     @Override
-    protected Fragment getVistaGrande() {
+    protected Fragment getVistaGrande(RecyclerView.Adapter<?> adapter) {
+        return null;
+    }
+
+    @Override
+    protected RecyclerView.Adapter<?> obtenerAdapter() {
         return null;
     }
 
     @Override
     protected View getPrevisualizacion(Context context) {
         ImageView iv = new ImageView(context);
-
         Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.tablon_no_border_collabview);
-
         iv.setImageBitmap(bmp);
         iv.setAdjustViewBounds(true);
         iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -46,16 +49,6 @@ public class TablonNotas extends AbstractCollabView {
     @Override
     protected Fragment getFragmentAjustes() {
         return null;
-    }
-
-    @Override
-    public void populate(CollabItem item, OnOperationCallback callback) {
-
-    }
-
-    @Override
-    public void remove(CollabItem item, OnOperationCallback callback) {
-
     }
 
     @Override
