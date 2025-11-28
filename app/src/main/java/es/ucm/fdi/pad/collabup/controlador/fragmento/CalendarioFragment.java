@@ -42,10 +42,12 @@ public class CalendarioFragment extends Fragment {
     private static final String ARG_COLLAB_ID = "idC";
     private static final String ARG_COLLABVIEW_ID = "idCV";
     private static final String ARG_ITEMS_ID = "idItems";
+    private static final String ARG_DIA_START = "diaStart";
     private static final String TITULO_DEFECTO = "Calendario Collab View";
     private String idC;
     private String idCV;
     private List<String> idItems;
+    private String diaStart = "Monday";
     private boolean general = true; //para saber si estamos en el calendario general o no
 
     List<CollabItem> lci = new ArrayList<>();
@@ -61,12 +63,13 @@ public class CalendarioFragment extends Fragment {
         return new CalendarioFragment();
     }
 
-    public static CalendarioFragment newInstance(String collabId, String collabViewId, ArrayList<String> itemIds) {
+    public static CalendarioFragment newInstance(String collabId, String collabViewId, ArrayList<String> itemIds, String diaStart) {
         CalendarioFragment fragment = new CalendarioFragment();
         Bundle args = new Bundle();
         args.putString(ARG_COLLAB_ID, collabId);
         args.putString(ARG_COLLABVIEW_ID, collabViewId);
         args.putStringArrayList(ARG_ITEMS_ID, itemIds);
+        args.putString(ARG_DIA_START, diaStart);
         fragment.setArguments(args);
         return fragment;
     }
@@ -136,6 +139,7 @@ public class CalendarioFragment extends Fragment {
             idC = getArguments().getString(ARG_COLLAB_ID);
             idCV = getArguments().getString(ARG_COLLABVIEW_ID);
             idItems = getArguments().getStringArrayList(ARG_ITEMS_ID);
+            diaStart = getArguments().getString(ARG_DIA_START);
 
             if (idC != null && idCV != null && idItems != null) { //si no son nulos, estamos en el modo collab view
                 general = false;
@@ -225,7 +229,10 @@ public class CalendarioFragment extends Fragment {
             item.obtener(idItem, new OnDataLoadedCallback<CollabItem>() {
                 @Override
                 public void onSuccess(CollabItem data) {
-                    lci.add(data);
+                    if (!existeItem(data)) {
+                        lci.add(data);
+                    }
+
                     if (contador.incrementAndGet() == idItems.size()) {
                         Toast.makeText(getContext(), CollabItem.CollabItemConstants.CONF_COLLABITEM_CARGADOS, Toast.LENGTH_SHORT).show();
                         Calendar hoy = Calendar.getInstance();
@@ -264,10 +271,51 @@ public class CalendarioFragment extends Fragment {
         adapter.setItems(filtrados);
     }
 
+    private boolean existeItem(CollabItem nuevo) {
+        for (CollabItem item : lci) {
+            if (item.getIdI().equals(nuevo.getIdI())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void ajustesCalendario() {
-        calendarView.setFirstDayOfWeek(Calendar.MONDAY);
+        calendarView.setFirstDayOfWeek(getDiaSemana(this.diaStart));
         calendarView.setWeekDayTextAppearance(R.style.CalendarWeekDay);
         calendarView.setDateTextAppearance(R.style.CalendarDate);
+    }
+
+    private int getDiaSemana(String day) {
+        if (day == null) return Calendar.MONDAY;
+
+        switch (day.toLowerCase()) {
+            case "monday":
+            case "lunes":
+                return Calendar.MONDAY;
+            case "tuesday":
+            case "martes":
+                return Calendar.TUESDAY;
+            case "wednesday":
+            case "miercoles":
+            case "miércoles":
+                return Calendar.WEDNESDAY;
+            case "thursday":
+            case "jueves":
+                return Calendar.THURSDAY;
+            case "friday":
+            case "viernes":
+                return Calendar.FRIDAY;
+            case "saturday":
+            case "sabado":
+            case "sábado":
+                return Calendar.SATURDAY;
+            case "sunday":
+            case "domingo":
+                return Calendar.SUNDAY;
+            default:
+                return Calendar.MONDAY;
+        }
     }
 
     private void configurarIdiomaCalendario() {

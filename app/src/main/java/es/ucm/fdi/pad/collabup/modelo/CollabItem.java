@@ -16,6 +16,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -50,6 +51,18 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         this.cvAsignadas = cvAsignadas;
         this.idC = idC;
         db = FirebaseFirestore.getInstance();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        CollabItem that = (CollabItem) o;
+        return Objects.equals(idI, that.idI) && Objects.equals(idC, that.idC);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idI, idC);
     }
 
     public CollabItem() {

@@ -36,7 +36,7 @@ public class Calendario extends AbstractCollabView {
             ids.add(item.getIdI());
         }
 
-        CalendarioFragment cal = CalendarioFragment.newInstance(getCollabId(), getUid(), ids);
+        CalendarioFragment cal = CalendarioFragment.newInstance(getCollabId(), getUid(), ids, "Monday");
         cal.setAdapter(adapter);
         if (adapter instanceof CollabItemAdapter) {
             ((CollabItemAdapter) adapter).setListener(cal.cambiarAItem());
