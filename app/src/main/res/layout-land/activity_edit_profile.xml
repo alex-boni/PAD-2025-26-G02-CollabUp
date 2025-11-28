@@ -38,6 +38,7 @@
             android:padding="16dp"
             android:baselineAligned="false">
 
+            <!-- Left Side: Image & Button -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_weight="0.4"
@@ -68,6 +69,7 @@
                     app:icon="@drawable/ic_edit"/>
             </LinearLayout>
 
+            <!-- Right Side: Form Fields -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_weight="0.6"
@@ -107,41 +109,42 @@
                     android:orientation="horizontal"
                     android:layout_marginTop="8dp">
 
-                    <LinearLayout
+                    <!-- AUTOCOMPLETE PROVINCIA -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilProvincia"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginEnd="8dp">
-                        <TextView
-                            android:text="@string/hint_province"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="?attr/textAppearanceBodySmall"/>
-                        <Spinner
-                            android:id="@+id/spinnerProvincia"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:background="@drawable/abc_spinner_textfield_background_material" />
-                    </LinearLayout>
+                        android:layout_marginEnd="8dp"
+                        android:hint="@string/hint_province">
 
-                    <LinearLayout
+                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                            android:id="@+id/autoCompleteProvincia"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:maxLines="1" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- AUTOCOMPLETE LOCALIDAD -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilLocalidad"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_marginStart="8dp">
-                        <TextView
-                            android:text="@string/hint_city"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="?attr/textAppearanceBodySmall"/>
-                        <Spinner
-                            android:id="@+id/spinnerLocalidad"
+                        android:layout_marginStart="8dp"
+                        android:hint="@string/hint_city">
+
+                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                            android:id="@+id/autoCompleteLocalidad"
                             android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:background="@drawable/abc_spinner_textfield_background_material" />
-                    </LinearLayout>
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:maxLines="1" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
                 </LinearLayout>
 
                 <Button

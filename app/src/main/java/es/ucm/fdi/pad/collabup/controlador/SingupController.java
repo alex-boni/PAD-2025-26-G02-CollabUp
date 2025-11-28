@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton; // Import necesario para la flecha
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,6 +32,7 @@ public class SingupController extends AppCompatActivity implements View.OnClickL
     private EditText eTxtEmailRegistro;
     private EditText eTxtPassword;
     private Button btnSingup;
+    private ImageButton imgBack; // Variable para el botón de atrás
 
     // Variable para emplear Firebase Authentication
     private FirebaseAuth mAuth;
@@ -47,11 +49,17 @@ public class SingupController extends AppCompatActivity implements View.OnClickL
         eTxtPassword = findViewById(R.id.eTxtPassword);
         btnSingup = findViewById(R.id.btnSingup);
 
+        // Instancio el botón de la flecha
+        imgBack = findViewById(R.id.imgBack);
+
         // Inicializo Firebase Auth
         mAuth = FirebaseAuth.getInstance();
 
-        // Establezco listener al unico boton
+        // Establezco listener al botón de registro
         btnSingup.setOnClickListener(this);
+
+        // Establezco listener a la flecha para volver atrás
+        imgBack.setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
     }
 
     @Override
@@ -91,6 +99,10 @@ public class SingupController extends AppCompatActivity implements View.OnClickL
                             usuario.setEmail(emailRegistro);
                             usuario.setNombre(nombre);
                             usuario.setUsuario(usuarioAlias);
+
+                            // NOTA: Aquí NO se está guardando ninguna imagen.
+                            // Si quisieras guardar una imagen por defecto o subida, deberías setearla aquí:
+                            // usuario.setUrlFoto("url_o_null");
 
                             // Llamamos al método crear() de nuestro DAO
                             usuario.crear(new OnOperationCallback() {

@@ -1,39 +1,32 @@
 package es.ucm.fdi.pad.collabup.controlador;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
-import com.bumptech.glide.Glide; // Importar Glide
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.bumptech.glide.Glide;
+import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Usuario;
@@ -45,7 +38,11 @@ public class EditProfileActivity extends AppCompatActivity {
     private ImageView imgProfile;
     private Button btnChangeImage, btnSaveChanges;
     private EditText eTxtPresentation;
-    private Spinner spinnerProvincia, spinnerLocalidad;
+
+    // Cambiamos Spinner por MaterialAutoCompleteTextView
+    private MaterialAutoCompleteTextView autoCompleteProvincia, autoCompleteLocalidad;
+
+    private Toolbar editProfileToolbar;
 
     private FirebaseAuth mAuth;
     private FirebaseStorage mStorage;
@@ -74,8 +71,6 @@ public class EditProfileActivity extends AppCompatActivity {
                 }
             });
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,15 +81,21 @@ public class EditProfileActivity extends AppCompatActivity {
         btnChangeImage = findViewById(R.id.btnChangeImage);
         btnSaveChanges = findViewById(R.id.btnSaveChanges);
         eTxtPresentation = findViewById(R.id.eTxtPresentation);
-        spinnerProvincia = findViewById(R.id.spinnerProvincia);
-        spinnerLocalidad = findViewById(R.id.spinnerLocalidad);
+
+        // Nuevas referencias a los AutoCompleteTextView
+        autoCompleteProvincia = findViewById(R.id.autoCompleteProvincia);
+        autoCompleteLocalidad = findViewById(R.id.autoCompleteLocalidad);
+
+        editProfileToolbar = findViewById(R.id.editProfileToolbar);
+
+        editProfileToolbar.setNavigationOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
 
         // Inicializar Firebase
         mAuth = FirebaseAuth.getInstance();
         mStorage = FirebaseStorage.getInstance();
 
-        // Configurar Spinners
-        setupSpinners();
+        // Configurar Listas Desplegables
+        setupDropdowns();
 
         // Cargar datos del usuario
         loadUserData();
@@ -129,8 +130,22 @@ public class EditProfileActivity extends AppCompatActivity {
                             .into(imgProfile);
                 }
 
-                // TODO: Lógica para seleccionar el item correcto en los spinners
-                // basado en data.getUbicacion()
+                // Lógica para pre-rellenar los campos de ubicación
+                // Se asume que se guardó como "Provincia, Localidad"
+                if (data.getUbicacion() != null && data.getUbicacion().contains(",")) {
+                    String[] partes = data.getUbicacion().split(",");
+                    if (partes.length >= 1) {
+                        String provincia = partes[0].trim();
+                        // El false evita que se despliegue el filtro al setear texto
+                        autoCompleteProvincia.setText(provincia, false);
+                        // Cargar las localidades correspondientes a esa provincia
+                        cargarLocalidades(provincia);
+                    }
+                    if (partes.length >= 2) {
+                        String localidad = partes[1].trim();
+                        autoCompleteLocalidad.setText(localidad, false);
+                    }
+                }
             }
             @Override
             public void onFailure(Exception e) {
@@ -203,9 +218,17 @@ public class EditProfileActivity extends AppCompatActivity {
      */
     private void saveChangesToFirestore(String newImageUrl) {
         String presentacion = eTxtPresentation.getText().toString();
-        String provincia = spinnerProvincia.getSelectedItem().toString();
-        String localidad = spinnerLocalidad.getSelectedItem().toString();
-        String ubicacion = provincia + ", " + localidad;
+
+        // Ahora obtenemos el texto directamente del AutoCompleteTextView
+        String provincia = autoCompleteProvincia.getText().toString();
+        String localidad = autoCompleteLocalidad.getText().toString();
+
+        String ubicacion = "";
+        if(!provincia.isEmpty() && !localidad.isEmpty()){
+            ubicacion = provincia + ", " + localidad;
+        } else if (!provincia.isEmpty()) {
+            ubicacion = provincia;
+        }
 
         // Usamos un Map para actualizar solo los campos modificados
         Map<String, Object> updates = new HashMap<>();
@@ -216,7 +239,6 @@ public class EditProfileActivity extends AppCompatActivity {
             updates.put("urlFoto", newImageUrl);
         }
 
-        // Usamos el método 'actualizarCampos' que crearemos en Usuario.java
         usuarioActual.actualizarCampos(updates, new OnOperationCallback() {
             @Override
             public void onSuccess() {
@@ -231,37 +253,46 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Configura los adaptadores para los Spinners de ubicación.
+     * Configura los adaptadores para los campos de autocompletado (Provincia y Localidad).
      */
-    private void setupSpinners() {
-        // Adaptador para Provincias (desde arrays.xml)
-        ArrayAdapter<CharSequence> provinciaAdapter = ArrayAdapter.createFromResource(this,
-                R.array.provincias, android.R.layout.simple_spinner_item);
-        provinciaAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerProvincia.setAdapter(provinciaAdapter);
+    private void setupDropdowns() {
+        // 1. Configurar PROVINCIAS
+        String[] provinciasArray = getResources().getStringArray(R.array.provincias);
+        ArrayAdapter<String> provinciaAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, provinciasArray);
 
-        // Listener para Provincia
-        spinnerProvincia.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // Basado en la provincia, cambiamos el adaptador de Localidad
-                String provinciaSeleccionada = parent.getItemAtPosition(position).toString();
-                int idArrayLocalidades = R.array.localidades_default; // Por defecto
+        autoCompleteProvincia.setAdapter(provinciaAdapter);
 
-                if (provinciaSeleccionada.equals("Madrid")) {
-                    idArrayLocalidades = R.array.localidades_madrid;
-                } else if (provinciaSeleccionada.equals("Barcelona")) {
-                    idArrayLocalidades = R.array.localidades_barcelona;
-                } // ... añadir más 'else if'
+        // Listener: Cuando el usuario selecciona una provincia de la lista
+        autoCompleteProvincia.setOnItemClickListener((parent, view, position, id) -> {
+            String provinciaSeleccionada = (String) parent.getItemAtPosition(position);
 
-                // Actualizar adaptador de Localidad
-                ArrayAdapter<CharSequence> localidadAdapter = ArrayAdapter.createFromResource(EditProfileActivity.this,
-                        idArrayLocalidades, android.R.layout.simple_spinner_item);
-                localidadAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                spinnerLocalidad.setAdapter(localidadAdapter);
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
+            // Limpiar localidad anterior porque ha cambiado la provincia
+            autoCompleteLocalidad.setText("");
+
+            // Cargar las localidades de esa provincia
+            cargarLocalidades(provinciaSeleccionada);
         });
+    }
+
+    /**
+     * Carga el adaptador de localidades basado en la provincia seleccionada.
+     */
+    private void cargarLocalidades(String provinciaSeleccionada) {
+        int idArrayLocalidades = R.array.localidades_default; // Por defecto
+
+        // Lógica simple de mapeo (Asegúrate de tener estos arrays en strings.xml/arrays.xml)
+        if (provinciaSeleccionada.equals("Madrid")) {
+            idArrayLocalidades = R.array.localidades_madrid;
+        } else if (provinciaSeleccionada.equals("Barcelona")) {
+            idArrayLocalidades = R.array.localidades_barcelona;
+        }
+        // Puedes añadir más 'else if' para otras provincias aquí
+
+        String[] localidadesArray = getResources().getStringArray(idArrayLocalidades);
+        ArrayAdapter<String> localidadAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, localidadesArray);
+
+        autoCompleteLocalidad.setAdapter(localidadAdapter);
     }
 }

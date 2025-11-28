@@ -4,20 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:colorBackground">
+    android:background="?android:attr/windowBackground">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:colorBackground"
+        android:background="?android:attr/colorBackground"
         app:elevation="0dp">
 
-        <com.google.android.material.appbar.MaterialToolbar
+        <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:navigationIcon="?attr/homeAsUpIndicator"
-            app:title="@string/app_name" />
+            app:title="Calendario"
+            app:titleTextColor="?android:attr/textColorPrimary" />
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
@@ -39,26 +41,42 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
+                <!-- Título (Oculto o visible según preferencia en landscape, aquí lo mantengo para consistencia de IDs) -->
                 <TextView
                     android:id="@+id/tituloCalendario"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:text="@string/list_screen_title"
-                    android:textAppearance="?attr/textAppearanceHeadlineSmall"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textStyle="bold" />
+                    android:text="Mi Calendario general"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="4dp" />
+
+                <!-- Subtítulo -->
+                <TextView
+                    android:id="@+id/subtituloCalendario"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Selecciona un día"
+                    android:textSize="14sp"
+                    android:textColor="@color/gray_300"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="?attr/materialCardViewFilledStyle">
+                    app:cardElevation="4dp"
+                    app:cardCornerRadius="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="12dp">
 
                     <CalendarView
                         android:id="@+id/calendarView"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="?attr/colorSurfaceContainerHigh" />
+                        android:layout_height="wrap_content" />
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
         </ScrollView>
