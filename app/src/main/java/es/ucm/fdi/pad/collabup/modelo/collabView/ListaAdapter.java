@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import es.ucm.fdi.pad.collabup.R;
+import es.ucm.fdi.pad.collabup.modelo.CollabItem;
 
 /**
  * Adaptador específico para la vista de tipo "Lista" de CollabView..

@@ -28,9 +28,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Collab;
+import es.ucm.fdi.pad.collabup.modelo.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.collabView.AbstractCollabView;
 import es.ucm.fdi.pad.collabup.modelo.collabView.Calendario;
-import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
@@ -44,6 +44,8 @@ public class CreateCollabItemFragment extends Fragment {
     private ListView lvUsrsAsigCollabItem, lvCvAsigCollabItem;
     private Button btnCrearCollabItem;
     private MaterialToolbar toolbar;
+
+    private static final String ARG_COLLAB_ID = "idC";
 
 
     //---------- Atributos necesarios
@@ -96,7 +98,7 @@ public class CreateCollabItemFragment extends Fragment {
         lvCvAsigCollabItem = view.findViewById(R.id.lvCVAsigCollabItem);
 
         toolbar = view.findViewById(R.id.toolbarCollabItem);
-        toolbar.setTitle("Crear nuevo Collab Item");
+        toolbar.setTitle(CollabItem.CollabItemConstants.TOOLBAR_TITLE);
         toolbar.setNavigationOnClickListener(v -> {
             getParentFragmentManager().popBackStack();
         });
@@ -105,7 +107,7 @@ public class CreateCollabItemFragment extends Fragment {
         // Recuperamos argumentos del fragment
         Bundle bundle = getArguments();
         if (bundle != null) {
-            idC = bundle.getString("idC");
+            idC = bundle.getString(ARG_COLLAB_ID);
         }
 
         btnSeleccionMiembros.setOnClickListener(v -> seleccionarMiembros());
@@ -178,21 +180,21 @@ public class CreateCollabItemFragment extends Fragment {
 
                             @Override
                             public void onFailure(Exception e) {
-                                Toast.makeText(requireContext(), "Error al cargar collabViews: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_CARGA_ITEMS + e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
 
                     @Override
                     public void onFailure(Exception e) {
-                        Toast.makeText(requireContext(), "Error al cargar miembros: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_CARGA_MIEMBROS + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
             }
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(requireContext(), "Error al cargar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_CARGA_ITEMS + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -209,7 +211,7 @@ public class CreateCollabItemFragment extends Fragment {
                 .toArray(String[]::new);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Selecciona los miembros");
+        builder.setTitle(CollabItem.CollabItemConstants.BTN_SELECCION_MIEMBROS);
         builder.setMultiChoiceItems(nombres, seleccionados,
                 (dialog, which, isChecked) -> seleccionados[which] = isChecked);
         builder.setPositiveButton("OK", (dialog, which) -> {
@@ -238,7 +240,7 @@ public class CreateCollabItemFragment extends Fragment {
                 nombresAsignados);
         lvUsrsAsigCollabItem.setAdapter(adapter);
         setListViewHeightBasedOnItems(lvUsrsAsigCollabItem); //para la vista
-        btnSeleccionMiembros.setText(nombresAsignados.isEmpty() ? "Seleccionar miembros" :
+        btnSeleccionMiembros.setText(nombresAsignados.isEmpty() ? CollabItem.CollabItemConstants.BTN_SELECCION_MIEMBROS :
                 "Miembros: " + nombresAsignados.size());
     }
 
@@ -258,7 +260,7 @@ public class CreateCollabItemFragment extends Fragment {
 
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Selecciona Collab Views");
+        builder.setTitle(CollabItem.CollabItemConstants.BTN_SELECCION_CV);
         builder.setMultiChoiceItems(nombres, cvseleccionados,
                 (dialog, which, isChecked) -> cvseleccionados[which] = isChecked);
         builder.setPositiveButton("OK", (dialog, which) -> {
@@ -278,7 +280,7 @@ public class CreateCollabItemFragment extends Fragment {
                 nombresAsignados);
         lvCvAsigCollabItem.setAdapter(adapter);
         setListViewHeightBasedOnItems(lvCvAsigCollabItem);
-        btnSeleccionCV.setText(nombresAsignados.isEmpty() ? "Seleccionar Collab Views" :
+        btnSeleccionCV.setText(nombresAsignados.isEmpty() ? CollabItem.CollabItemConstants.BTN_SELECCION_CV :
                 "CollabViews: " + nombresAsignados.size());
     }
 
@@ -289,7 +291,7 @@ public class CreateCollabItemFragment extends Fragment {
         String fechastr = eTxtFechaCollabItem.getText().toString().trim();
 
         if (nombre.isEmpty()) {
-            eTxtNombreCollabItem.setError("El nombre es requerido");
+            eTxtNombreCollabItem.setError(CollabItem.CollabItemConstants.ERROR_NOMBRE_REQUERIDO);
             return;
         }
 
@@ -306,8 +308,7 @@ public class CreateCollabItemFragment extends Fragment {
         for (String cvId : cvElegidas) {
             CollabView cvaux = idCv.get(cvId);
             if (cvaux instanceof Calendario && fecha == null) {
-                Toast.makeText(requireContext(),
-                        "No puedes añadir un CollabItem sin fecha a un Calendario",
+                Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_FECHA_CALENDARIO,
                         Toast.LENGTH_LONG).show();
                 return;
             }
@@ -319,7 +320,7 @@ public class CreateCollabItemFragment extends Fragment {
         nuevo.crear(new OnOperationCallback() {
             @Override
             public void onSuccess() {
-                Toast.makeText(requireContext(), "CollabItem creado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), CollabItem.CollabItemConstants.CONF_COLLABITEM_CREADO, Toast.LENGTH_SHORT).show();
                 //Necesito añadirlo a la lista de collabItems asignados a cada view.
                 // Actualizar cada CollabView
 
@@ -340,7 +341,7 @@ public class CreateCollabItemFragment extends Fragment {
 
                         @Override
                         public void onFailure(Exception e) {
-                            Toast.makeText(requireContext(), "Error al actualizar CV: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_UPDATE_ITEMS_CV + e.getMessage(), Toast.LENGTH_SHORT).show();
                             if (contador.incrementAndGet() == cvElegidas.size()) {
                                 // Aunque haya errores, cerramos al final
                                 requireActivity().getSupportFragmentManager().popBackStack();
@@ -352,7 +353,7 @@ public class CreateCollabItemFragment extends Fragment {
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(requireContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_CREAR_ITEM + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

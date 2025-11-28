@@ -1,4 +1,4 @@
-package es.ucm.fdi.pad.collabup.modelo.collabView;
+package es.ucm.fdi.pad.collabup.modelo.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import es.ucm.fdi.pad.collabup.R;
+import es.ucm.fdi.pad.collabup.modelo.CollabItem;
 
 public class CollabItemAdapter extends RecyclerView.Adapter<CollabItemAdapter.ViewHolder> {
 

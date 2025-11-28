@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.ucm.fdi.pad.collabup.R;
-import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
-import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItemAdapter;
+import es.ucm.fdi.pad.collabup.modelo.CollabItem;
+import es.ucm.fdi.pad.collabup.modelo.adapters.CollabItemAdapter;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 
 //Para ver todos los collabItems de una collab específica
@@ -100,5 +100,5 @@ public class CollabItemsListFragment extends Fragment {
             }
         });
     }
-    
+
 }

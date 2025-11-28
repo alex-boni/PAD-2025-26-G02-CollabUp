@@ -1,6 +1,5 @@
 package es.ucm.fdi.pad.collabup.modelo.collabView;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.View;
 
@@ -10,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import es.ucm.fdi.pad.collabup.modelo.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.DAO;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
@@ -54,7 +54,7 @@ public interface CollabView extends DAO<CollabView> {
      * Construye una instancia usable de CollabView a partir de un collabId y mapa de configuraciones.
      *
      * @param settings especificas para cada CollabView.
-     * @param items lista de CollabItems a poblar en la vista
+     * @param items    lista de CollabItems a poblar en la vista
      * @return una nueva instancia de CollabView configurada.
      */
     CollabView build(String collabId, String uid, String name, Map<String, Object> settings, List<CollabItem> items);

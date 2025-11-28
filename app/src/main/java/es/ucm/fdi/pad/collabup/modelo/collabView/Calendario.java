@@ -15,6 +15,7 @@ import java.util.Set;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.controlador.fragmento.CalendarioFragment;
+import es.ucm.fdi.pad.collabup.modelo.CollabItem;
 
 public class Calendario extends AbstractCollabView {
 

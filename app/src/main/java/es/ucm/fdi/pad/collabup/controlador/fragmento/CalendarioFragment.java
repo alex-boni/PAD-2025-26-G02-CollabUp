@@ -28,9 +28,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Collab;
+import es.ucm.fdi.pad.collabup.modelo.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.Usuario;
-import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
-import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItemAdapter;
+import es.ucm.fdi.pad.collabup.modelo.adapters.CollabItemAdapter;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 
 public class CalendarioFragment extends Fragment {
@@ -43,6 +43,7 @@ public class CalendarioFragment extends Fragment {
     private static final String ARG_COLLAB_ID = "idC";
     private static final String ARG_COLLABVIEW_ID = "idCV";
     private static final String ARG_ITEMS_ID = "idItems";
+    private static final String TITULO_DEFECTO = "Calendario Collab View";
     private String idC;
     private String idCV;
     private List<String> idItems;
@@ -95,7 +96,7 @@ public class CalendarioFragment extends Fragment {
             tvTitulo.setVisibility(View.GONE);
             tvSubtitulo.setVisibility(View.GONE);
 
-            toolbar.setTitle(titulo != null ? titulo : "Calendario CV");
+            toolbar.setTitle(titulo != null ? titulo : TITULO_DEFECTO);
             toolbar.setNavigationOnClickListener(v -> { //para volver atrás
                 if (getParentFragmentManager() != null) {
                     getParentFragmentManager().popBackStack();
@@ -182,7 +183,7 @@ public class CalendarioFragment extends Fragment {
                 public void onSuccess(CollabItem data) {
                     lci.add(data);
                     if (contador.incrementAndGet() == idItems.size()) {
-                        Toast.makeText(getContext(), "Items cargados ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), CollabItem.CollabItemConstants.CONF_COLLABITEM_CARGADOS, Toast.LENGTH_SHORT).show();
                         Calendar hoy = Calendar.getInstance();
                         cargarItemsDiaCV(lci, hoy);
 
@@ -196,7 +197,7 @@ public class CalendarioFragment extends Fragment {
 
                 @Override
                 public void onFailure(Exception e) {
-                    Toast.makeText(getContext(), "Error al cargar items: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), CollabItem.CollabItemConstants.ERROR_CARGAR_ITEM + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -226,7 +227,7 @@ public class CalendarioFragment extends Fragment {
 
                         @Override
                         public void onFailure(Exception e) {
-                            Toast.makeText(getContext(), "Error al cargar items: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), CollabItem.CollabItemConstants.ERROR_CARGAR_ITEM + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
 

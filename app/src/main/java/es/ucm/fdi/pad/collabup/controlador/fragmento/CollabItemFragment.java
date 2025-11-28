@@ -1,7 +1,6 @@
 package es.ucm.fdi.pad.collabup.controlador.fragmento;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,9 +30,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.Collab;
+import es.ucm.fdi.pad.collabup.modelo.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.collabView.AbstractCollabView;
 import es.ucm.fdi.pad.collabup.modelo.collabView.Calendario;
-import es.ucm.fdi.pad.collabup.modelo.collabView.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
@@ -49,6 +48,9 @@ public class CollabItemFragment extends Fragment {
     private MaterialToolbar toolbar;
 
     //------------
+
+    private static final String ARG_COLLAB_ITEM_ID = "idI";
+    private static final String ARG_COLLAB_ID = "idC";
     private String idI; //el que estoy viendo
     private CollabItem ci; //collabitem seleccionado
 
@@ -70,8 +72,8 @@ public class CollabItemFragment extends Fragment {
     public static CollabItemFragment newInstance(String idI, String idC) {
         CollabItemFragment fragment = new CollabItemFragment();
         Bundle args = new Bundle();
-        args.putString("idI", idI);
-        args.putString("idC", idC);
+        args.putString(ARG_COLLAB_ITEM_ID, idI);
+        args.putString(ARG_COLLAB_ID, idC);
         fragment.setArguments(args);
         return fragment;
     }
@@ -109,7 +111,7 @@ public class CollabItemFragment extends Fragment {
         btnSeleccionCV = view.findViewById(R.id.btnSeleccionCV);
 
         toolbar = view.findViewById(R.id.toolbarCollabItem);
-        toolbar.setTitle("Detalles del Collab Item");
+        toolbar.setTitle(CollabItem.CollabItemConstants.TOOLBAR_TITLE);
         toolbar.setNavigationOnClickListener(v -> {
             getParentFragmentManager().popBackStack(); //para poder volver atrás
         });
@@ -118,8 +120,8 @@ public class CollabItemFragment extends Fragment {
         // Recupero argumentos
         Bundle bundle = getArguments();
         if (bundle != null) {
-            idI = bundle.getString("idI");
-            idC = bundle.getString("idC");
+            idI = bundle.getString(ARG_COLLAB_ITEM_ID);
+            idC = bundle.getString(ARG_COLLAB_ID);
         }
 
         // Botones:
@@ -135,8 +137,8 @@ public class CollabItemFragment extends Fragment {
 
         btnEliminarCollabItem.setOnClickListener(v -> {
             new AlertDialog.Builder(requireContext())
-                    .setTitle("Eliminar CollabItem")
-                    .setMessage("¿Estás seguro de que quieres eliminar este CollabItem?")
+                    .setTitle(CollabItem.CollabItemConstants.BTN_ELIMINAR_ITEM)
+                    .setMessage(CollabItem.CollabItemConstants.PREG_ELIMINAR_ITEM)
                     .setPositiveButton("Sí", (dialog, which) -> eliminarCollabItem())
                     .setNegativeButton("No", null)
                     .show();
@@ -214,25 +216,25 @@ public class CollabItemFragment extends Fragment {
 
                                         @Override
                                         public void onFailure(Exception e) {
-                                            Toast.makeText(requireContext(), "Error al cargar collabViews: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_CARGA_ITEMS + e.getMessage(), Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                 }
 
                                 @Override
                                 public void onFailure(Exception e) {
-                                    Toast.makeText(requireContext(), "Error al cargar miembros: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_CARGA_MIEMBROS + e.getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             });
 
                         } else {
-                            Toast.makeText(requireContext(), "Item no encontrado", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_CARGA_ITEMS, Toast.LENGTH_SHORT).show();
                         }
                     }
 
                     @Override
                     public void onFailure(Exception e) {
-                        Toast.makeText(requireContext(), "Error al cargar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_CARGA_ITEMS + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -240,7 +242,7 @@ public class CollabItemFragment extends Fragment {
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(requireContext(), "Error al cargar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_CARGA_ITEMS + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -251,7 +253,7 @@ public class CollabItemFragment extends Fragment {
         String nombre = eTxtNombreCollabItem.getText().toString().trim();
         String descripcion = eTxtDescripcionCollabItem.getText().toString().trim();
         String fechastr = eTxtFechaCollabItem.getText().toString().trim();
-        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()); //todo posible cambiar
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         Date date = null; // convierte el String a Date
         Timestamp fecha = null;
         if (!fechastr.isEmpty()) {
@@ -267,7 +269,7 @@ public class CollabItemFragment extends Fragment {
         List<String> collabAsig = new ArrayList<>(cvElegidas);
 
         if (nombre.isEmpty()) {
-            Toast.makeText(requireContext(), "Por favor ponle un nombre al CollabItem", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_NOMBRE_REQUERIDO, Toast.LENGTH_SHORT).show();
             return null;
         }
 
@@ -290,7 +292,7 @@ public class CollabItemFragment extends Fragment {
                 .toArray(String[]::new);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Selecciona los miembros");
+        builder.setTitle(CollabItem.CollabItemConstants.BTN_SELECCION_MIEMBROS);
         builder.setMultiChoiceItems(nombres, seleccionados,
                 (dialog, which, isChecked) -> seleccionados[which] = isChecked);
         builder.setPositiveButton("OK", (dialog, which) -> {
@@ -314,7 +316,7 @@ public class CollabItemFragment extends Fragment {
                 .toArray(String[]::new);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Selecciona Collab Views");
+        builder.setTitle(CollabItem.CollabItemConstants.BTN_SELECCION_CV);
         builder.setMultiChoiceItems(nombres, cvseleccionados,
                 (dialog, which, isChecked) -> cvseleccionados[which] = isChecked);
         builder.setPositiveButton("OK", (dialog, which) -> {
@@ -353,7 +355,7 @@ public class CollabItemFragment extends Fragment {
                 nombresAsignados);
         lvUsrsAsigCollabItem.setAdapter(adapter);
         setListViewHeightBasedOnItems(lvUsrsAsigCollabItem);
-        btnSeleccionMiembros.setText(nombresAsignados.isEmpty() ? "Seleccionar miembros" :
+        btnSeleccionMiembros.setText(nombresAsignados.isEmpty() ? CollabItem.CollabItemConstants.BTN_SELECCION_MIEMBROS :
                 "Miembros: " + nombresAsignados.size());
     }
 
@@ -365,7 +367,7 @@ public class CollabItemFragment extends Fragment {
                 nombresAsignados);
         lvCvAsigCollabItem.setAdapter(adapter);
         setListViewHeightBasedOnItems(lvCvAsigCollabItem);
-        btnSeleccionCV.setText(nombresAsignados.isEmpty() ? "Seleccionar Collab Views" :
+        btnSeleccionCV.setText(nombresAsignados.isEmpty() ? CollabItem.CollabItemConstants.BTN_SELECCION_CV :
                 "CollabViews: " + nombresAsignados.size());
     }
 
@@ -373,7 +375,6 @@ public class CollabItemFragment extends Fragment {
     //Función que se usa para mostrar los datos del item al que estamos viendo una vez ya tenemos
     //la información
     private void mostrarDatosCollabItem() {
-        Log.d("Calendario", "en mostrar item");
         eTxtNombreCollabItem.setText(ci.getNombre());
         eTxtDescripcionCollabItem.setText(ci.getDescripcion());
         if (ci.getFecha() != null) {
@@ -432,8 +433,7 @@ public class CollabItemFragment extends Fragment {
         for (String cvId : ciActualizado.getcvAsignadas()) {
             CollabView cvaux = idCv.get(cvId);
             if (cvaux instanceof Calendario && fecha == null) {
-                Toast.makeText(requireContext(),
-                        "No puedes asignar este CollabItem a un Calendario sin fecha",
+                Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_FECHA_CALENDARIO,
                         Toast.LENGTH_LONG).show();
                 return; // se detiene la edición
             }
@@ -451,7 +451,7 @@ public class CollabItemFragment extends Fragment {
         ciActualizado.modificar(ciActualizado, new OnOperationCallback() {
             @Override
             public void onSuccess() {
-                Toast.makeText(requireContext(), "CollabItem actualizado correctamente", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), CollabItem.CollabItemConstants.CONF_COLLABITEM_ACT, Toast.LENGTH_SHORT).show();
 
                 AtomicInteger operacionesPendientes = new AtomicInteger(cvAañadir.size() + cvAEliminar.size());
 
@@ -473,7 +473,7 @@ public class CollabItemFragment extends Fragment {
 
                         @Override
                         public void onFailure(Exception e) {
-                            Toast.makeText(requireContext(), "Error al actualizar CV: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_UPDATE_ITEMS_CV + e.getMessage(), Toast.LENGTH_SHORT).show();
                             if (operacionesPendientes.decrementAndGet() == 0) { //todos los cv han sido actualziados
                                 finalizarModificacion(ciActualizado);
                             }
@@ -494,7 +494,7 @@ public class CollabItemFragment extends Fragment {
 
                         @Override
                         public void onFailure(Exception e) {
-                            Toast.makeText(requireContext(), "Error al actualizar CV: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_UPDATE_ITEMS_CV + e.getMessage(), Toast.LENGTH_SHORT).show();
                             if (operacionesPendientes.decrementAndGet() == 0) { //todos los cv han sido actualziados
                                 finalizarModificacion(ciActualizado);
                             }
@@ -505,13 +505,13 @@ public class CollabItemFragment extends Fragment {
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(requireContext(), "Error al actualizar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_MODIFICAR_ITEM + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void finalizarModificacion(CollabItem ciActualizado) {
-        Toast.makeText(requireContext(), "CollabItem actualizado correctamente", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), CollabItem.CollabItemConstants.CONF_COLLABITEM_ACT, Toast.LENGTH_SHORT).show();
         setEditable(false);
         btnGuardarCollabItem.setVisibility(View.GONE);
         btnEditarCollabItem.setVisibility(View.VISIBLE);
@@ -527,7 +527,7 @@ public class CollabItemFragment extends Fragment {
         ciEliminar.eliminar(new OnOperationCallback() {
             @Override
             public void onSuccess() {
-                Toast.makeText(requireContext(), "CollabItem eliminado correctamente", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), CollabItem.CollabItemConstants.CONF_COLLABITEM_ELIM, Toast.LENGTH_SHORT).show();
 
                 AtomicInteger operacionesPendientes = new AtomicInteger(ciEliminar.getcvAsignadas().size());
                 if (ciEliminar.getcvAsignadas().isEmpty()) {
@@ -546,7 +546,7 @@ public class CollabItemFragment extends Fragment {
 
                         @Override
                         public void onFailure(Exception e) {
-                            Toast.makeText(requireContext(), "Error al actualizar CV: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_UPDATE_ITEMS_CV + e.getMessage(), Toast.LENGTH_SHORT).show();
                             if (operacionesPendientes.decrementAndGet() == 0) { //todos los cv han sido actualziados
                                 getParentFragmentManager().popBackStack(); // cierro el fragment y vuelvo a la lista
                             }
@@ -557,7 +557,7 @@ public class CollabItemFragment extends Fragment {
 
             @Override
             public void onFailure(Exception e) {
-                Toast.makeText(requireContext(), "Error al eliminar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), CollabItem.CollabItemConstants.ERROR_ELIMINAR_ITEM + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 

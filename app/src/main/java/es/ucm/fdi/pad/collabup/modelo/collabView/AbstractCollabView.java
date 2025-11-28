@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import es.ucm.fdi.pad.collabup.modelo.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 

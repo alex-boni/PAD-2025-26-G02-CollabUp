@@ -1,4 +1,4 @@
-package es.ucm.fdi.pad.collabup.modelo.collabView;
+package es.ucm.fdi.pad.collabup.modelo;
 
 import androidx.annotation.NonNull;
 
@@ -19,8 +19,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import es.ucm.fdi.pad.collabup.modelo.Etiqueta;
-import es.ucm.fdi.pad.collabup.modelo.Usuario;
+import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.DAO;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
@@ -414,6 +413,37 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
             }
         }
         return nombres;
+    }
+
+    //Clase con constantes para no poner nada a mano. Estática porque no necesito un objeto para acceder a ella
+    public static class CollabItemConstants {
+        // Títulos y botones
+        public static final String TOOLBAR_TITLE = "Crear nuevo Collab Item";
+        public static final String BTN_SELECCION_MIEMBROS = "Seleccionar miembros";
+        public static final String BTN_SELECCION_CV = "Seleccionar CollabViews";
+        public static final String BTN_ELIMINAR_ITEM = "Eliminar item";
+
+        // VALIDACIONES Y ERRORES
+        public static final String ERROR_NOMBRE_REQUERIDO = "El nombre es requerido";
+        public static final String ERROR_FECHA_CALENDARIO = "No puedes añadir un CollabItem sin fecha a un Calendario";
+
+        public static final String ERROR_CARGA_ITEMS = "Error al cargar items";
+        public static final String ERROR_CARGA_MIEMBROS = "Error al cargar miembros";
+        public static final String ERROR_UPDATE_ITEMS_CV = "Error al actualizar los items de la collab view";
+        public static final String ERROR_CREAR_ITEM = "No se ha podido crear el collab item";
+        public static final String ERROR_MODIFICAR_ITEM = "No se ha podido modificar el collab item";
+        public static final String ERROR_ELIMINAR_ITEM = "No se ha podido eliminar el collab item";
+        public static final String ERROR_CARGAR_ITEM = "No se han podido cargar los collab items";
+
+
+        // CONFIRMACIONES
+        public static final String CONF_COLLABITEM_CREADO = "CollabItem creado correctamente";
+        public static final String CONF_COLLABITEM_ACT = "CollabItem actualizado correctamente";
+        public static final String CONF_COLLABITEM_ELIM = "CollabItem eliminado correctamente";
+        public static final String CONF_COLLABITEM_CARGADOS = "CollabItems cargados correctamente";
+
+        //PREGUNTAS
+        public static final String PREG_ELIMINAR_ITEM = "¿Estás seguro de que quieres eliminar este CollabItem?";
     }
 
 
