@@ -16,7 +16,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -48,6 +47,8 @@ public class CalendarioFragment extends Fragment {
     private String idCV;
     private List<String> idItems;
     private boolean general = true; //para saber si estamos en el calendario general o no
+
+    List<CollabItem> lci = new ArrayList<>();
 
 
     //Para tener el usuario:
@@ -150,13 +151,14 @@ public class CalendarioFragment extends Fragment {
 
                 // Cargar items del día actual (para que al inicio salgan los items de hoy)
                 Calendar hoy = Calendar.getInstance();
-                cargarItemsDiaGeneral(hoy);
+                cargarItems(hoy);
+                //filtrarItemsDia(hoy);
 
                 // Listener al cambiar de día -> se abre lista de items
                 calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
                     Calendar cal = Calendar.getInstance();
                     cal.set(year, month, dayOfMonth);
-                    cargarItemsDiaGeneral(cal);
+                    filtrarItemsDia(cal);
                 });
             }
 
@@ -169,9 +171,47 @@ public class CalendarioFragment extends Fragment {
         });
     }
 
+    private void cargarItems(Calendar cal) {
+
+        // Cargo los items de ese día del usuario de cualquier collab (de ese usuario)
+        //Saco collabs del usuario:
+        new Collab().obtenerCollabsDelUsuario(usuario.getUID(), new OnDataLoadedCallback<ArrayList<Collab>>() {
+            @Override
+            public void onSuccess(ArrayList<Collab> listaCollabs) {
+                List<CollabItem> todosItems = new ArrayList<>(); //auxiliar por firebase
+                AtomicInteger contador = new AtomicInteger(0); //por firebase
+
+                // Aquí tenemos todas las collabs del usuario -> sacamos los items asignados a ese usuario
+                for (Collab collab : listaCollabs) {
+                    new CollabItem().obtenerCollabItemsUsr(usuario.getUID(), collab.getId(), new OnDataLoadedCallback<List<CollabItem>>() {
+
+                        @Override
+                        public void onSuccess(List<CollabItem> data) {
+                            todosItems.addAll(data);
+                            if (contador.incrementAndGet() == listaCollabs.size()) {
+                                lci = todosItems; //solo aqui actualizo esta lista
+                                filtrarItemsDia(cal);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            Toast.makeText(getContext(), CollabItem.CollabItemConstants.ERROR_CARGA_ITEMS + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(getContext(), "Error al cargar collabs del usuario: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void cargarCalendarioCV() {
         //Me llega la lista de los ids de los collab items
-        List<CollabItem> lci = new ArrayList<>();
         AtomicInteger contador = new AtomicInteger(0); //por firebase
 
         for (String idItem : idItems) {
@@ -185,12 +225,12 @@ public class CalendarioFragment extends Fragment {
                     if (contador.incrementAndGet() == idItems.size()) {
                         Toast.makeText(getContext(), CollabItem.CollabItemConstants.CONF_COLLABITEM_CARGADOS, Toast.LENGTH_SHORT).show();
                         Calendar hoy = Calendar.getInstance();
-                        cargarItemsDiaCV(lci, hoy);
+                        filtrarItemsDia(hoy);
 
                         calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
                             Calendar cal = Calendar.getInstance();
                             cal.set(year, month, dayOfMonth);
-                            cargarItemsDiaCV(lci, cal);
+                            filtrarItemsDia(cal);
                         });
                     }
                 }
@@ -203,46 +243,8 @@ public class CalendarioFragment extends Fragment {
         }
     }
 
-    private void cargarItemsDiaGeneral(Calendar cal) {
-        Timestamp fecha = new Timestamp(cal.getTime());
 
-        // Cargo los items de ese día del usuario de cualquier collab (de ese usuario)
-        //Saco collabs del usuario:
-        new Collab().obtenerCollabsDelUsuario(usuario.getUID(), new OnDataLoadedCallback<ArrayList<Collab>>() {
-            @Override
-            public void onSuccess(ArrayList<Collab> listaCollabs) {
-                List<CollabItem> todosItems = new ArrayList<>(); //auxiliar por firebase
-                AtomicInteger contador = new AtomicInteger(0); //por firebase
-
-                // Aquí tenemos todas las collabs del usuario -> sacamos los items asignados a ese usuario en esa fecha
-                for (Collab collab : listaCollabs) {
-                    new CollabItem().obtenerCollabItemsUsrFecha(usuario.getUID(), collab.getId(), fecha, new OnDataLoadedCallback<List<CollabItem>>() {
-                        @Override
-                        public void onSuccess(List<CollabItem> result) {
-                            todosItems.addAll(result);
-                            if (contador.incrementAndGet() == listaCollabs.size()) {
-                                adapter.setItems(todosItems); //porque sino se carga raro
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Exception e) {
-                            Toast.makeText(getContext(), CollabItem.CollabItemConstants.ERROR_CARGAR_ITEM + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-
-                }
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                Toast.makeText(getContext(), "Error al cargar collabs del usuario: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-
-    }
-
-    private void cargarItemsDiaCV(List<CollabItem> lci, Calendar fSel) {
+    private void filtrarItemsDia(Calendar fSel) {
         List<CollabItem> filtrados = new ArrayList<>();
         for (CollabItem item : lci) {
             if (item.getFecha() != null) {

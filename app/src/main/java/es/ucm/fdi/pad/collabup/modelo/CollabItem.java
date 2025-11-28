@@ -308,6 +308,25 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
                 .addOnFailureListener(callback::onFailure);
     }
 
+    public void obtenerCollabItemsUsr(String usuarioId, String collabId, OnDataLoadedCallback<List<CollabItem>> callback) {
+        db.collection("collabs")
+                .document(collabId)
+                .collection("collabItems")
+                .whereArrayContains("usuariosAsignados", usuarioId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<CollabItem> itemsFiltrados = new ArrayList<>();
+
+                    for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                        Timestamp fechaItem = doc.getTimestamp("fecha");
+                        if (fechaItem == null) continue; // Solo me interesan los que tienen fecha
+                        itemsFiltrados.add(buildItemDocument(doc, collabId, fechaItem));
+                    }
+                    callback.onSuccess(itemsFiltrados);
+                })
+                .addOnFailureListener(callback::onFailure);
+    }
+
     //Funcion que dado un documento de firebase construye el objeto. Prefiero no usar la función
     //directa porque puede causar excepciones difíciles de controlar.
     private CollabItem buildItemDocument(DocumentSnapshot doc, String collabId, Timestamp fechaItem) {
