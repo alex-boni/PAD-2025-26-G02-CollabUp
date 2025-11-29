@@ -451,6 +451,7 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
     public static class CollabItemConstants {
         // Títulos y botones
         public static final String TOOLBAR_TITLE = "Crear nuevo Collab Item";
+        public static final String TOOLBAR_TITLE_DETAIL = "Detalles del Collab Item";
         public static final String BTN_SELECCION_MIEMBROS = "Seleccionar miembros";
         public static final String BTN_SELECCION_CV = "Seleccionar CollabViews";
         public static final String BTN_ELIMINAR_ITEM = "Eliminar item";
