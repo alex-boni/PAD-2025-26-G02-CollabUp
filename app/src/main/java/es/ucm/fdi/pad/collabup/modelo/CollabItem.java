@@ -348,9 +348,6 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         List<String> usuariosAsignados = doc.contains("usuariosAsignados")
                 ? (List<String>) doc.get("usuariosAsignados")
                 : new ArrayList<>();
-        List<Etiqueta> etiquetasItem = doc.contains("etiquetas")
-                ? (List<Etiqueta>) doc.get("etiquetas")
-                : new ArrayList<>();
         List<String> cvAsignadas = doc.contains("cvAsignadas")
                 ? (List<String>) doc.get("cvAsignadas")
                 : new ArrayList<>();
