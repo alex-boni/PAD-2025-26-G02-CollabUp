@@ -17,7 +17,6 @@ import es.ucm.fdi.pad.collabup.modelo.collabView.Calendario;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
 import es.ucm.fdi.pad.collabup.modelo.collabView.Lista;
 import es.ucm.fdi.pad.collabup.modelo.collabView.Registry;
-import es.ucm.fdi.pad.collabup.modelo.collabView.TablonNotas;
 
 
 public class AppController extends AppCompatActivity {
@@ -27,7 +26,7 @@ public class AppController extends AppCompatActivity {
         Registry<String, CollabView> reg = Registry.getOrCreateRegistry(CollabView.class);
         reg.register(Lista.class.getSimpleName(), Lista::getTemplateInstance);
         reg.register(Calendario.class.getSimpleName(), Calendario::getTemplateInstance);
-        reg.register(TablonNotas.class.getSimpleName(), TablonNotas::getTemplateInstance);
+        //reg.register(TablonNotas.class.getSimpleName(), TablonNotas::getTemplateInstance);
     }
 
     // Variables que controlarán a los fragmentos
