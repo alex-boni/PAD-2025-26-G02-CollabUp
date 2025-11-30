@@ -4,11 +4,14 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,11 +25,15 @@ import com.google.android.material.appbar.AppBarLayout;
 import java.lang.reflect.Method;
 
 import es.ucm.fdi.pad.collabup.R;
+import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
+import android.app.AlertDialog;
 
 public class FullViewHostFragment extends Fragment {
     private static final String ARG_TITLE = "ARG_TITLE";
     private Fragment contentFragment;
     private int containerId = View.generateViewId();
+    private CollabView collabView; // referencia opcional para acciones (p.ej. eliminar)
 
     public static FullViewHostFragment newInstance(String title) {
         FullViewHostFragment f = new FullViewHostFragment();
@@ -38,6 +45,11 @@ public class FullViewHostFragment extends Fragment {
 
     public void setContent(Fragment content) {
         this.contentFragment = content;
+    }
+
+    // Setter que usará AbstractCollabView para pasar la instancia que represente la vista actual
+    public void setCollabView(CollabView cv) {
+        this.collabView = cv;
     }
 
     @Nullable
@@ -165,6 +177,8 @@ public class FullViewHostFragment extends Fragment {
                     }
                 }
             });
+
+            addActionButtonsToToolbar(toolbar);
         }
 
         // Insertar el fragment de vista grande como hijo solo si aún no existe
@@ -175,6 +189,87 @@ public class FullViewHostFragment extends Fragment {
                 }
             } catch (Exception ignored) {}
         }
+    }
+
+    private void addActionButtonsToToolbar(Toolbar toolbar) {
+        Context ctx = requireContext();
+        float density = ctx.getResources().getDisplayMetrics().density;
+        int size = (int) (40 * density);
+        int margin = (int) (6 * density);
+
+        Toolbar.LayoutParams lp = new Toolbar.LayoutParams(size, size);
+        lp.gravity = Gravity.END | Gravity.CENTER_VERTICAL;
+        lp.setMarginEnd(margin);
+
+        ImageButton btnAdd = new ImageButton(ctx);
+        btnAdd.setImageResource(R.drawable.ic_add);
+        btnAdd.setBackgroundResource(android.R.color.transparent);
+        btnAdd.setLayoutParams(lp);
+        btnAdd.setContentDescription("Añadir");
+        btnAdd.setOnClickListener(v -> {
+            // Por ahora no implementado
+            Toast.makeText(ctx, "Añadir (no implementado)", Toast.LENGTH_SHORT).show();
+        });
+
+        ImageButton btnEdit = new ImageButton(ctx);
+        btnEdit.setImageResource(R.drawable.ic_edit);
+        btnEdit.setBackgroundResource(android.R.color.transparent);
+        btnEdit.setLayoutParams(lp);
+        btnEdit.setContentDescription("Editar");
+        btnEdit.setOnClickListener(v -> {
+            // Por ahora no implementado
+            Toast.makeText(ctx, "Editar (no implementado)", Toast.LENGTH_SHORT).show();
+        });
+
+        ImageButton btnDelete = new ImageButton(ctx);
+        btnDelete.setImageResource(R.drawable.ic_deleted);
+        btnDelete.setBackgroundResource(android.R.color.transparent);
+        btnDelete.setLayoutParams(lp);
+        btnDelete.setContentDescription("Eliminar");
+        btnDelete.setOnClickListener(v -> onDeleteClicked());
+
+        // Añadir en orden inverso: eliminar, editar, añadir
+        toolbar.addView(btnDelete);
+        toolbar.addView(btnEdit);
+        toolbar.addView(btnAdd);
+    }
+
+    private void onDeleteClicked() {
+        if (collabView == null) {
+            Toast.makeText(requireContext(), "No se puede eliminar: referencia no disponible.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Confirmar eliminación")
+                .setMessage("¿Deseas eliminar esta CollabView? Esta acción no se puede deshacer.")
+                .setPositiveButton("Eliminar", (dialog, which) -> {
+                    try {
+                        collabView.eliminar(new OnOperationCallback() {
+                            @Override
+                            public void onSuccess() {
+                                // Notificar al usuario y retroceder
+                                if (getActivity() != null) {
+                                    Toast.makeText(getActivity(), "CollabView eliminada", Toast.LENGTH_SHORT).show();
+                                    if (getParentFragmentManager().getBackStackEntryCount() > 0) {
+                                        getParentFragmentManager().popBackStack();
+                                    } else {
+                                        getActivity().finish();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Exception e) {
+                                Toast.makeText(requireContext(), "Error al eliminar: " + (e != null ? e.getMessage() : ""), Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    } catch (Exception e) {
+                        Toast.makeText(requireContext(), "Error al solicitar eliminación: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
     }
 
     private Toolbar findToolbarInViewGroup(ViewGroup vg) {

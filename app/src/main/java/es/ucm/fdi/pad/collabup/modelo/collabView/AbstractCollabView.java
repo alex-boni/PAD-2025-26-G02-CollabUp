@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.lang.reflect.InvocationTargetException;
@@ -176,6 +177,7 @@ public abstract class AbstractCollabView implements CollabView {
         // Usar un host con toolbar para mostrar el título y contener la vista grande
         FullViewHostFragment host = FullViewHostFragment.newInstance(this.nombre != null ? this.nombre : (this.getClass().getSimpleName()));
         host.setContent(content);
+        host.setCollabView(this);
         return host;
     }
 
@@ -417,12 +419,83 @@ public abstract class AbstractCollabView implements CollabView {
 
     @Override
     public void eliminar(OnOperationCallback callback) {
+        // Primero leer la lista de collabItems asignados (ciAsignados) a esta CollabView
+        if (collabId == null || uid == null) {
+            callback.onFailure(new Exception("collabId o uid no definidos"));
+            return;
+        }
+
         db.collection("collabs")
                 .document(collabId)
                 .collection("collabViews")
                 .document(uid)
-                .delete()
-                .addOnSuccessListener(v -> callback.onSuccess())
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (!documentSnapshot.exists()) {
+                        // Si no existe el documento, nada que limpiar; intentar eliminar (idempotente)
+                        db.collection("collabs")
+                                .document(collabId)
+                                .collection("collabViews")
+                                .document(uid)
+                                .delete()
+                                .addOnSuccessListener(v -> callback.onSuccess())
+                                .addOnFailureListener(callback::onFailure);
+                        return;
+                    }
+
+                    List<String> ciAsignados = documentSnapshot.contains("items")
+                            ? (List<String>) documentSnapshot.get("items")
+                            : new ArrayList<>();
+
+                    if (ciAsignados.isEmpty()) {
+                        // No hay items que actualizar, eliminar directamente la collabView
+                        db.collection("collabs")
+                                .document(collabId)
+                                .collection("collabViews")
+                                .document(uid)
+                                .delete()
+                                .addOnSuccessListener(v -> callback.onSuccess())
+                                .addOnFailureListener(callback::onFailure);
+                        return;
+                    }
+
+                    // Actualizar cada CollabItem: quitar esta collabView de su array "cvAsignadas"
+                    AtomicInteger processed = new AtomicInteger(0);
+                    AtomicInteger failures = new AtomicInteger(0);
+
+                    for (String ciId : ciAsignados) {
+                        db.collection("collabs")
+                                .document(collabId)
+                                .collection("collabItems")
+                                .document(ciId)
+                                .update("cvAsignadas", FieldValue.arrayRemove(uid))
+                                .addOnSuccessListener(aVoid -> {
+                                    if (processed.incrementAndGet() == ciAsignados.size()) {
+                                        // Una vez actualizados todos (incluso si hubo fallos individuales), intentar eliminar la collabView
+                                        db.collection("collabs")
+                                                .document(collabId)
+                                                .collection("collabViews")
+                                                .document(uid)
+                                                .delete()
+                                                .addOnSuccessListener(v -> callback.onSuccess())
+                                                .addOnFailureListener(callback::onFailure);
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    failures.incrementAndGet();
+                                    if (processed.incrementAndGet() == ciAsignados.size()) {
+                                        // Tras procesar todos, intentar eliminar la collabView a pesar de fallos en algunos items
+                                        db.collection("collabs")
+                                                .document(collabId)
+                                                .collection("collabViews")
+                                                .document(uid)
+                                                .delete()
+                                                .addOnSuccessListener(v -> callback.onSuccess())
+                                                .addOnFailureListener(callback::onFailure);
+                                    }
+                                });
+                    }
+                })
                 .addOnFailureListener(callback::onFailure);
     }
 
