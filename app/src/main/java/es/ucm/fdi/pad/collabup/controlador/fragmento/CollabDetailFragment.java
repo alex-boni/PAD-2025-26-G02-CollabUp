@@ -305,7 +305,7 @@ public class CollabDetailFragment extends Fragment {
                     tvCollabDescription.setText(currentCollab.getDescripcion());
                     if (currentCollab.getImageUri() != null && !currentCollab.getImageUri().isEmpty()) {
                         try {
-                            ivCollabImage.setImageURI(Uri.parse(currentCollab.getImageUri()));
+                            Glide.with(getContext()).load(currentCollab.getImageUri()).into(ivCollabImage);
                         } catch (Exception e) {
                             ivCollabImage.setImageResource(R.drawable.logo); // Imagen por defecto
                         }

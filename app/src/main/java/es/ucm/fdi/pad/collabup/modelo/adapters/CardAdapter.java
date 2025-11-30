@@ -10,6 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 import es.ucm.fdi.pad.collabup.R;
@@ -55,7 +57,7 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.CardViewHolder
 
         if (item.getImageUri() != null && !item.getImageUri().isEmpty()) {
             try {
-                holder.image.setImageURI(Uri.parse(item.getImageUri()));
+                Glide.with(holder.itemView.getContext()).load(item.getImageUri()).into(holder.image);
             } catch (SecurityException e) {
                 holder.image.setImageResource(R.drawable.logo);
             }

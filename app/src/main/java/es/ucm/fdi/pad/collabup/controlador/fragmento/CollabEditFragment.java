@@ -19,10 +19,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 // Agrega la importación de Glide si lo usas para cargar imágenes por URI
 // import com.bumptech.glide.Glide;
 
@@ -50,6 +53,7 @@ public class CollabEditFragment extends Fragment {
     private Button btnCancel;
     private Button btnUpdate;
     private FirebaseAuth mAuth;
+    private FirebaseStorage mStorage;
     private ActivityResultLauncher<PickVisualMediaRequest> pickMedia;
 
 
@@ -72,6 +76,7 @@ public class CollabEditFragment extends Fragment {
             collabId = getArguments().getString(ARG_COLLAB_ID);
         }
         mAuth = FirebaseAuth.getInstance();
+        mStorage = FirebaseStorage.getInstance();
         pickMedia = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
             if (uri != null) {
                 try {
@@ -181,14 +186,9 @@ public class CollabEditFragment extends Fragment {
     private void fillFormWithData(Collab collab) {
         etCollabName.setText(collab.getNombre());
         etCollabDescription.setText(collab.getDescripcion());
-        if(collab.getImageUri() != null){
+        if (collab.getImageUri() != null) {
             try {
-                requireContext().getContentResolver().takePersistableUriPermission(
-                        Uri.parse(collab.getImageUri()),
-                        android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
-                );
-                ivCollabImage.setImageURI(Uri.parse(collab.getImageUri()));
-                selectedImageUri = Uri.parse(collab.getImageUri());
+                Glide.with(CollabEditFragment.this).load(collab.getImageUri()).into(ivCollabImage);
             } catch (SecurityException e) {
                 // No se pueden tomar permisos persistentes, la URI será temporal
             }
@@ -208,32 +208,45 @@ public class CollabEditFragment extends Fragment {
             if (currentCollab != null) {
                 currentCollab.setNombre(name);
                 currentCollab.setDescripcion(description);
-                if (imageUriString != null)
-                    currentCollab.setImageUri(imageUriString);
+                if (imageUriString != null) {
+                    String fileName = "collab_images/" + currentCollab.getId() + ".jpg";
+                    StorageReference storageRef = mStorage.getReference().child(fileName);
+                    storageRef.putFile(selectedImageUri).addOnSuccessListener(taskSnapshot -> {
+                        // Imagen subida exitosamente
+                        storageRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {
+                            // URL obtenida, ahora guardamos todo en Firestore
+                            currentCollab.setImageUri(downloadUri.toString());
+                            Collab daoCollab = new Collab();
+                            daoCollab.modificar(currentCollab, new OnOperationCallback() {
+                                @Override
+                                public void onSuccess() {
+                                    Toast.makeText(getContext(), "Collab actualizado con éxito.", Toast.LENGTH_SHORT).show();
+
+                                    // Enviar resultado al fragmento de
+                                    Bundle result = new Bundle();
+                                    result.putString("collab_id", currentCollab.getId());
+                                    getParentFragmentManager().setFragmentResult(RESULT_KEY, result);
+
+                                    if (getParentFragmentManager() != null) {
+                                        getParentFragmentManager().popBackStack();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Exception e) {
+                                    Toast.makeText(getContext(), "Error al actualizar Collab: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        });
+                    }).addOnFailureListener(e -> {
+                        Toast.makeText(getContext(), "Error al subir la imagen: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    });
+                }
             }
-            Collab daoCollab = new Collab();
-            daoCollab.modificar(currentCollab, new OnOperationCallback() {
-                @Override
-                public void onSuccess() {
-                    Toast.makeText(getContext(), "Collab actualizado con éxito.", Toast.LENGTH_SHORT).show();
 
-                    // Enviar resultado al fragmento de
-                     Bundle result = new Bundle();
-                     result.putString("collab_id", currentCollab.getId());
-                     getParentFragmentManager().setFragmentResult(RESULT_KEY, result);
-
-                    if (getParentFragmentManager() != null) {
-                        getParentFragmentManager().popBackStack();
-                    }
-                }
-
-                @Override
-                public void onFailure(Exception e) {
-                    Toast.makeText(getContext(), "Error al actualizar Collab: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                }
-            });
         }
     }
+
     private boolean validateForm(String name, String description) {
         boolean isValid = true;
 
