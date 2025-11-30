@@ -66,12 +66,8 @@ public class ConfigurarNuevoCollabViewFragment extends Fragment {
         if (args != null) {
             collabId = args.getString(ARG_COLLAB_ID);
             collabViewType = args.getString(ARG_COLLABVIEW);
-            Class<? extends CollabView> clazz = Registry.getRegistry(CollabView.class).get(collabViewType);
-            try {
-                instance = (CollabView) clazz.getMethod("getTemplateInstance").invoke(null);
-            } catch (ReflectiveOperationException e) {
-                throw new RuntimeException(e);
-            }
+            Registry<String, CollabView> reg = Registry.getRegistry(CollabView.class);
+            instance = reg != null ? reg.createTemplate(collabViewType) : null;
         }
 
         AppCompatActivity act = (AppCompatActivity) requireActivity();

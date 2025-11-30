@@ -23,11 +23,11 @@ import es.ucm.fdi.pad.collabup.modelo.collabView.TablonNotas;
 public class AppController extends AppCompatActivity {
 
     static {
-        // Registrar los tipos de CollabView disponibles
-        Registry<CollabView> reg = Registry.getOrCreateRegistry(CollabView.class);
-        reg.register(Lista.class);
-        reg.register(Calendario.class);
-        reg.register(TablonNotas.class);
+        // Registrar los tipos de CollabView disponibles usando factories
+        Registry<String, CollabView> reg = Registry.getOrCreateRegistry(CollabView.class);
+        reg.register(Lista.class.getSimpleName(), Lista::getTemplateInstance);
+        reg.register(Calendario.class.getSimpleName(), Calendario::getTemplateInstance);
+        reg.register(TablonNotas.class.getSimpleName(), TablonNotas::getTemplateInstance);
     }
 
     // Variables que controlarán a los fragmentos

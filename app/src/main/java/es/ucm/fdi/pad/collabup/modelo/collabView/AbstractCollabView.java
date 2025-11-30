@@ -342,9 +342,9 @@ public abstract class AbstractCollabView implements CollabView {
                 .addOnSuccessListener(documentSnapshot -> {
                     CollabViewTransfer t = documentSnapshot.toObject(CollabViewTransfer.class);
                     if (t != null) {
-                        Registry<CollabView> reg = Registry.getRegistry(CollabView.class);
+                        Registry<String, CollabView> reg = Registry.getRegistry(CollabView.class);
                         try {
-                            CollabView cvStatic = (CollabView) reg.get(t.type).getMethod("getTemplateInstance").invoke(null);
+                            CollabView cvStatic = reg.createTemplate(t.type);
                             assert cvStatic != null;
 
                             // Cargar los items desde la BD si existen
@@ -367,8 +367,7 @@ public abstract class AbstractCollabView implements CollabView {
                                 CollabView cv = cvStatic.build(collabId, documentSnapshot.getId(), t.name, t.settings, new ArrayList<>());
                                 callback.onSuccess(cv);
                             }
-                        } catch (IllegalAccessException | InvocationTargetException |
-                                 NoSuchMethodException e) {
+                        } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
                     } else {
@@ -509,7 +508,7 @@ public abstract class AbstractCollabView implements CollabView {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     ArrayList<CollabView> collabViews = new ArrayList<>();
-                    Registry<CollabView> reg = Registry.getRegistry(CollabView.class);
+                    Registry<String, CollabView> reg = Registry.getRegistry(CollabView.class);
                     AtomicInteger totalDocs = new AtomicInteger(queryDocumentSnapshots.size());
                     AtomicInteger procesados = new AtomicInteger(0);
 
@@ -522,7 +521,7 @@ public abstract class AbstractCollabView implements CollabView {
                         CollabViewTransfer t = doc.toObject(CollabViewTransfer.class);
                         if (t != null) {
                             try {
-                                CollabView cvStatic = (CollabView) reg.get(t.type).getMethod("getTemplateInstance").invoke(null);
+                                CollabView cvStatic = reg.createTemplate(t.type);
                                 assert cvStatic != null;
 
                                 // Cargar los items desde la BD si existen
@@ -554,8 +553,7 @@ public abstract class AbstractCollabView implements CollabView {
                                         callback.onSuccess(collabViews);
                                     }
                                 }
-                            } catch (IllegalAccessException | InvocationTargetException |
-                                     NoSuchMethodException e) {
+                            } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
                         } else {

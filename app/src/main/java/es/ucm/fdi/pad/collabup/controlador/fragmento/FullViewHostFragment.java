@@ -1,5 +1,6 @@
 package es.ucm.fdi.pad.collabup.controlador.fragmento;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -27,7 +28,6 @@ import java.lang.reflect.Method;
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
-import android.app.AlertDialog;
 
 public class FullViewHostFragment extends Fragment {
     private static final String ARG_TITLE = "ARG_TITLE";
@@ -101,11 +101,15 @@ public class FullViewHostFragment extends Fragment {
         if (!navSet) {
             try {
                 toolbar.setNavigationIcon(android.R.drawable.ic_menu_revert);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         // Poner description accesible (coincidir con otros layouts)
-        try { toolbar.setNavigationContentDescription(R.string.back_description); } catch (Exception ignored) {}
+        try {
+            toolbar.setNavigationContentDescription(R.string.back_description);
+        } catch (Exception ignored) {
+        }
 
         // Asegurar que la flecha es negra (tint al drawable)
         try {
@@ -115,7 +119,8 @@ public class FullViewHostFragment extends Fragment {
                 DrawableCompat.setTint(wrapped, black);
                 toolbar.setNavigationIcon(wrapped);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
 
         appBar.addView(toolbar);
 
@@ -158,15 +163,21 @@ public class FullViewHostFragment extends Fragment {
                     toolbar.setNavigationIcon(wrapped);
                 }
                 toolbar.setNavigationContentDescription(R.string.back_description);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
 
             toolbar.setNavigationOnClickListener(v -> {
                 try {
+                    // Si hay fragments hijos en el host, cerrarlos primero (p. ej. editor abierto)
+                    if (getChildFragmentManager().getBackStackEntryCount() > 0) {
+                        getChildFragmentManager().popBackStack();
+                        return;
+                    }
+                    // Si no hay hijos, refrescar comportamiento previo y cerrar el host (o pop del parent)
                     if (getParentFragmentManager().getBackStackEntryCount() > 0) {
                         getParentFragmentManager().popBackStack();
                         return;
                     }
-                    // Si no hay backstack, cerrar la Activity (patrón usado en Activities del proyecto)
                     if (getActivity() != null) {
                         getActivity().finish();
                     }
@@ -187,7 +198,8 @@ public class FullViewHostFragment extends Fragment {
                 if (getChildFragmentManager().findFragmentById(containerId) == null) {
                     getChildFragmentManager().beginTransaction().replace(containerId, contentFragment).commitAllowingStateLoss();
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 
@@ -207,8 +219,41 @@ public class FullViewHostFragment extends Fragment {
         btnAdd.setLayoutParams(lp);
         btnAdd.setContentDescription("Añadir");
         btnAdd.setOnClickListener(v -> {
-            // Por ahora no implementado
-            Toast.makeText(ctx, "Añadir (no implementado)", Toast.LENGTH_SHORT).show();
+            // Navegar al fragmento de creación de CollabItem pasando el collab y la CV preseleccionada
+            try {
+                if (collabView == null) {
+                    android.widget.Toast.makeText(ctx, "No hay CollabView disponible para añadir item.", android.widget.Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                String collabId = null;
+                String collabViewUid = null;
+                try {
+                    collabId = collabView.getCollabId();
+                } catch (Exception ignored) {
+                }
+                try {
+                    collabViewUid = collabView.getUid();
+                } catch (Exception ignored) {
+                }
+                if (collabId == null || collabId.isEmpty()) {
+                    android.widget.Toast.makeText(ctx, "Identificador del collab desconocido.", android.widget.Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                androidx.fragment.app.Fragment f = es.ucm.fdi.pad.collabup.controlador.fragmento.CreateCollabItemFragment.newInstance(collabId, collabViewUid, true);
+                try {
+                    // Reemplazamos dentro del host usando su childFragmentManager y el containerId local
+                    getChildFragmentManager()
+                            .beginTransaction()
+                            .replace(containerId, f)
+                            .addToBackStack("CREATE_ITEM")
+                            .commitAllowingStateLoss();
+                } catch (IllegalArgumentException iae) {
+                    // Si algo falla, informar con Toast
+                    android.widget.Toast.makeText(ctx, "No se pudo abrir el editor: " + iae.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+                }
+            } catch (Exception e) {
+                android.widget.Toast.makeText(ctx, "Error al abrir crear item: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+            }
         });
 
         ImageButton btnEdit = new ImageButton(ctx);
@@ -291,6 +336,7 @@ public class FullViewHostFragment extends Fragment {
                 Method m = contentFragment.getClass().getMethod("refreshView");
                 m.invoke(contentFragment);
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 }
