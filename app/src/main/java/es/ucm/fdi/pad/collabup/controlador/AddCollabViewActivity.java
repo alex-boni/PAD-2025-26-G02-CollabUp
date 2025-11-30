@@ -6,8 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -21,9 +19,6 @@ import es.ucm.fdi.pad.collabup.modelo.collabView.Registry;
 
 public class AddCollabViewActivity extends AppCompatActivity {
 
-    // Launcher para abrir ConfigurarNuevoCollabViewActivity y recibir su resultado
-    private ActivityResultLauncher<Intent> configureLauncher;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,16 +28,6 @@ public class AddCollabViewActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String collabId = intent.getStringExtra("COLLAB_ID");
         String collabName = intent.getStringExtra("COLLAB_NAME");
-
-        configureLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == RESULT_OK) {
-                        // Si en la siguiente activity (configuracion) se pulso guardar, aqui llega RESULT_OK
-                        finish();
-                    }
-                }
-        );
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Añadir a " + collabName);
@@ -62,6 +47,7 @@ public class AddCollabViewActivity extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(v -> finish());
 
         LinearLayout containerView = findViewById(R.id.collabview_list);
+        View fragmentContainer = findViewById(R.id.fragment_container);
 
         float density = getResources().getDisplayMetrics().density;
         int thumbMargin = (int) (6 * density);
@@ -91,10 +77,18 @@ public class AddCollabViewActivity extends AppCompatActivity {
                 mini.setLayoutParams(lp);
 
                 mini.setOnClickListener(v -> {
-                    Intent resultIntent = new Intent(this, ConfigurarNuevoCollabViewActivity.class);
-                    resultIntent.putExtra("COLLAB_ID", collabId);
-                    resultIntent.putExtra("COLLABVIEW", cvClass.getSimpleName());
-                    configureLauncher.launch(resultIntent);
+                    fragmentContainer.setVisibility(View.VISIBLE);
+                    findViewById(R.id.collabview_container).setVisibility(View.GONE);
+
+                    toolbar.setTitle("Configurar " + cvClass.getSimpleName());
+                    toolbar.setNavigationOnClickListener(nav -> getSupportFragmentManager().popBackStack());
+
+                    ConfigurarNuevoCollabViewFragment fragment = ConfigurarNuevoCollabViewFragment.newInstance(collabId, cvClass.getSimpleName());
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, fragment)
+                            .addToBackStack(null)
+                            .commit();
                 });
 
                 containerView.addView(mini);
@@ -104,5 +98,16 @@ public class AddCollabViewActivity extends AppCompatActivity {
                 throw new RuntimeException("Error al instanciar CollabView: " + cvClass.getSimpleName(), e);
             }
         }
+
+        // Cuando se haga pop del fragment, mostrar de nuevo la lista y restaurar toolbar
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> {
+            if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+                fragmentContainer.setVisibility(View.GONE);
+                findViewById(R.id.collabview_container).setVisibility(View.VISIBLE);
+
+                toolbar.setTitle("Añadir a " + collabName);
+                toolbar.setNavigationOnClickListener(v -> finish());
+            }
+        });
     }
 }

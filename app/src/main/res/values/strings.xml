@@ -114,9 +114,5 @@
     <string name="title_collab_detail">Detalles del Collab</string>
     <string name="created_by_prefix">Creado por:</string>
     <string name="button_add">Añadir</string>
-
-
-
-
-
+    <string name="create_collabview_button">Crear CollabView</string>
 </resources>

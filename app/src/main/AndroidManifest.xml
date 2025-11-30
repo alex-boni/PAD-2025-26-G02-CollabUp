@@ -45,9 +45,6 @@
         <activity
             android:name=".controlador.AddCollabViewActivity"
             android:exported="false" />
-        <activity
-            android:name=".controlador.ConfigurarNuevoCollabViewActivity"
-            android:exported="false" />
 
 
     </application>
