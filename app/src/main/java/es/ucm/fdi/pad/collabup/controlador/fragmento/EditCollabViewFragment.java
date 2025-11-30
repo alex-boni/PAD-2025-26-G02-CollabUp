@@ -279,6 +279,9 @@ public class EditCollabViewFragment extends Fragment {
             containerView.addView(group);
         }
 
+        Map<CollabViewSetting, Object> currentValues = instance.getSettings();
+        populateSettingsUI(currentValues);
+        
         View btn = view.findViewById(R.id.btn_save_collabview);
         if (btn != null) {
             btn.setOnClickListener(v -> onEditActionClicked());
@@ -430,7 +433,7 @@ public class EditCollabViewFragment extends Fragment {
 
                 if (collabViewId != null && !collabViewId.isEmpty()) {
                     CollabItem helper = new CollabItem();
-                    helper.obtenerCollabItemsCollabView(collabId, collabViewId, new OnDataLoadedCallback<List<String>>() {
+                    helper.obtenerCollabItemsCollabView(collabId, collabViewId, new OnDataLoadedCallback<>() {
                         @Override
                         public void onSuccess(List<String> idsAsignados) {
                             for (CollabItem item : loadedItems) {
@@ -477,4 +480,49 @@ public class EditCollabViewFragment extends Fragment {
         });
     }
 
+    // Rellena los widgets creados con los valores pasados en el mapa
+    private void populateSettingsUI(Map<CollabViewSetting, Object> vals) {
+        if (vals == null || vals.isEmpty()) return;
+        for (CollabViewSetting setting : vals.keySet()) {
+            String widgetKey = generateSettingId(setting.getName()) + "_widget";
+            View widget = settingWidgets.get(widgetKey);
+            if (widget == null) continue;
+            Object value = vals.get(setting);
+            if (value == null) continue;
+            switch (setting.getType()) {
+                case TEXTO:
+                case NUMERO: {
+                    if (widget instanceof EditText) {
+                        ((EditText) widget).setText(String.valueOf(value));
+                    }
+                    break;
+                }
+                case LISTA_OPCIONES: {
+                    if (widget instanceof Spinner) {
+                        Spinner spinner = (Spinner) widget;
+                        String str = String.valueOf(value);
+                        if (spinner.getAdapter() != null) {
+                            for (int i = 0; i < spinner.getAdapter().getCount(); i++) {
+                                Object o = spinner.getAdapter().getItem(i);
+                                if (o != null && str.equals(String.valueOf(o))) {
+                                    spinner.setSelection(i);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+                case BOOLEANO: {
+                    if (widget instanceof CheckBox) {
+                        boolean b;
+                        if (value instanceof Boolean) b = (Boolean) value;
+                        else b = Boolean.parseBoolean(String.valueOf(value));
+                        ((CheckBox) widget).setChecked(b);
+                    }
+                    break;
+                }
+            }
+        }
+    }
 }
