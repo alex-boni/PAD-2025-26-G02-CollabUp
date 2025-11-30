@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import es.ucm.fdi.pad.collabup.R;
@@ -40,8 +41,8 @@ public class ListaFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         // Configurar RecyclerView con el adapter recibido
-        androidx.recyclerview.widget.RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(requireContext()));
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         if (adapter != null) {
             recyclerView.setAdapter(adapter);
 
@@ -51,7 +52,7 @@ public class ListaFragment extends Fragment {
                             item1.getIdI(),
                             item1.getIdC()
                     );
-                    getParentFragmentManager()
+                    requireActivity().getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.fragmentApp, fragment)
                             .addToBackStack(null)

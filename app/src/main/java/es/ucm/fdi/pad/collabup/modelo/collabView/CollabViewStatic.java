@@ -1,10 +1,7 @@
 package es.ucm.fdi.pad.collabup.modelo.collabView;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.View;
-import android.widget.ImageView;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
@@ -12,17 +9,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.Collections;
 import java.util.Set;
 
-import es.ucm.fdi.pad.collabup.R;
+public class CollabViewStatic extends AbstractCollabView {
 
-public class TablonNotas extends AbstractCollabView {
-
-    public TablonNotas() {
-        this.nombre = "Tablón de Notas";
+    public CollabViewStatic() {
+        this.nombre = "Vista Estática";
     }
 
     public static CollabView getTemplateInstance() {
-        return new TablonNotas();
+        throw new IllegalStateException("Esta clase no debe ser instanciada directamente.");
     }
+
 
     @Override
     protected Fragment getVistaGrande(RecyclerView.Adapter<?> adapter) {
@@ -36,15 +32,8 @@ public class TablonNotas extends AbstractCollabView {
 
     @Override
     protected View getPrevisualizacion(Context context) {
-        ImageView iv = new ImageView(context);
-        Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.tablon_no_border_collabview);
-        iv.setImageBitmap(bmp);
-        iv.setAdjustViewBounds(true);
-        iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
-
-        return iv;
+        return null;
     }
-
 
     @Override
     protected Fragment getFragmentAjustes() {
@@ -55,5 +44,4 @@ public class TablonNotas extends AbstractCollabView {
     public Set<CollabViewSetting> getStaticCreationSettings() {
         return Collections.emptySet();
     }
-
 }

@@ -21,7 +21,7 @@ public class Lista extends AbstractCollabView {
         this.nombre = "Lista";
     }
 
-    public static CollabView getStaticInstance() {
+    public static CollabView getTemplateInstance() {
         return new Lista();
     }
 

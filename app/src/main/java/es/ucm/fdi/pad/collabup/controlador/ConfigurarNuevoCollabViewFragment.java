@@ -20,18 +20,18 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import es.ucm.fdi.pad.collabup.R;
-import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
-import es.ucm.fdi.pad.collabup.modelo.collabView.CollabViewSetting;
-import es.ucm.fdi.pad.collabup.modelo.collabView.Registry;
-import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import es.ucm.fdi.pad.collabup.R;
+import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
+import es.ucm.fdi.pad.collabup.modelo.collabView.CollabViewSetting;
+import es.ucm.fdi.pad.collabup.modelo.collabView.Registry;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
 public class ConfigurarNuevoCollabViewFragment extends Fragment {
 
@@ -68,7 +68,7 @@ public class ConfigurarNuevoCollabViewFragment extends Fragment {
             collabViewType = args.getString(ARG_COLLABVIEW);
             Class<? extends CollabView> clazz = Registry.getRegistry(CollabView.class).get(collabViewType);
             try {
-                instance = (CollabView) clazz.getMethod("getStaticInstance").invoke(null);
+                instance = (CollabView) clazz.getMethod("getTemplateInstance").invoke(null);
             } catch (ReflectiveOperationException e) {
                 throw new RuntimeException(e);
             }

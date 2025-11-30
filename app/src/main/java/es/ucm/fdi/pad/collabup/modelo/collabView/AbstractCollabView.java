@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import es.ucm.fdi.pad.collabup.controlador.fragmento.FullViewHostFragment;
 import es.ucm.fdi.pad.collabup.modelo.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
-import es.ucm.fdi.pad.collabup.controlador.fragmento.FullViewHostFragment;
 
 public abstract class AbstractCollabView implements CollabView {
 
@@ -45,10 +45,12 @@ public abstract class AbstractCollabView implements CollabView {
         this.settings = new HashMap<>();
         this.settingsById = new HashMap<>();
         this.listaCollabItems = new ArrayList<>();
-        getStaticCreationSettings().forEach((s) -> {
-            this.settings.put(s, null);
-            this.settingsById.put(s.getId(), null);
-        });
+        if (getStaticCreationSettings() != null) {
+            getStaticCreationSettings().forEach((s) -> {
+                this.settings.put(s, null);
+                this.settingsById.put(s.getId(), null);
+            });
+        }
     }
 
     public String getCollabId() {
@@ -310,7 +312,7 @@ public abstract class AbstractCollabView implements CollabView {
     public CollabView build(String collabId, String uid, String name, Map<String, Object> settings, List<CollabItem> items) {
         AbstractCollabView cv;
         try {
-            cv = (AbstractCollabView) this.getClass().getMethod("getStaticInstance").invoke(null);
+            cv = (AbstractCollabView) this.getClass().getMethod("getTemplateInstance").invoke(null);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
@@ -342,7 +344,7 @@ public abstract class AbstractCollabView implements CollabView {
                     if (t != null) {
                         Registry<CollabView> reg = Registry.getRegistry(CollabView.class);
                         try {
-                            CollabView cvStatic = (CollabView) reg.get(t.type).getMethod("getStaticInstance").invoke(null);
+                            CollabView cvStatic = (CollabView) reg.get(t.type).getMethod("getTemplateInstance").invoke(null);
                             assert cvStatic != null;
 
                             // Cargar los items desde la BD si existen
@@ -520,7 +522,7 @@ public abstract class AbstractCollabView implements CollabView {
                         CollabViewTransfer t = doc.toObject(CollabViewTransfer.class);
                         if (t != null) {
                             try {
-                                CollabView cvStatic = (CollabView) reg.get(t.type).getMethod("getStaticInstance").invoke(null);
+                                CollabView cvStatic = (CollabView) reg.get(t.type).getMethod("getTemplateInstance").invoke(null);
                                 assert cvStatic != null;
 
                                 // Cargar los items desde la BD si existen

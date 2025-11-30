@@ -46,7 +46,7 @@ public interface CollabView extends DAO<CollabView> {
      *
      * @return una nueva instancia de la CollabView
      */
-    static CollabView getStaticInstance() {
+    static CollabView getTemplateInstance() {
         throw new AssertionError("Este método debe ser implementado en cada subclase de CollabView");
     }
 
@@ -92,13 +92,6 @@ public interface CollabView extends DAO<CollabView> {
      * @return el fragmento de vista completa
      */
     Fragment getFullViewFragment();
-
-    /**
-     * Obtiene el fragment que permite editar los ajustes de una instancia de CollabView.
-     *
-     * @return el fragment de edición de ajustes
-     */
-    Fragment getEditSettingsFragment();
 
     /**
      * Obtiene los ajustes disponibles para la creación de una nueva instancia de CollabView.

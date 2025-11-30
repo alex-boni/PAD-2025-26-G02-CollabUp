@@ -24,7 +24,7 @@ public class Calendario extends AbstractCollabView {
         this.nombre = "Calendario";
     }
 
-    public static CollabView getStaticInstance() {
+    public static CollabView getTemplateInstance() {
         return new Calendario();
     }
 

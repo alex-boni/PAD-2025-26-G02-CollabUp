@@ -56,7 +56,7 @@ public class AddCollabViewActivity extends AppCompatActivity {
         Registry<CollabView> registry = Registry.getRegistry(CollabView.class);
         for (Class<? extends CollabView> cvClass : registry.getAll()) {
             try {
-                CollabView cvInstance = (CollabView) cvClass.getMethod("getStaticInstance").invoke(null);
+                CollabView cvInstance = (CollabView) cvClass.getMethod("getTemplateInstance").invoke(null);
 
                 View mini = cvInstance.getStaticAddCollabViewInListEntry(this);
                 if (mini == null) continue; // evitar añadir vistas nulas

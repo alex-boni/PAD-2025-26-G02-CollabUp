@@ -19,6 +19,7 @@ import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.adapters.CollabViewListAdapter;
 import es.ucm.fdi.pad.collabup.modelo.collabView.AbstractCollabView;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
+import es.ucm.fdi.pad.collabup.modelo.collabView.CollabViewStatic;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 
 public class CollabViewsListFragment extends Fragment {
@@ -87,33 +88,7 @@ public class CollabViewsListFragment extends Fragment {
         }
 
         // Crear una instancia estatica de CollabView para usar obtenerListado
-        AbstractCollabView tempCollabView = new AbstractCollabView() {
-            @Override
-            protected Fragment getVistaGrande(RecyclerView.Adapter<?> adapter) {
-                // Dummy fragment - nunca se usa porque solo necesitamos obtenerListado()
-                return new Fragment();
-            }
-
-            @Override
-            protected RecyclerView.Adapter<?> obtenerAdapter() {
-                return null;
-            }
-
-            @Override
-            protected View getPrevisualizacion(android.content.Context context) {
-                return null;
-            }
-
-            @Override
-            protected Fragment getFragmentAjustes() {
-                return null;
-            }
-
-            @Override
-            public java.util.Set<es.ucm.fdi.pad.collabup.modelo.collabView.CollabViewSetting> getStaticCreationSettings() {
-                return java.util.Collections.emptySet();
-            }
-        };
+        AbstractCollabView tempCollabView = new CollabViewStatic();
         tempCollabView.setCollabId(collabId);
 
         // Usar el método obtenerListado de AbstractCollabView
