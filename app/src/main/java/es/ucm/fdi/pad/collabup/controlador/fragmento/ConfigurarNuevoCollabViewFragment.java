@@ -377,7 +377,7 @@ public class ConfigurarNuevoCollabViewFragment extends Fragment {
 
                 if (loadedItems.isEmpty()) {
                     TextView tv = new TextView(requireContext());
-                    tv.setText(R.string.empty_list_message);
+                    tv.setText(R.string.empty_list_message_no_add);
                     tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                     tv.setPadding(16, 16, 16, 16);
                     tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
