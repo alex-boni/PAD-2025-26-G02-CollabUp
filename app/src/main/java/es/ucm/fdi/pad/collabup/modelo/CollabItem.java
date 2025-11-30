@@ -215,19 +215,8 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         ArrayList<CollabItem> listaItems = new ArrayList<>();
                         for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
-                            // Leemos los campos manualmente
-                            String nombre = document.getString("nombre");
-                            String descripcion = document.getString("descripcion");
                             Timestamp fecha = document.getTimestamp("fecha");
-                            List<String> usuariosAsignados = document.contains("usuariosAsignados")
-                                    ? (List<String>) document.get("usuariosAsignados")
-                                    : new ArrayList<>();
-                            List<String> cvAsignadas = new ArrayList<>();
-
-                            // Creamos el objeto manualmente
-                            CollabItem item = new CollabItem(nombre, descripcion, fecha, usuariosAsignados, collabId, cvAsignadas);
-                            item.setIdI(document.getId());
-
+                            CollabItem item = buildItemDocument(document, collabId, fecha);
                             listaItems.add(item);
                         }
                         callback.onSuccess(listaItems);

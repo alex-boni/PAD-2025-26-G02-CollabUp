@@ -297,14 +297,8 @@ public class EditCollabViewFragment extends Fragment {
 
         Map<String, Object> settings = getSettingsFromUI();
 
-        // Contamos items seleccionados (si se cargaron)
+        // Los ítems seleccionados se obtienen de `selectedItems` cuando sea necesario
 
-        List<String> selected = new ArrayList<>();
-        for (Map.Entry<String, Boolean> entry : selectedItems.entrySet()) {
-            if (entry.getValue() != null && entry.getValue()) {
-                selected.add(entry.getKey());
-            }
-        }
 
         // Si tenemos una instancia original registrada, la utilizamos para modificar
         if (instance != null && collabViewId != null && !collabViewId.isEmpty()) {
@@ -433,17 +427,46 @@ public class EditCollabViewFragment extends Fragment {
                     return;
                 }
 
-                for (CollabItem item : loadedItems) {
-                    CheckBox cb = new CheckBox(requireContext());
-                    cb.setTag(item.getIdI());
-                    cb.setText(item.getNombre() != null ? item.getNombre() : item.getIdI());
-                    cb.setLayoutParams(new LinearLayout.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT));
-                    cb.setChecked(false);
-                    selectedItems.put(item.getIdI(), false);
-                    cb.setOnCheckedChangeListener((buttonView, isChecked) -> selectedItems.put(item.getIdI(), isChecked));
-                    list.addView(cb);
+
+                if (collabViewId != null && !collabViewId.isEmpty()) {
+                    CollabItem helper = new CollabItem();
+                    helper.obtenerCollabItemsCollabView(collabId, collabViewId, new OnDataLoadedCallback<List<String>>() {
+                        @Override
+                        public void onSuccess(List<String> idsAsignados) {
+                            for (CollabItem item : loadedItems) {
+                                CheckBox cb = new CheckBox(requireContext());
+                                cb.setTag(item.getIdI());
+                                cb.setText(item.getNombre() != null ? item.getNombre() : item.getIdI());
+                                cb.setLayoutParams(new LinearLayout.LayoutParams(
+                                        ViewGroup.LayoutParams.MATCH_PARENT,
+                                        ViewGroup.LayoutParams.WRAP_CONTENT));
+                                boolean initiallyChecked = idsAsignados != null && idsAsignados.contains(item.getIdI());
+                                cb.setChecked(initiallyChecked);
+                                selectedItems.put(item.getIdI(), initiallyChecked);
+                                cb.setOnCheckedChangeListener((buttonView, isChecked) -> selectedItems.put(item.getIdI(), isChecked));
+                                list.addView(cb);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            Toast.makeText(requireContext(), "Error al cargar ítems asignados: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                } else {
+                    // No hay UID de collabView (así que no hay ítems asignados)
+                    for (CollabItem item : loadedItems) {
+                        CheckBox cb = new CheckBox(requireContext());
+                        cb.setTag(item.getIdI());
+                        cb.setText(item.getNombre() != null ? item.getNombre() : item.getIdI());
+                        cb.setLayoutParams(new LinearLayout.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT));
+                        cb.setChecked(false);
+                        selectedItems.put(item.getIdI(), false);
+                        cb.setOnCheckedChangeListener((buttonView, isChecked) -> selectedItems.put(item.getIdI(), isChecked));
+                        list.addView(cb);
+                    }
                 }
             }
 
