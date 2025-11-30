@@ -281,7 +281,7 @@ public class EditCollabViewFragment extends Fragment {
 
         Map<CollabViewSetting, Object> currentValues = instance.getSettings();
         populateSettingsUI(currentValues);
-        
+
         View btn = view.findViewById(R.id.btn_save_collabview);
         if (btn != null) {
             btn.setOnClickListener(v -> onEditActionClicked());
@@ -299,9 +299,6 @@ public class EditCollabViewFragment extends Fragment {
         }
 
         Map<String, Object> settings = getSettingsFromUI();
-
-        // Los ítems seleccionados se obtienen de `selectedItems` cuando sea necesario
-
 
         // Si tenemos una instancia original registrada, la utilizamos para modificar
         if (instance != null && collabViewId != null && !collabViewId.isEmpty()) {
