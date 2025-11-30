@@ -115,7 +115,5 @@
     <string name="created_by_prefix">Created by:</string>
     <string name="button_add">Add</string>
     <string name="create_collabview_button">Create CollabView</string>
-
-
-
+    <string name="edit_collabview_name_label">Edit name</string>
 </resources>

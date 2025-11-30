@@ -27,12 +27,13 @@ import java.lang.reflect.Method;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
+import es.ucm.fdi.pad.collabup.modelo.collabView.Registry;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
 public class FullViewHostFragment extends Fragment {
     private static final String ARG_TITLE = "ARG_TITLE";
     private Fragment contentFragment;
-    private int containerId = View.generateViewId();
+    private final int containerId = View.generateViewId();
     private CollabView collabView; // referencia opcional para acciones (p.ej. eliminar)
 
     public static FullViewHostFragment newInstance(String title) {
@@ -80,9 +81,9 @@ public class FullViewHostFragment extends Fragment {
         }
         toolbar.setBackgroundColor(bgColor);
 
-        if (ctx.getTheme().resolveAttribute(android.R.attr.textColorPrimary, tv, true)) {
-            // preferir color del tema, pero forzamos a negro si no está definido
-        }
+        // Intentamos resolver el color de texto primario del tema (si se necesita en el futuro).
+        ctx.getTheme().resolveAttribute(android.R.attr.textColorPrimary, tv, true);
+
         // Forzar título visible: usar negro (soluciona que el título no se vea)
         int black = ContextCompat.getColor(ctx, android.R.color.black);
         toolbar.setTitleTextColor(black);
@@ -262,8 +263,49 @@ public class FullViewHostFragment extends Fragment {
         btnEdit.setLayoutParams(lp);
         btnEdit.setContentDescription("Editar");
         btnEdit.setOnClickListener(v -> {
-            // Por ahora no implementado
-            Toast.makeText(ctx, "Editar (no implementado)", Toast.LENGTH_SHORT).show();
+            try {
+                if (collabView == null) {
+                    Toast.makeText(ctx, "No hay CollabView disponible para editar.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                String collabId = null;
+                String collabViewUid = null;
+                try {
+                    collabId = collabView.getCollabId();
+                } catch (Exception ignored) {
+                }
+                try {
+                    collabViewUid = collabView.getUid();
+                } catch (Exception ignored) {
+                }
+
+                if (collabId == null || collabId.isEmpty()) {
+                    Toast.makeText(ctx, "Identificador del collab desconocido.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Registrar la instancia actual en la Registry para que el editor la recupere por UID.
+                try {
+                    if (collabViewUid != null && !collabViewUid.isEmpty()) {
+                        Registry.registerInstance(CollabView.class, collabViewUid, collabView);
+                    }
+                } catch (Exception ignored) {
+                }
+
+                androidx.fragment.app.Fragment f = EditCollabViewFragment.newInstance(collabId, collabViewUid);
+                try {
+                    getChildFragmentManager()
+                            .beginTransaction()
+                            .replace(containerId, f)
+                            .addToBackStack("EDIT_COLLAVIEW")
+                            .commitAllowingStateLoss();
+                } catch (IllegalArgumentException iae) {
+                    Toast.makeText(ctx, "No se pudo abrir el editor: " + iae.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            } catch (Exception e) {
+                Toast.makeText(ctx, "Error al abrir editor: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         });
 
         ImageButton btnDelete = new ImageButton(ctx);

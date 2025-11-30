@@ -1,4 +1,4 @@
-package es.ucm.fdi.pad.collabup.controlador;
+package es.ucm.fdi.pad.collabup.controlador.fragmento;
 
 import android.app.Activity;
 import android.os.Bundle;

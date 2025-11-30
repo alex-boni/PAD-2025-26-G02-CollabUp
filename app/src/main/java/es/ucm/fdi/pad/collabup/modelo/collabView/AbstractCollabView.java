@@ -19,6 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -505,6 +506,11 @@ public abstract class AbstractCollabView implements CollabView {
     }
 
     @Override
+    public List<CollabItem> getItems() {
+        return Collections.unmodifiableList(listaCollabItems);
+    }
+
+    @Override
     public void modificar(CollabView reemplazo, OnOperationCallback callback) {
         Map<String, Object> settings = new HashMap<>();
         for (Map.Entry<CollabViewSetting, Object> entry : reemplazo.getSettings().entrySet()) {
@@ -514,14 +520,154 @@ public abstract class AbstractCollabView implements CollabView {
                 reemplazo.getName(),
                 reemplazo.getClass().getSimpleName(),
                 settings,
-                Arrays.asList(listaCollabItems.stream().map(CollabItem::getIdI).toArray(String[]::new))
+                Arrays.asList(reemplazo.getItems().stream().map(CollabItem::getIdI).toArray(String[]::new))
         );
+
         db.collection("collabs")
                 .document(collabId)
                 .collection("collabViews")
                 .document(reemplazo.getUid())
                 .set(t)
-                .addOnSuccessListener(v -> callback.onSuccess())
+                .addOnSuccessListener(v -> {
+                    // Tras actualizar el documento del CollabView, debemos sincronizar cada CollabItem:
+                    // - obtener la lista previa de ids (antes de modificar)
+                    // - obtener la lista nueva de ids (desde 'reemplazo')
+                    // - calcular added = new - prev ; removed = prev - new
+                    List<String> prevIds = new ArrayList<>();
+                    for (CollabItem it : this.listaCollabItems) {
+                        if (it != null && it.getIdI() != null) prevIds.add(it.getIdI());
+                    }
+
+                    List<String> newIds = new ArrayList<>();
+                    List<CollabItem> newItems = reemplazo.getItems();
+                    if (newItems != null) {
+                        for (CollabItem it : newItems) {
+                            if (it != null && it.getIdI() != null) newIds.add(it.getIdI());
+                        }
+                    }
+
+                    List<String> toAdd = new ArrayList<>(newIds);
+                    toAdd.removeAll(prevIds);
+                    List<String> toRemove = new ArrayList<>(prevIds);
+                    toRemove.removeAll(newIds);
+
+                    // Si no hay cambios en asignación de items, actualizar la lista local y terminar
+                    if (toAdd.isEmpty() && toRemove.isEmpty()) {
+                        // Actualizar lista local con los objetos proporcionados en reemplazo
+                        this.listaCollabItems.clear();
+                        if (newItems != null) this.listaCollabItems.addAll(newItems);
+                        if (adapter != null) adapter.notifyDataSetChanged();
+                        callback.onSuccess();
+                        return;
+                    }
+
+                    // Procesar cambios en CollabItems (añadir/quitar la referencia a esta collabView)
+                    AtomicInteger processed = new AtomicInteger(0);
+                    AtomicInteger failures = new AtomicInteger(0);
+                    int totalOps = toAdd.size() + toRemove.size();
+
+                    // Helper para comprobar finalización
+                    Runnable checkFinish = () -> {
+                        if (processed.get() == totalOps) {
+                            // Tras procesar, actualizar la lista local para reflejar el reemplazo
+                            this.listaCollabItems.clear();
+                            if (newItems != null) this.listaCollabItems.addAll(newItems);
+                            if (adapter != null) adapter.notifyDataSetChanged();
+
+                            if (failures.get() == 0) {
+                                callback.onSuccess();
+                            } else {
+                                callback.onFailure(new Exception("Algunos CollabItems no se pudieron actualizar"));
+                            }
+                        }
+                    };
+
+                    // Añadir uid a los CollabItems nuevos
+                    for (String ciId : toAdd) {
+                        db.collection("collabs")
+                                .document(collabId)
+                                .collection("collabItems")
+                                .document(ciId)
+                                .update("cvAsignadas", FieldValue.arrayUnion(reemplazo.getUid()))
+                                .addOnSuccessListener(aVoid -> {
+                                    // Actualizar objeto local si existe en listaCollabItems
+                                    for (CollabItem local : listaCollabItems) {
+                                        if (local != null && ciId.equals(local.getIdI())) {
+                                            List<String> cvs = local.getcvAsignadas();
+                                            if (cvs == null) cvs = new ArrayList<>();
+                                            if (!cvs.contains(reemplazo.getUid())) {
+                                                cvs.add(reemplazo.getUid());
+                                                local.setcvAsignadas(cvs);
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    // También actualizar en newItems (por si el CollabItem es uno de los recién asignados)
+                                    if (newItems != null) {
+                                        for (CollabItem ni : newItems) {
+                                            if (ni != null && ciId.equals(ni.getIdI())) {
+                                                List<String> cvs2 = ni.getcvAsignadas();
+                                                if (cvs2 == null) cvs2 = new ArrayList<>();
+                                                if (!cvs2.contains(reemplazo.getUid())) {
+                                                    cvs2.add(reemplazo.getUid());
+                                                    ni.setcvAsignadas(cvs2);
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    processed.incrementAndGet();
+                                    checkFinish.run();
+                                })
+                                .addOnFailureListener(e -> {
+                                    failures.incrementAndGet();
+                                    processed.incrementAndGet();
+                                    checkFinish.run();
+                                });
+                    }
+
+                    // Quitar uid de los CollabItems eliminados
+                    for (String ciId : toRemove) {
+                        db.collection("collabs")
+                                .document(collabId)
+                                .collection("collabItems")
+                                .document(ciId)
+                                .update("cvAsignadas", FieldValue.arrayRemove(reemplazo.getUid()))
+                                .addOnSuccessListener(aVoid -> {
+                                    // Actualizar objeto local si existe
+                                    for (CollabItem local : listaCollabItems) {
+                                        if (local != null && ciId.equals(local.getIdI())) {
+                                            List<String> cvs = local.getcvAsignadas();
+                                            if (cvs != null && cvs.contains(reemplazo.getUid())) {
+                                                cvs.remove(reemplazo.getUid());
+                                                local.setcvAsignadas(cvs);
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    // También quitar de newItems si aparece allí
+                                    if (newItems != null) {
+                                        for (CollabItem ni : newItems) {
+                                            if (ni != null && ciId.equals(ni.getIdI())) {
+                                                List<String> cvs2 = ni.getcvAsignadas();
+                                                if (cvs2 != null && cvs2.contains(reemplazo.getUid())) {
+                                                    cvs2.remove(reemplazo.getUid());
+                                                    ni.setcvAsignadas(cvs2);
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    processed.incrementAndGet();
+                                    checkFinish.run();
+                                })
+                                .addOnFailureListener(e -> {
+                                    failures.incrementAndGet();
+                                    processed.incrementAndGet();
+                                    checkFinish.run();
+                                });
+                    }
+                })
                 .addOnFailureListener(callback::onFailure);
     }
 
