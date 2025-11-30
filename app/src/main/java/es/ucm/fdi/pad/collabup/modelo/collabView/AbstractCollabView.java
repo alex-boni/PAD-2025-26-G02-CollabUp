@@ -89,7 +89,36 @@ public abstract class AbstractCollabView implements CollabView {
                 adapter.notifyDataSetChanged();
             }
 
-            actualizarCollabViewEnBD(onOperationCallback);
+            actualizarCollabViewEnBD(new OnOperationCallback() {
+                @Override
+                public void onSuccess() {
+                    if (uid == null || uid.isEmpty() || item.getIdI() == null) {
+                        onOperationCallback.onSuccess();
+                        return;
+                    }
+
+                    db.collection("collabs")
+                            .document(collabId)
+                            .collection("collabItems")
+                            .document(item.getIdI())
+                            .update("cvAsignadas", FieldValue.arrayUnion(uid))
+                            .addOnSuccessListener(aVoid -> {
+                                List<String> cvs = item.getcvAsignadas();
+                                if (cvs == null) cvs = new ArrayList<>();
+                                if (!cvs.contains(uid)) {
+                                    cvs.add(uid);
+                                    item.setcvAsignadas(cvs);
+                                }
+                                onOperationCallback.onSuccess();
+                            })
+                            .addOnFailureListener(e -> onOperationCallback.onFailure(e));
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    onOperationCallback.onFailure(e);
+                }
+            });
         } else {
             onOperationCallback.onFailure(new Exception("El CollabItem ya existe en la CollabView."));
         }
@@ -101,7 +130,36 @@ public abstract class AbstractCollabView implements CollabView {
             if (adapter != null) {
                 adapter.notifyDataSetChanged();
             }
-            actualizarCollabViewEnBD(onOperationCallback);
+
+            actualizarCollabViewEnBD(new OnOperationCallback() {
+                @Override
+                public void onSuccess() {
+                    if (uid == null || uid.isEmpty() || item.getIdI() == null) {
+                        onOperationCallback.onSuccess();
+                        return;
+                    }
+
+                    db.collection("collabs")
+                            .document(collabId)
+                            .collection("collabItems")
+                            .document(item.getIdI())
+                            .update("cvAsignadas", FieldValue.arrayRemove(uid))
+                            .addOnSuccessListener(aVoid -> {
+                                List<String> cvs = item.getcvAsignadas();
+                                if (cvs != null && cvs.contains(uid)) {
+                                    cvs.remove(uid);
+                                    item.setcvAsignadas(cvs);
+                                }
+                                onOperationCallback.onSuccess();
+                            })
+                            .addOnFailureListener(e -> onOperationCallback.onFailure(e));
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    onOperationCallback.onFailure(e);
+                }
+            });
         } else {
             onOperationCallback.onFailure(new Exception("El CollabItem no existe en la CollabView."));
         }
@@ -163,7 +221,7 @@ public abstract class AbstractCollabView implements CollabView {
                 .document(collabId)
                 .collection("collabViews")
                 .document(uid)
-                .update("items", itemIds)
+                .update("ciAsignados", itemIds)
                 .addOnSuccessListener(v -> callback.onSuccess())
                 .addOnFailureListener(callback::onFailure);
     }
@@ -348,8 +406,8 @@ public abstract class AbstractCollabView implements CollabView {
                             assert cvStatic != null;
 
                             // Cargar los items desde la BD si existen
-                            if (t.items != null && !t.items.isEmpty()) {
-                                cargarItemsDesdeDB(collabId, t.items, new OnDataLoadedCallback<List<CollabItem>>() {
+                            if (t.ciAsignados != null && !t.ciAsignados.isEmpty()) {
+                                cargarItemsDesdeDB(collabId, t.ciAsignados, new OnDataLoadedCallback<List<CollabItem>>() {
                                     @Override
                                     public void onSuccess(List<CollabItem> items) {
                                         CollabView cv = cvStatic.build(collabId, documentSnapshot.getId(), t.name, t.settings, items);
@@ -392,7 +450,56 @@ public abstract class AbstractCollabView implements CollabView {
                 .add(t)
                 .addOnSuccessListener(documentReference -> {
                     this.uid = documentReference.getId();
-                    callback.onSuccess();
+
+                    List<String> itemIds = Arrays.asList(listaCollabItems.stream().map(CollabItem::getIdI).toArray(String[]::new));
+
+                    if (itemIds.isEmpty()) {
+                        // No hay items que actualizar
+                        callback.onSuccess();
+                        return;
+                    }
+
+                    AtomicInteger processed = new AtomicInteger(0);
+                    AtomicInteger failures = new AtomicInteger(0);
+
+                    for (String ciId : itemIds) {
+                        db.collection("collabs")
+                                .document(collabId)
+                                .collection("collabItems")
+                                .document(ciId)
+                                .update("cvAsignadas", FieldValue.arrayUnion(this.uid))
+                                .addOnSuccessListener(aVoid -> {
+                                    for (CollabItem localItem : listaCollabItems) {
+                                        if (localItem != null && ciId.equals(localItem.getIdI())) {
+                                            List<String> cvs = localItem.getcvAsignadas();
+                                            if (cvs == null) cvs = new ArrayList<>();
+                                            if (!cvs.contains(this.uid)) {
+                                                cvs.add(this.uid);
+                                                localItem.setcvAsignadas(cvs);
+                                            }
+                                            break;
+                                        }
+                                    }
+
+                                    if (processed.incrementAndGet() == itemIds.size()) {
+                                        if (failures.get() == 0) {
+                                            callback.onSuccess();
+                                        } else {
+                                            callback.onFailure(new Exception("Algunos CollabItems no se pudieron actualizar"));
+                                        }
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    failures.incrementAndGet();
+                                    if (processed.incrementAndGet() == itemIds.size()) {
+                                        if (failures.get() == 0) {
+                                            callback.onSuccess();
+                                        } else {
+                                            callback.onFailure(new Exception("Algunos CollabItems no se pudieron actualizar"));
+                                        }
+                                    }
+                                });
+                    }
                 })
                 .addOnFailureListener(callback::onFailure);
     }
@@ -444,8 +551,8 @@ public abstract class AbstractCollabView implements CollabView {
                         return;
                     }
 
-                    List<String> ciAsignados = documentSnapshot.contains("items")
-                            ? (List<String>) documentSnapshot.get("items")
+                    List<String> ciAsignados = documentSnapshot.contains("ciAsignados")
+                            ? (List<String>) documentSnapshot.get("ciAsignados")
                             : new ArrayList<>();
 
                     if (ciAsignados.isEmpty()) {
@@ -525,8 +632,8 @@ public abstract class AbstractCollabView implements CollabView {
                                 assert cvStatic != null;
 
                                 // Cargar los items desde la BD si existen
-                                if (t.items != null && !t.items.isEmpty()) {
-                                    cargarItemsDesdeDB(collabId, t.items, new OnDataLoadedCallback<List<CollabItem>>() {
+                                if (t.ciAsignados != null && !t.ciAsignados.isEmpty()) {
+                                    cargarItemsDesdeDB(collabId, t.ciAsignados, new OnDataLoadedCallback<List<CollabItem>>() {
                                         @Override
                                         public void onSuccess(List<CollabItem> items) {
                                             CollabView cv = cvStatic.build(collabId, doc.getId(), t.name, t.settings, items);
@@ -568,19 +675,19 @@ public abstract class AbstractCollabView implements CollabView {
 
     public static class CollabViewTransfer {
         public CollabViewTransfer() {
+            // Necesario para Firebase
         }
 
-        public CollabViewTransfer(String name, String type, Map<String, Object> settings, List<String> items) {
+        public CollabViewTransfer(String name, String type, Map<String, Object> settings, List<String> ciAsignados) {
             this.name = name;
             this.type = type;
             this.settings = settings;
-            this.items = items;
+            this.ciAsignados = ciAsignados;
         }
 
         public String name;
         public String type;
         public Map<String, Object> settings;
-
-        public List<String> items;
+        public List<String> ciAsignados;
     }
 }

@@ -20,6 +20,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.tabs.TabLayout;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,9 +30,11 @@ import java.util.Map;
 import java.util.Set;
 
 import es.ucm.fdi.pad.collabup.R;
+import es.ucm.fdi.pad.collabup.modelo.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabViewSetting;
 import es.ucm.fdi.pad.collabup.modelo.collabView.Registry;
+import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
 public class ConfigurarNuevoCollabViewFragment extends Fragment {
@@ -41,6 +45,9 @@ public class ConfigurarNuevoCollabViewFragment extends Fragment {
     private String collabId;
     private CollabView instance;
     private final Map<String, View> settingWidgets = new HashMap<>();
+
+    private final List<CollabItem> loadedItems = new ArrayList<>();
+    private final Map<String, Boolean> selectedItems = new HashMap<>();
 
     public static ConfigurarNuevoCollabViewFragment newInstance(@Nullable String collabId, @NonNull String collabViewType) {
         ConfigurarNuevoCollabViewFragment f = new ConfigurarNuevoCollabViewFragment();
@@ -78,6 +85,38 @@ public class ConfigurarNuevoCollabViewFragment extends Fragment {
             } else if (collabViewType != null) {
                 actionBar.setTitle("Configurar " + collabViewType);
             }
+        }
+
+        TabLayout tabLayout = view.findViewById(R.id.tabLayoutConfigureCollabView);
+        View settingsTab = view.findViewById(R.id.settings_tab);
+        View itemsTab = view.findViewById(R.id.items_tab);
+        if (tabLayout != null && settingsTab != null && itemsTab != null) {
+            tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.label_settings)));
+            tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.assigned_views_title)));
+            settingsTab.setVisibility(View.VISIBLE);
+            itemsTab.setVisibility(View.GONE);
+            tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    int pos = tab.getPosition();
+                    if (pos == 0) {
+                        settingsTab.setVisibility(View.VISIBLE);
+                        itemsTab.setVisibility(View.GONE);
+                    } else {
+                        settingsTab.setVisibility(View.GONE);
+                        itemsTab.setVisibility(View.VISIBLE);
+                        if (loadedItems.isEmpty()) loadCollabItems();
+                    }
+                }
+
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {
+                }
+
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
+                }
+            });
         }
 
         LinearLayout containerView = view.findViewById(R.id.ajustes_list);
@@ -229,7 +268,14 @@ public class ConfigurarNuevoCollabViewFragment extends Fragment {
             nombre.setError("El nombre no puede estar vacío");
             return;
         }
-        CollabView actualInstance = instance.build(collabId, null, collabViewName, getSettingsFromUI(), new ArrayList<>());
+
+        List<CollabItem> itemsToAssign = new ArrayList<>();
+        for (CollabItem it : loadedItems) {
+            Boolean sel = selectedItems.get(it.getIdI());
+            if (sel != null && sel) itemsToAssign.add(it);
+        }
+
+        CollabView actualInstance = instance.build(collabId, null, collabViewName, getSettingsFromUI(), itemsToAssign);
         actualInstance.crear(new OnOperationCallback() {
             @Override
             public void onSuccess() {
@@ -313,4 +359,51 @@ public class ConfigurarNuevoCollabViewFragment extends Fragment {
         String sanitized = settingName.replaceAll("[^a-zA-Z0-9_]", "_").toLowerCase();
         return ("setting_" + sanitized).hashCode();
     }
+
+    private void loadCollabItems() {
+        if (collabId == null || collabId.isEmpty()) return;
+        CollabItem ci = new CollabItem();
+        ci.setIdC(collabId);
+        ci.obtenerCollabItemsCollab(collabId, new OnDataLoadedCallback<>() {
+            @Override
+            public void onSuccess(ArrayList<CollabItem> data) {
+                loadedItems.clear();
+                if (data != null) loadedItems.addAll(data);
+
+                View root = getView();
+                if (root == null) return;
+                LinearLayout list = root.findViewById(R.id.collabitems_list);
+                list.removeAllViews();
+
+                if (loadedItems.isEmpty()) {
+                    TextView tv = new TextView(requireContext());
+                    tv.setText(R.string.empty_list_message);
+                    tv.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                    tv.setPadding(16, 16, 16, 16);
+                    tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                    list.addView(tv);
+                    return;
+                }
+
+                for (CollabItem item : loadedItems) {
+                    CheckBox cb = new CheckBox(requireContext());
+                    cb.setTag(item.getIdI());
+                    cb.setText(item.getNombre() != null ? item.getNombre() : item.getIdI());
+                    cb.setLayoutParams(new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT));
+                    cb.setChecked(false);
+                    selectedItems.put(item.getIdI(), false);
+                    cb.setOnCheckedChangeListener((buttonView, isChecked) -> selectedItems.put(item.getIdI(), isChecked));
+                    list.addView(cb);
+                }
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                Toast.makeText(requireContext(), "Error al cargar CollabItems: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
 }
