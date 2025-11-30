@@ -337,9 +337,6 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         List<String> usuariosAsignados = doc.contains("usuariosAsignados")
                 ? (List<String>) doc.get("usuariosAsignados")
                 : new ArrayList<>();
-        List<Etiqueta> etiquetasItem = doc.contains("etiquetas")
-                ? (List<Etiqueta>) doc.get("etiquetas")
-                : new ArrayList<>();
         List<String> cvAsignadas = doc.contains("cvAsignadas")
                 ? (List<String>) doc.get("cvAsignadas")
                 : new ArrayList<>();
@@ -440,6 +437,7 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
     public static class CollabItemConstants {
         // Títulos y botones
         public static final String TOOLBAR_TITLE = "Crear nuevo Collab Item";
+        public static final String TOOLBAR_TITLE_DETAIL = "Detalles del Collab Item";
         public static final String BTN_SELECCION_MIEMBROS = "Seleccionar miembros";
         public static final String BTN_SELECCION_CV = "Seleccionar CollabViews";
         public static final String BTN_ELIMINAR_ITEM = "Eliminar item";

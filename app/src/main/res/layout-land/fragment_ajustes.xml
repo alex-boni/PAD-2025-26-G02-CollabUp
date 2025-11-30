@@ -18,6 +18,7 @@
         android:id="@+id/imgProfileSettings"
         android:layout_width="120dp"
         android:layout_height="120dp"
+        app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
         tools:src="@drawable/logo"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"

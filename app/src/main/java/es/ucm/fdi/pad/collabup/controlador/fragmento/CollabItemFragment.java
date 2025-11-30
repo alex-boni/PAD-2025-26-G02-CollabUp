@@ -111,7 +111,7 @@ public class CollabItemFragment extends Fragment {
         btnSeleccionCV = view.findViewById(R.id.btnSeleccionCV);
 
         toolbar = view.findViewById(R.id.toolbarCollabItem);
-        toolbar.setTitle(CollabItem.CollabItemConstants.TOOLBAR_TITLE);
+        toolbar.setTitle(CollabItem.CollabItemConstants.TOOLBAR_TITLE_DETAIL);
         toolbar.setNavigationOnClickListener(v -> {
             getParentFragmentManager().popBackStack(); //para poder volver atrás
         });
