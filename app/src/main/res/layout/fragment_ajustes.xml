@@ -39,6 +39,7 @@
                 android:layout_height="100dp"
                 android:background="?attr/colorSurfaceContainerHighest"
                 android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
                 tools:src="@drawable/logo"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

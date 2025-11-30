@@ -41,7 +41,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:labelFor="@id/editTextNombre"
-                android:text="@string/label_name"
+                android:text="@string/name_label"
                 android:textAlignment="center"
                 android:textSize="18sp" />
 

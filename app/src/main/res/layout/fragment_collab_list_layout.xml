@@ -124,7 +124,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="24dp"
-        android:contentDescription="@string/create_new_collab"
+        android:contentDescription="@string/title_create_collab"
         android:src="@drawable/ic_add"
         app:backgroundTint="?attr/colorPrimaryContainer"
         app:tint="?attr/colorOnPrimaryContainer" />

@@ -17,21 +17,17 @@
     <string name="back_button_description">Ir atrás</string>
     <string name="btn_back">Atrás</string>
     <string name="search_hint">Buscar…</string>
-    <string name="save_button">Guardar</string>
     <string name="settings_title">Configuración</string>
     <string name="filter_title">Filtro</string>
-    <string name="collabs_screen_title">Collabs</string>
     <string name="search_collabs_hint">Buscar Collabs</string>
     <string name="chip_all">Todos</string>
     <string name="chip_favorites">Favoritos</string>
     <string name="chip_creations">Creados</string>
     <string name="chip_invitations">Invitado</string>
     <string name="no_collabs_found">No se encontraron collabs.</string>
-    <string name="create_new_collab_fab">Crear nuevo Collab</string>
     <string name="add_collab_title">Añadir Collab</string>
     <string name="configure_collab_title">Configurar Collab</string>
     <string name="name_label">Nombre</string>
-    <string name="settings_label">Ajustes</string>
     <string name="setting_format">%1$s %2$s</string>
     <string name="collab_image_description">Imagen del Collab</string>
     <string name="favorite_icon_description">Marcar como favorito</string>
@@ -49,8 +45,7 @@
     <string name="add_new_task_button">Añadir Nueva Tarea</string>
     <string name="title_collabs">Collabs</string>
     <string name="hint_search_collab">Buscar Collab…</string>
-    <string name="create_new_collab">Crear nuevo Collab</string>
-    <string name="title_create_collab">Crear Nuevo Collab</string>
+    <string name="title_create_collab">Crear nuevo Collab</string>
     <string name="header_create_collab">Rellena los detalles de tu Collab</string>
     <string name="hint_collab_name_required">Nombre del Collab *</string>
     <string name="hint_description_required">Descripción *</string>
@@ -63,7 +58,6 @@
     <string name="welcome_message_simple">¡Hola!</string>
     <string name="desc_friends_button">Ver amigos</string>
     <string name="active_collabs_title">Tus Collabs Activos</string>
-    <string name="your_active_collabs">Tus Collabs Activos</string>
     <string name="friends_button">Amigos</string>
     <string name="member_profile_picture_desc">Foto de perfil del miembro</string>
     <string name="button_create">Crear</string>
@@ -83,7 +77,6 @@
     <string name="hint_due_date_optional">Fecha de entrega (Opcional)</string>
     <string name="button_create_task">Crear Tarea</string>
     <string name="button_add_task">Añadir Tarea</string>
-    <string name="label_name">Nombre</string>
     <string name="label_settings">Ajustes</string>
     <string name="configure_new_collabview_title">Configurar Nuevo CollabView</string>
     <string name="back_description">Ir atrás</string>
@@ -108,12 +101,14 @@
     <string name="select_members_button">Seleccionar miembros</string>
     <string name="assigned_views_title">CollabViews asignadas</string>
     <string name="select_views_button">Seleccionar CollabViews</string>
-    <string name="create_button">Crear</string>
     <string name="list_screen_title">Lista</string>
     <string name="list_empty_state">No hay elementos para mostrar</string>
     <string name="title_collab_detail">Detalles del Collab</string>
     <string name="created_by_prefix">Creado por:</string>
     <string name="button_add">Añadir</string>
+    <string name="calendar">Calendario</string>
+    <string name="my_calendar">Mi Calendario General</string>
+
 
 
 
