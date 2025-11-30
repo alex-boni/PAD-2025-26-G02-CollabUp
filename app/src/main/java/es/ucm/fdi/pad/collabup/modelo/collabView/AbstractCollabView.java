@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import es.ucm.fdi.pad.collabup.modelo.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
+import es.ucm.fdi.pad.collabup.controlador.fragmento.FullViewHostFragment;
 
 public abstract class AbstractCollabView implements CollabView {
 
@@ -171,7 +172,11 @@ public abstract class AbstractCollabView implements CollabView {
         if (adapter == null) {
             adapter = obtenerAdapter();
         }
-        return getVistaGrande(adapter);
+        Fragment content = getVistaGrande(adapter);
+        // Usar un host con toolbar para mostrar el título y contener la vista grande
+        FullViewHostFragment host = FullViewHostFragment.newInstance(this.nombre != null ? this.nombre : (this.getClass().getSimpleName()));
+        host.setContent(content);
+        return host;
     }
 
     /**

@@ -3,13 +3,9 @@ package es.ucm.fdi.pad.collabup.modelo.collabView;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,7 +13,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import es.ucm.fdi.pad.collabup.R;
-import es.ucm.fdi.pad.collabup.controlador.fragmento.CollabItemFragment;
+import es.ucm.fdi.pad.collabup.controlador.fragmento.ListaFragment;
 
 public class Lista extends AbstractCollabView {
 
@@ -31,70 +27,10 @@ public class Lista extends AbstractCollabView {
 
     @Override
     protected Fragment getVistaGrande(RecyclerView.Adapter<?> adapter) {
-        ListaFragment fragment = new ListaFragment();
+        ListaFragment fragment = ListaFragment.newInstance();
         fragment.setAdapter(adapter);
         fragment.setTitulo(this.nombre != null ? this.nombre : "Lista");
         return fragment;
-    }
-
-    /**
-     * Fragment para mostrar la vista de Lista.
-     */
-    public static class ListaFragment extends Fragment {
-        private RecyclerView.Adapter<?> adapter;
-        private String titulo;
-
-        public void setAdapter(RecyclerView.Adapter<?> adapter) {
-            this.adapter = adapter;
-        }
-
-        public void setTitulo(String titulo) {
-            this.titulo = titulo;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            return inflater.inflate(R.layout.fragment_lista, container, false);
-        }
-
-        @Override
-        public void onViewCreated(View view, Bundle savedInstanceState) {
-            super.onViewCreated(view, savedInstanceState);
-
-            // Configurar toolbar
-            Toolbar toolbar = view.findViewById(R.id.toolbar);
-            toolbar.setTitle(titulo != null ? titulo : "Lista");
-            toolbar.setNavigationOnClickListener(v -> {
-                if (getParentFragmentManager() != null) {
-                    getParentFragmentManager().popBackStack();
-                }
-            });
-
-            // Configurar RecyclerView con el adapter recibido
-            RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
-            recyclerView.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(requireContext()));
-            if (adapter != null) {
-                recyclerView.setAdapter(adapter);
-
-                if (adapter instanceof ListaAdapter) {
-                    ((ListaAdapter) adapter).setOnItemClickListener(cambiarAItem());
-                }
-            }
-        }
-
-        public ListaAdapter.OnItemClickListener cambiarAItem() {
-            return item1 -> {
-                CollabItemFragment fragment = CollabItemFragment.newInstance(
-                        item1.getIdI(),
-                        item1.getIdC()
-                );
-                getParentFragmentManager()
-                        .beginTransaction()
-                        .replace(R.id.fragmentApp, fragment)
-                        .addToBackStack(null)
-                        .commit();
-            };
-        }
     }
 
     @Override
