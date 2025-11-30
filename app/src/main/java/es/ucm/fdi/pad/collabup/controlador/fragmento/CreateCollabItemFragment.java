@@ -46,6 +46,8 @@ public class CreateCollabItemFragment extends Fragment {
     private MaterialToolbar toolbar;
 
     private static final String ARG_COLLAB_ID = "idC";
+    private static final String ARG_PRESELECT_CV = "preselect_cv";
+    private static final String ARG_EMBEDDED = "embedded_in_host";
 
 
     //---------- Atributos necesarios
@@ -63,10 +65,24 @@ public class CreateCollabItemFragment extends Fragment {
 
 
     //Crea fragment, mete los argumentos necesarios y devuelve el fragmento listo para usarse.
-    public static CreateCollabItemFragment newInstance(String idC) {
+    // idC: id del collab
+    // preselectCvUid: uid del CollabView que debe aparecer preseleccionado (opcional, puede ser null)
+    public static CreateCollabItemFragment newInstance(String idC, String preselectCvUid) {
         CreateCollabItemFragment fragment = new CreateCollabItemFragment();
         Bundle args = new Bundle();
-        args.putString("idC", idC);
+        args.putString(ARG_COLLAB_ID, idC);
+        if (preselectCvUid != null) args.putString(ARG_PRESELECT_CV, preselectCvUid);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    // Nueva firma que permite indicar explícitamente que el fragment será embebido en el host
+    public static CreateCollabItemFragment newInstance(String idC, String preselectCvUid, boolean embedded) {
+        CreateCollabItemFragment fragment = new CreateCollabItemFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_COLLAB_ID, idC);
+        if (preselectCvUid != null) args.putString(ARG_PRESELECT_CV, preselectCvUid);
+        args.putBoolean(ARG_EMBEDDED, embedded);
         fragment.setArguments(args);
         return fragment;
     }
@@ -76,7 +92,27 @@ public class CreateCollabItemFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_create_collabitem, container, false);
+        View root = inflater.inflate(R.layout.fragment_create_collabitem, container, false);
+        try {
+            // Preferir un flag explícito si se pasó en los argumentos
+            Bundle args = getArguments();
+            boolean embedded = args != null && args.getBoolean(ARG_EMBEDDED, false);
+            if (!embedded) {
+                // Fallback: detectar por parent fragment
+                androidx.fragment.app.Fragment parent = getParentFragment();
+                if (parent != null) {
+                    String parentName = parent.getClass().getName();
+                    if (parentName != null && parentName.endsWith("FullViewHostFragment"))
+                        embedded = true;
+                }
+            }
+            if (embedded) {
+                View tb = root.findViewById(R.id.toolbarCollabItem);
+                if (tb != null) tb.setVisibility(View.GONE);
+            }
+        } catch (Exception ignored) {
+        }
+        return root;
     }
 
 
@@ -103,11 +139,31 @@ public class CreateCollabItemFragment extends Fragment {
             getParentFragmentManager().popBackStack();
         });
 
+        // Si este fragment está embebido dentro de un FullViewHostFragment, ocultar
+        // la toolbar del fragment para evitar mostrar dos toolbars (host + inner)
+        try {
+            boolean embeddedInHost = false;
+            androidx.fragment.app.Fragment parent = getParentFragment();
+            if (parent != null) {
+                String parentName = parent.getClass().getName();
+                if (parentName != null && parentName.endsWith("FullViewHostFragment"))
+                    embeddedInHost = true;
+            }
+            if (embeddedInHost) {
+                toolbar.setVisibility(View.GONE);
+            }
+        } catch (Exception ignored) {
+        }
 
         // Recuperamos argumentos del fragment
         Bundle bundle = getArguments();
         if (bundle != null) {
             idC = bundle.getString(ARG_COLLAB_ID);
+            String preselect = bundle.getString(ARG_PRESELECT_CV);
+            if (preselect != null && !preselect.isEmpty()) {
+                // Guardar temporalmente en cvElegidas: se confirmará cuando se carguen los CV reales
+                cvElegidas.add(preselect);
+            }
         }
 
         btnSeleccionMiembros.setOnClickListener(v -> seleccionarMiembros());
@@ -169,6 +225,16 @@ public class CreateCollabItemFragment extends Fragment {
                                 for (CollabView auxCV : data) {
                                     cv.add(auxCV.getUid()); //lista con los ids de los collabViews
                                     idCv.put(auxCV.getUid(), auxCV);
+                                }
+
+                                // Si se pasó un cv a preseleccionar, mantenerlo seleccionado solo si existe
+                                if (!cvElegidas.isEmpty()) {
+                                    List<String> present = new java.util.ArrayList<>();
+                                    for (String maybe : new java.util.ArrayList<>(cvElegidas)) {
+                                        if (idCv.containsKey(maybe)) present.add(maybe);
+                                    }
+                                    cvElegidas.clear();
+                                    cvElegidas.addAll(present);
                                 }
 
                                 btnSeleccionMiembros.setEnabled(true);
@@ -378,4 +444,3 @@ public class CreateCollabItemFragment extends Fragment {
         listView.requestLayout();
     }
 }
-

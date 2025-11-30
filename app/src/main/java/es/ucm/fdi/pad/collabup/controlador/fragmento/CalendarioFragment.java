@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -90,28 +89,19 @@ public class CalendarioFragment extends Fragment {
         TextView tvSubtitulo = view.findViewById(R.id.subtituloCalendario);
         recyclerView = view.findViewById(R.id.recyclerItemsDia);
 
-        Toolbar toolbar = view.findViewById(R.id.toolbar);
-
         lecturaArgumentos();
         ajustesCalendario();
 
         if (general) {
-            toolbar.setVisibility(View.GONE);
+            // En modo general mostramos el título y cargamos el calendario general
             cargarCalendarioGeneral();
         } else {
-            //Oculto estos, que solo quiero que se enseñen en el modo general.
+            // Oculto elementos que solo quiero que se muestren en el modo general.
             tvTitulo.setVisibility(View.GONE);
             tvSubtitulo.setVisibility(View.GONE);
 
-            toolbar.setTitle(titulo != null ? titulo : TITULO_DEFECTO);
-            toolbar.setNavigationOnClickListener(v -> { //para volver atrás
-                if (getParentFragmentManager() != null) {
-                    getParentFragmentManager().popBackStack();
-                }
-            });
             cargarCalendarioCV();
         }
-
 
         //Creamos el adapter de la lista de items
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

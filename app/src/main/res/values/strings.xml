@@ -108,10 +108,8 @@
     <string name="button_add">Añadir</string>
     <string name="calendar">Calendario</string>
     <string name="my_calendar">Mi Calendario General</string>
-
-
-
-
-
-
+    <string name="create_collabview_button">Crear CollabView</string>
+    <string name="edit_collabview_name_label">Editar nombre</string>
+    <string name="label_name">Nombre</string>
+    <string name="empty_list_message_no_add">No hay items</string>
 </resources>

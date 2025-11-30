@@ -13,16 +13,19 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import es.ucm.fdi.pad.collabup.controlador.fragmento.FullViewHostFragment;
 import es.ucm.fdi.pad.collabup.modelo.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
@@ -43,10 +46,12 @@ public abstract class AbstractCollabView implements CollabView {
         this.settings = new HashMap<>();
         this.settingsById = new HashMap<>();
         this.listaCollabItems = new ArrayList<>();
-        getStaticCreationSettings().forEach((s) -> {
-            this.settings.put(s, null);
-            this.settingsById.put(s.getId(), null);
-        });
+        if (getStaticCreationSettings() != null) {
+            getStaticCreationSettings().forEach((s) -> {
+                this.settings.put(s, null);
+                this.settingsById.put(s.getId(), null);
+            });
+        }
     }
 
     public String getCollabId() {
@@ -85,7 +90,36 @@ public abstract class AbstractCollabView implements CollabView {
                 adapter.notifyDataSetChanged();
             }
 
-            actualizarCollabViewEnBD(onOperationCallback);
+            actualizarCollabViewEnBD(new OnOperationCallback() {
+                @Override
+                public void onSuccess() {
+                    if (uid == null || uid.isEmpty() || item.getIdI() == null) {
+                        onOperationCallback.onSuccess();
+                        return;
+                    }
+
+                    db.collection("collabs")
+                            .document(collabId)
+                            .collection("collabItems")
+                            .document(item.getIdI())
+                            .update("cvAsignadas", FieldValue.arrayUnion(uid))
+                            .addOnSuccessListener(aVoid -> {
+                                List<String> cvs = item.getcvAsignadas();
+                                if (cvs == null) cvs = new ArrayList<>();
+                                if (!cvs.contains(uid)) {
+                                    cvs.add(uid);
+                                    item.setcvAsignadas(cvs);
+                                }
+                                onOperationCallback.onSuccess();
+                            })
+                            .addOnFailureListener(e -> onOperationCallback.onFailure(e));
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    onOperationCallback.onFailure(e);
+                }
+            });
         } else {
             onOperationCallback.onFailure(new Exception("El CollabItem ya existe en la CollabView."));
         }
@@ -97,7 +131,36 @@ public abstract class AbstractCollabView implements CollabView {
             if (adapter != null) {
                 adapter.notifyDataSetChanged();
             }
-            actualizarCollabViewEnBD(onOperationCallback);
+
+            actualizarCollabViewEnBD(new OnOperationCallback() {
+                @Override
+                public void onSuccess() {
+                    if (uid == null || uid.isEmpty() || item.getIdI() == null) {
+                        onOperationCallback.onSuccess();
+                        return;
+                    }
+
+                    db.collection("collabs")
+                            .document(collabId)
+                            .collection("collabItems")
+                            .document(item.getIdI())
+                            .update("cvAsignadas", FieldValue.arrayRemove(uid))
+                            .addOnSuccessListener(aVoid -> {
+                                List<String> cvs = item.getcvAsignadas();
+                                if (cvs != null && cvs.contains(uid)) {
+                                    cvs.remove(uid);
+                                    item.setcvAsignadas(cvs);
+                                }
+                                onOperationCallback.onSuccess();
+                            })
+                            .addOnFailureListener(e -> onOperationCallback.onFailure(e));
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    onOperationCallback.onFailure(e);
+                }
+            });
         } else {
             onOperationCallback.onFailure(new Exception("El CollabItem no existe en la CollabView."));
         }
@@ -159,7 +222,7 @@ public abstract class AbstractCollabView implements CollabView {
                 .document(collabId)
                 .collection("collabViews")
                 .document(uid)
-                .update("items", itemIds)
+                .update("ciAsignados", itemIds)
                 .addOnSuccessListener(v -> callback.onSuccess())
                 .addOnFailureListener(callback::onFailure);
     }
@@ -171,7 +234,12 @@ public abstract class AbstractCollabView implements CollabView {
         if (adapter == null) {
             adapter = obtenerAdapter();
         }
-        return getVistaGrande(adapter);
+        Fragment content = getVistaGrande(adapter);
+        // Usar un host con toolbar para mostrar el título y contener la vista grande
+        FullViewHostFragment host = FullViewHostFragment.newInstance(this.nombre != null ? this.nombre : (this.getClass().getSimpleName()));
+        host.setContent(content);
+        host.setCollabView(this);
+        return host;
     }
 
     /**
@@ -303,7 +371,7 @@ public abstract class AbstractCollabView implements CollabView {
     public CollabView build(String collabId, String uid, String name, Map<String, Object> settings, List<CollabItem> items) {
         AbstractCollabView cv;
         try {
-            cv = (AbstractCollabView) this.getClass().getMethod("getStaticInstance").invoke(null);
+            cv = (AbstractCollabView) this.getClass().getMethod("getTemplateInstance").invoke(null);
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
@@ -333,14 +401,14 @@ public abstract class AbstractCollabView implements CollabView {
                 .addOnSuccessListener(documentSnapshot -> {
                     CollabViewTransfer t = documentSnapshot.toObject(CollabViewTransfer.class);
                     if (t != null) {
-                        Registry<CollabView> reg = Registry.getRegistry(CollabView.class);
+                        Registry<String, CollabView> reg = Registry.getRegistry(CollabView.class);
                         try {
-                            CollabView cvStatic = (CollabView) reg.get(t.type).getMethod("getStaticInstance").invoke(null);
+                            CollabView cvStatic = reg.createTemplate(t.type);
                             assert cvStatic != null;
 
                             // Cargar los items desde la BD si existen
-                            if (t.items != null && !t.items.isEmpty()) {
-                                cargarItemsDesdeDB(collabId, t.items, new OnDataLoadedCallback<List<CollabItem>>() {
+                            if (t.ciAsignados != null && !t.ciAsignados.isEmpty()) {
+                                cargarItemsDesdeDB(collabId, t.ciAsignados, new OnDataLoadedCallback<List<CollabItem>>() {
                                     @Override
                                     public void onSuccess(List<CollabItem> items) {
                                         CollabView cv = cvStatic.build(collabId, documentSnapshot.getId(), t.name, t.settings, items);
@@ -358,8 +426,7 @@ public abstract class AbstractCollabView implements CollabView {
                                 CollabView cv = cvStatic.build(collabId, documentSnapshot.getId(), t.name, t.settings, new ArrayList<>());
                                 callback.onSuccess(cv);
                             }
-                        } catch (IllegalAccessException | InvocationTargetException |
-                                 NoSuchMethodException e) {
+                        } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
                     } else {
@@ -384,9 +451,63 @@ public abstract class AbstractCollabView implements CollabView {
                 .add(t)
                 .addOnSuccessListener(documentReference -> {
                     this.uid = documentReference.getId();
-                    callback.onSuccess();
+
+                    List<String> itemIds = Arrays.asList(listaCollabItems.stream().map(CollabItem::getIdI).toArray(String[]::new));
+
+                    if (itemIds.isEmpty()) {
+                        // No hay items que actualizar
+                        callback.onSuccess();
+                        return;
+                    }
+
+                    AtomicInteger processed = new AtomicInteger(0);
+                    AtomicInteger failures = new AtomicInteger(0);
+
+                    for (String ciId : itemIds) {
+                        db.collection("collabs")
+                                .document(collabId)
+                                .collection("collabItems")
+                                .document(ciId)
+                                .update("cvAsignadas", FieldValue.arrayUnion(this.uid))
+                                .addOnSuccessListener(aVoid -> {
+                                    for (CollabItem localItem : listaCollabItems) {
+                                        if (localItem != null && ciId.equals(localItem.getIdI())) {
+                                            List<String> cvs = localItem.getcvAsignadas();
+                                            if (cvs == null) cvs = new ArrayList<>();
+                                            if (!cvs.contains(this.uid)) {
+                                                cvs.add(this.uid);
+                                                localItem.setcvAsignadas(cvs);
+                                            }
+                                            break;
+                                        }
+                                    }
+
+                                    if (processed.incrementAndGet() == itemIds.size()) {
+                                        if (failures.get() == 0) {
+                                            callback.onSuccess();
+                                        } else {
+                                            callback.onFailure(new Exception("Algunos CollabItems no se pudieron actualizar"));
+                                        }
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    failures.incrementAndGet();
+                                    if (processed.incrementAndGet() == itemIds.size()) {
+                                        if (failures.get() == 0) {
+                                            callback.onSuccess();
+                                        } else {
+                                            callback.onFailure(new Exception("Algunos CollabItems no se pudieron actualizar"));
+                                        }
+                                    }
+                                });
+                    }
                 })
                 .addOnFailureListener(callback::onFailure);
+    }
+
+    @Override
+    public List<CollabItem> getItems() {
+        return Collections.unmodifiableList(listaCollabItems);
     }
 
     @Override
@@ -399,25 +520,236 @@ public abstract class AbstractCollabView implements CollabView {
                 reemplazo.getName(),
                 reemplazo.getClass().getSimpleName(),
                 settings,
-                Arrays.asList(listaCollabItems.stream().map(CollabItem::getIdI).toArray(String[]::new))
+                Arrays.asList(reemplazo.getItems().stream().map(CollabItem::getIdI).toArray(String[]::new))
         );
+
         db.collection("collabs")
                 .document(collabId)
                 .collection("collabViews")
                 .document(reemplazo.getUid())
                 .set(t)
-                .addOnSuccessListener(v -> callback.onSuccess())
+                .addOnSuccessListener(v -> {
+                    // Tras actualizar el documento del CollabView, debemos sincronizar cada CollabItem:
+                    // - obtener la lista previa de ids (antes de modificar)
+                    // - obtener la lista nueva de ids (desde 'reemplazo')
+                    // - calcular added = new - prev ; removed = prev - new
+                    List<String> prevIds = new ArrayList<>();
+                    for (CollabItem it : this.listaCollabItems) {
+                        if (it != null && it.getIdI() != null) prevIds.add(it.getIdI());
+                    }
+
+                    List<String> newIds = new ArrayList<>();
+                    List<CollabItem> newItems = reemplazo.getItems();
+                    if (newItems != null) {
+                        for (CollabItem it : newItems) {
+                            if (it != null && it.getIdI() != null) newIds.add(it.getIdI());
+                        }
+                    }
+
+                    List<String> toAdd = new ArrayList<>(newIds);
+                    toAdd.removeAll(prevIds);
+                    List<String> toRemove = new ArrayList<>(prevIds);
+                    toRemove.removeAll(newIds);
+
+                    // Si no hay cambios en asignación de items, actualizar la lista local y terminar
+                    if (toAdd.isEmpty() && toRemove.isEmpty()) {
+                        // Actualizar lista local con los objetos proporcionados en reemplazo
+                        this.listaCollabItems.clear();
+                        if (newItems != null) this.listaCollabItems.addAll(newItems);
+                        if (adapter != null) adapter.notifyDataSetChanged();
+                        callback.onSuccess();
+                        return;
+                    }
+
+                    // Procesar cambios en CollabItems (añadir/quitar la referencia a esta collabView)
+                    AtomicInteger processed = new AtomicInteger(0);
+                    AtomicInteger failures = new AtomicInteger(0);
+                    int totalOps = toAdd.size() + toRemove.size();
+
+                    // Helper para comprobar finalización
+                    Runnable checkFinish = () -> {
+                        if (processed.get() == totalOps) {
+                            // Tras procesar, actualizar la lista local para reflejar el reemplazo
+                            this.listaCollabItems.clear();
+                            if (newItems != null) this.listaCollabItems.addAll(newItems);
+                            if (adapter != null) adapter.notifyDataSetChanged();
+
+                            if (failures.get() == 0) {
+                                callback.onSuccess();
+                            } else {
+                                callback.onFailure(new Exception("Algunos CollabItems no se pudieron actualizar"));
+                            }
+                        }
+                    };
+
+                    // Añadir uid a los CollabItems nuevos
+                    for (String ciId : toAdd) {
+                        db.collection("collabs")
+                                .document(collabId)
+                                .collection("collabItems")
+                                .document(ciId)
+                                .update("cvAsignadas", FieldValue.arrayUnion(reemplazo.getUid()))
+                                .addOnSuccessListener(aVoid -> {
+                                    // Actualizar objeto local si existe en listaCollabItems
+                                    for (CollabItem local : listaCollabItems) {
+                                        if (local != null && ciId.equals(local.getIdI())) {
+                                            List<String> cvs = local.getcvAsignadas();
+                                            if (cvs == null) cvs = new ArrayList<>();
+                                            if (!cvs.contains(reemplazo.getUid())) {
+                                                cvs.add(reemplazo.getUid());
+                                                local.setcvAsignadas(cvs);
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    // También actualizar en newItems (por si el CollabItem es uno de los recién asignados)
+                                    if (newItems != null) {
+                                        for (CollabItem ni : newItems) {
+                                            if (ni != null && ciId.equals(ni.getIdI())) {
+                                                List<String> cvs2 = ni.getcvAsignadas();
+                                                if (cvs2 == null) cvs2 = new ArrayList<>();
+                                                if (!cvs2.contains(reemplazo.getUid())) {
+                                                    cvs2.add(reemplazo.getUid());
+                                                    ni.setcvAsignadas(cvs2);
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    processed.incrementAndGet();
+                                    checkFinish.run();
+                                })
+                                .addOnFailureListener(e -> {
+                                    failures.incrementAndGet();
+                                    processed.incrementAndGet();
+                                    checkFinish.run();
+                                });
+                    }
+
+                    // Quitar uid de los CollabItems eliminados
+                    for (String ciId : toRemove) {
+                        db.collection("collabs")
+                                .document(collabId)
+                                .collection("collabItems")
+                                .document(ciId)
+                                .update("cvAsignadas", FieldValue.arrayRemove(reemplazo.getUid()))
+                                .addOnSuccessListener(aVoid -> {
+                                    // Actualizar objeto local si existe
+                                    for (CollabItem local : listaCollabItems) {
+                                        if (local != null && ciId.equals(local.getIdI())) {
+                                            List<String> cvs = local.getcvAsignadas();
+                                            if (cvs != null && cvs.contains(reemplazo.getUid())) {
+                                                cvs.remove(reemplazo.getUid());
+                                                local.setcvAsignadas(cvs);
+                                            }
+                                            break;
+                                        }
+                                    }
+                                    // También quitar de newItems si aparece allí
+                                    if (newItems != null) {
+                                        for (CollabItem ni : newItems) {
+                                            if (ni != null && ciId.equals(ni.getIdI())) {
+                                                List<String> cvs2 = ni.getcvAsignadas();
+                                                if (cvs2 != null && cvs2.contains(reemplazo.getUid())) {
+                                                    cvs2.remove(reemplazo.getUid());
+                                                    ni.setcvAsignadas(cvs2);
+                                                }
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    processed.incrementAndGet();
+                                    checkFinish.run();
+                                })
+                                .addOnFailureListener(e -> {
+                                    failures.incrementAndGet();
+                                    processed.incrementAndGet();
+                                    checkFinish.run();
+                                });
+                    }
+                })
                 .addOnFailureListener(callback::onFailure);
     }
 
     @Override
     public void eliminar(OnOperationCallback callback) {
+        // Primero leer la lista de collabItems asignados (ciAsignados) a esta CollabView
+        if (collabId == null || uid == null) {
+            callback.onFailure(new Exception("collabId o uid no definidos"));
+            return;
+        }
+
         db.collection("collabs")
                 .document(collabId)
                 .collection("collabViews")
                 .document(uid)
-                .delete()
-                .addOnSuccessListener(v -> callback.onSuccess())
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (!documentSnapshot.exists()) {
+                        // Si no existe el documento, nada que limpiar; intentar eliminar (idempotente)
+                        db.collection("collabs")
+                                .document(collabId)
+                                .collection("collabViews")
+                                .document(uid)
+                                .delete()
+                                .addOnSuccessListener(v -> callback.onSuccess())
+                                .addOnFailureListener(callback::onFailure);
+                        return;
+                    }
+
+                    List<String> ciAsignados = documentSnapshot.contains("ciAsignados")
+                            ? (List<String>) documentSnapshot.get("ciAsignados")
+                            : new ArrayList<>();
+
+                    if (ciAsignados.isEmpty()) {
+                        // No hay items que actualizar, eliminar directamente la collabView
+                        db.collection("collabs")
+                                .document(collabId)
+                                .collection("collabViews")
+                                .document(uid)
+                                .delete()
+                                .addOnSuccessListener(v -> callback.onSuccess())
+                                .addOnFailureListener(callback::onFailure);
+                        return;
+                    }
+
+                    // Actualizar cada CollabItem: quitar esta collabView de su array "cvAsignadas"
+                    AtomicInteger processed = new AtomicInteger(0);
+                    AtomicInteger failures = new AtomicInteger(0);
+
+                    for (String ciId : ciAsignados) {
+                        db.collection("collabs")
+                                .document(collabId)
+                                .collection("collabItems")
+                                .document(ciId)
+                                .update("cvAsignadas", FieldValue.arrayRemove(uid))
+                                .addOnSuccessListener(aVoid -> {
+                                    if (processed.incrementAndGet() == ciAsignados.size()) {
+                                        // Una vez actualizados todos (incluso si hubo fallos individuales), intentar eliminar la collabView
+                                        db.collection("collabs")
+                                                .document(collabId)
+                                                .collection("collabViews")
+                                                .document(uid)
+                                                .delete()
+                                                .addOnSuccessListener(v -> callback.onSuccess())
+                                                .addOnFailureListener(callback::onFailure);
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    failures.incrementAndGet();
+                                    if (processed.incrementAndGet() == ciAsignados.size()) {
+                                        // Tras procesar todos, intentar eliminar la collabView a pesar de fallos en algunos items
+                                        db.collection("collabs")
+                                                .document(collabId)
+                                                .collection("collabViews")
+                                                .document(uid)
+                                                .delete()
+                                                .addOnSuccessListener(v -> callback.onSuccess())
+                                                .addOnFailureListener(callback::onFailure);
+                                    }
+                                });
+                    }
+                })
                 .addOnFailureListener(callback::onFailure);
     }
 
@@ -429,7 +761,7 @@ public abstract class AbstractCollabView implements CollabView {
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     ArrayList<CollabView> collabViews = new ArrayList<>();
-                    Registry<CollabView> reg = Registry.getRegistry(CollabView.class);
+                    Registry<String, CollabView> reg = Registry.getRegistry(CollabView.class);
                     AtomicInteger totalDocs = new AtomicInteger(queryDocumentSnapshots.size());
                     AtomicInteger procesados = new AtomicInteger(0);
 
@@ -442,12 +774,12 @@ public abstract class AbstractCollabView implements CollabView {
                         CollabViewTransfer t = doc.toObject(CollabViewTransfer.class);
                         if (t != null) {
                             try {
-                                CollabView cvStatic = (CollabView) reg.get(t.type).getMethod("getStaticInstance").invoke(null);
+                                CollabView cvStatic = reg.createTemplate(t.type);
                                 assert cvStatic != null;
 
                                 // Cargar los items desde la BD si existen
-                                if (t.items != null && !t.items.isEmpty()) {
-                                    cargarItemsDesdeDB(collabId, t.items, new OnDataLoadedCallback<List<CollabItem>>() {
+                                if (t.ciAsignados != null && !t.ciAsignados.isEmpty()) {
+                                    cargarItemsDesdeDB(collabId, t.ciAsignados, new OnDataLoadedCallback<List<CollabItem>>() {
                                         @Override
                                         public void onSuccess(List<CollabItem> items) {
                                             CollabView cv = cvStatic.build(collabId, doc.getId(), t.name, t.settings, items);
@@ -474,8 +806,7 @@ public abstract class AbstractCollabView implements CollabView {
                                         callback.onSuccess(collabViews);
                                     }
                                 }
-                            } catch (IllegalAccessException | InvocationTargetException |
-                                     NoSuchMethodException e) {
+                            } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
                         } else {
@@ -490,19 +821,19 @@ public abstract class AbstractCollabView implements CollabView {
 
     public static class CollabViewTransfer {
         public CollabViewTransfer() {
+            // Necesario para Firebase
         }
 
-        public CollabViewTransfer(String name, String type, Map<String, Object> settings, List<String> items) {
+        public CollabViewTransfer(String name, String type, Map<String, Object> settings, List<String> ciAsignados) {
             this.name = name;
             this.type = type;
             this.settings = settings;
-            this.items = items;
+            this.ciAsignados = ciAsignados;
         }
 
         public String name;
         public String type;
         public Map<String, Object> settings;
-
-        public List<String> items;
+        public List<String> ciAsignados;
     }
 }

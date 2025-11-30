@@ -2,19 +2,17 @@ package es.ucm.fdi.pad.collabup.controlador.fragmento;
 
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
-import androidx.viewpager2.widget.ViewPager2;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
@@ -27,7 +25,6 @@ import java.util.ArrayList;
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.controlador.AddCollabViewActivity;
 import es.ucm.fdi.pad.collabup.modelo.Collab;
-import es.ucm.fdi.pad.collabup.modelo.Usuario;
 import es.ucm.fdi.pad.collabup.modelo.adapters.TabCollabItemViewAdapter;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
@@ -45,7 +42,8 @@ public class CollabItemViewListFragment extends Fragment {
     private ViewPager2 viewPager;
     private FloatingActionButton fabCreate;
 
-    public CollabItemViewListFragment() {}
+    public CollabItemViewListFragment() {
+    }
 
     public static CollabItemViewListFragment newInstance(String collabId) {
         CollabItemViewListFragment fragment = new CollabItemViewListFragment();
@@ -104,8 +102,8 @@ public class CollabItemViewListFragment extends Fragment {
         // Manejo del menú (Editar, Archivar, etc.)
         detailToolbar.setOnMenuItemClickListener(item -> {
             int itemId = item.getItemId();
-            if(itemId == R.id.action_view_more){
-                if(currentCollab != null){
+            if (itemId == R.id.action_view_more) {
+                if (currentCollab != null) {
                     CollabDetailFragment detailFragment = CollabDetailFragment.newInstance(collabId);
                     getParentFragmentManager().beginTransaction()
                             .replace(R.id.fragmentApp, detailFragment)
@@ -135,18 +133,19 @@ public class CollabItemViewListFragment extends Fragment {
             return false;
         });
     }
+
     private void deleteCollab() {
         if (currentCollab == null) {
             Toast.makeText(getContext(), "Error: No se ha cargado el Collab", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        FirebaseAuth mAuth= FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser usuarioActual = mAuth.getCurrentUser();
         if (usuarioActual == null) return;
         if (!currentCollab.getCreadorId().equals(usuarioActual.getUid())) {
             Toast.makeText(getContext(), "Error: Solo el creador puede eliminar el Collab", Toast.LENGTH_SHORT).show();
-        }else{
+        } else {
             showDeleteConfirmationDialog();
         }
     }
@@ -190,18 +189,18 @@ public class CollabItemViewListFragment extends Fragment {
             return;
         }
 
-        FirebaseAuth mAuth= FirebaseAuth.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser usuarioActual = mAuth.getCurrentUser();
         if (usuarioActual == null) {
             Toast.makeText(getContext(), "Error: Usuario no autenticado", Toast.LENGTH_SHORT).show();
             return;
         }
-        if(currentCollab.getMiembros().size()==1 && currentCollab.getMiembros().contains(usuarioActual.getUid())){
+        if (currentCollab.getMiembros().size() == 1 && currentCollab.getMiembros().contains(usuarioActual.getUid())) {
             Toast.makeText(getContext(), "Eres el último miembro. Si sales, el Collab se eliminará.", Toast.LENGTH_SHORT).show();
             showDeleteConfirmationDialog();
             return;
         }
-        if(currentCollab.getCreadorId().equals(usuarioActual.getUid())){
+        if (currentCollab.getCreadorId().equals(usuarioActual.getUid())) {
             Toast.makeText(getContext(), "Eres el creador, se asignara a otro creador al collab", Toast.LENGTH_SHORT).show();
             newCreatorAssignment(usuarioActual.getUid());
         }
@@ -215,7 +214,7 @@ public class CollabItemViewListFragment extends Fragment {
 
         builder.setPositiveButton("Salir", (dialog, which) -> {
             // Lógica para salir del Collab
-            FirebaseAuth mAuth= FirebaseAuth.getInstance();
+            FirebaseAuth mAuth = FirebaseAuth.getInstance();
             FirebaseUser usuarioActual = mAuth.getCurrentUser();
             if (usuarioActual == null) return;
             currentCollab.removerMiembro(usuarioActual.getUid(), new OnOperationCallback() {
@@ -243,6 +242,7 @@ public class CollabItemViewListFragment extends Fragment {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
     private void newCreatorAssignment(String exitingCreatorId) {
         ArrayList<String> miembros = currentCollab.getMiembros();
         String newCreatorId = null;
@@ -295,7 +295,7 @@ public class CollabItemViewListFragment extends Fragment {
             if (currentTab == 0) {
                 // Estamos en "Collab Views"
                 Toast.makeText(getContext(), "Crear nuevo Collab View", Toast.LENGTH_SHORT).show();
-                if(collabId != null){
+                if (collabId != null) {
                     Intent intent = new Intent(getActivity(), AddCollabViewActivity.class);
 
                     intent.putExtra("COLLAB_ID", this.collabId);
@@ -305,8 +305,8 @@ public class CollabItemViewListFragment extends Fragment {
             } else {
                 // Estamos en "Collab Items"
                 Toast.makeText(getContext(), "Crear nuevo Collab Item", Toast.LENGTH_SHORT).show();
-                if(collabId != null){
-                    Fragment createItemFragment = CreateCollabItemFragment.newInstance(collabId);
+                if (collabId != null) {
+                    Fragment createItemFragment = CreateCollabItemFragment.newInstance(collabId, null);
                     getParentFragmentManager().beginTransaction()
                             .replace(R.id.fragmentApp, createItemFragment)
                             .addToBackStack("collab_item_view_list_tag")
@@ -315,24 +315,25 @@ public class CollabItemViewListFragment extends Fragment {
             }
         });
     }
-        private void cargarDetallesDelCollabDesdeFirestore(String id) {
-            Collab dao = new Collab();
-            dao.obtener(id, new OnDataLoadedCallback<Collab>() {
-                @Override
-                public void onSuccess(Collab data) {
-                    if (isAdded()) {
-                        currentCollab = data;
-                    }
+
+    private void cargarDetallesDelCollabDesdeFirestore(String id) {
+        Collab dao = new Collab();
+        dao.obtener(id, new OnDataLoadedCallback<Collab>() {
+            @Override
+            public void onSuccess(Collab data) {
+                if (isAdded()) {
+                    currentCollab = data;
                 }
+            }
 
-                @Override
-                public void onFailure(Exception e) {
-                    if (isAdded()) {
-                        Toast.makeText(getContext(), "Error al cargar Collab: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
+            @Override
+            public void onFailure(Exception e) {
+                if (isAdded()) {
+                    Toast.makeText(getContext(), "Error al cargar Collab: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
-            });
+            }
+        });
 
 
-        }
+    }
 }
