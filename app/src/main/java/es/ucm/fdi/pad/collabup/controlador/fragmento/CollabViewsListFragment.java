@@ -101,8 +101,6 @@ public class CollabViewsListFragment extends Fragment {
 
                 if (collabViews.isEmpty()) {
                     Toast.makeText(getContext(), "No hay CollabViews en este Collab", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getContext(), "Éxito: Se han cargado " + collabViews.size() + " Collab Views", Toast.LENGTH_SHORT).show();
                 }
             }
 

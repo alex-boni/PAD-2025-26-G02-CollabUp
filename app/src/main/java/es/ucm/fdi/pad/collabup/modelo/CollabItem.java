@@ -459,7 +459,6 @@ public class CollabItem implements Serializable, DAO<CollabItem> {
         public static final String CONF_COLLABITEM_CREADO = "CollabItem creado correctamente";
         public static final String CONF_COLLABITEM_ACT = "CollabItem actualizado correctamente";
         public static final String CONF_COLLABITEM_ELIM = "CollabItem eliminado correctamente";
-        public static final String CONF_COLLABITEM_CARGADOS = "CollabItems cargados correctamente";
 
         //PREGUNTAS
         public static final String PREG_ELIMINAR_ITEM = "¿Estás seguro de que quieres eliminar este CollabItem?";

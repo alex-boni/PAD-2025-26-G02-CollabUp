@@ -45,12 +45,6 @@ public class TablonNotas extends AbstractCollabView {
         return iv;
     }
 
-
-    @Override
-    protected Fragment getFragmentAjustes() {
-        return null;
-    }
-
     @Override
     public Set<CollabViewSetting> getStaticCreationSettings() {
         return Collections.emptySet();

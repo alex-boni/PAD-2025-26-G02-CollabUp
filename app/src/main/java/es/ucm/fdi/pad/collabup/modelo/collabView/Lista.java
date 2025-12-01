@@ -14,6 +14,7 @@ import java.util.Set;
 
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.controlador.fragmento.ListaFragment;
+import es.ucm.fdi.pad.collabup.modelo.adapters.ListaAdapter;
 
 public class Lista extends AbstractCollabView {
 
@@ -47,11 +48,6 @@ public class Lista extends AbstractCollabView {
         iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
         return iv;
-    }
-
-    @Override
-    protected Fragment getFragmentAjustes() {
-        return null;
     }
 
     @Override

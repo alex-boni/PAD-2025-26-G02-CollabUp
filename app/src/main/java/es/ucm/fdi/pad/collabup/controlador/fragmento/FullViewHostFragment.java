@@ -23,8 +23,6 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.appbar.AppBarLayout;
 
-import java.lang.reflect.Method;
-
 import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.collabView.CollabView;
 import es.ucm.fdi.pad.collabup.modelo.collabView.Registry;
@@ -223,7 +221,7 @@ public class FullViewHostFragment extends Fragment {
             // Navegar al fragmento de creación de CollabItem pasando el collab y la CV preseleccionada
             try {
                 if (collabView == null) {
-                    android.widget.Toast.makeText(ctx, "No hay CollabView disponible para añadir item.", android.widget.Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, "No hay CollabView disponible para añadir item.", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 String collabId = null;
@@ -237,10 +235,10 @@ public class FullViewHostFragment extends Fragment {
                 } catch (Exception ignored) {
                 }
                 if (collabId == null || collabId.isEmpty()) {
-                    android.widget.Toast.makeText(ctx, "Identificador del collab desconocido.", android.widget.Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, "Identificador del collab desconocido.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                androidx.fragment.app.Fragment f = es.ucm.fdi.pad.collabup.controlador.fragmento.CreateCollabItemFragment.newInstance(collabId, collabViewUid, true);
+                Fragment f = CreateCollabItemFragment.newInstance(collabId, collabViewUid, true);
                 try {
                     // Reemplazamos dentro del host usando su childFragmentManager y el containerId local
                     getChildFragmentManager()
@@ -250,10 +248,10 @@ public class FullViewHostFragment extends Fragment {
                             .commitAllowingStateLoss();
                 } catch (IllegalArgumentException iae) {
                     // Si algo falla, informar con Toast
-                    android.widget.Toast.makeText(ctx, "No se pudo abrir el editor: " + iae.getMessage(), android.widget.Toast.LENGTH_LONG).show();
+                    Toast.makeText(ctx, "No se pudo abrir el editor: " + iae.getMessage(), Toast.LENGTH_LONG).show();
                 }
             } catch (Exception e) {
-                android.widget.Toast.makeText(ctx, "Error al abrir crear item: " + e.getMessage(), android.widget.Toast.LENGTH_SHORT).show();
+                Toast.makeText(ctx, "Error al abrir crear item: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -293,7 +291,7 @@ public class FullViewHostFragment extends Fragment {
                 } catch (Exception ignored) {
                 }
 
-                androidx.fragment.app.Fragment f = EditCollabViewFragment.newInstance(collabId, collabViewUid);
+                Fragment f = EditCollabViewFragment.newInstance(collabId, collabViewUid);
                 try {
                     getChildFragmentManager()
                             .beginTransaction()
@@ -369,16 +367,5 @@ public class FullViewHostFragment extends Fragment {
             }
         }
         return null;
-    }
-
-    // Intento de refrescar el contenido si este implementa refreshView()
-    public void refreshView() {
-        try {
-            if (contentFragment != null) {
-                Method m = contentFragment.getClass().getMethod("refreshView");
-                m.invoke(contentFragment);
-            }
-        } catch (Exception ignored) {
-        }
     }
 }

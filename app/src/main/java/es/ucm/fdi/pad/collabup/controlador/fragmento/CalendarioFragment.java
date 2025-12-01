@@ -223,7 +223,6 @@ public class CalendarioFragment extends Fragment {
                     }
 
                     if (contador.incrementAndGet() == idItems.size()) {
-                        Toast.makeText(getContext(), CollabItem.CollabItemConstants.CONF_COLLABITEM_CARGADOS, Toast.LENGTH_SHORT).show();
                         Calendar hoy = Calendar.getInstance();
                         filtrarItemsDia(hoy);
 

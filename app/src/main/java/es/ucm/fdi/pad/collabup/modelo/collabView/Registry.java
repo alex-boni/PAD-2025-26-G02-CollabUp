@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Registry genérica que puede registrar clases (por nombre) y además guardar instancias
@@ -18,7 +19,7 @@ import java.util.function.Consumer;
  */
 public final class Registry<K, V> {
     // Mapa local de nombres de tipo -> factory que crea instancias de V
-    private final Map<String, java.util.function.Supplier<? extends V>> registry = new HashMap<>();
+    private final Map<String, Supplier<? extends V>> registry = new HashMap<>();
 
     public Registry() {
     }
@@ -27,7 +28,7 @@ public final class Registry<K, V> {
      * Registra una factory para crear instancias del tipo V asociada a la clave "typeKey".
      * No almacenamos ni guardamos Class en la registry.
      */
-    public void register(String typeKey, java.util.function.Supplier<? extends V> factory) {
+    public void register(String typeKey, Supplier<? extends V> factory) {
         if (typeKey == null || typeKey.isEmpty() || factory == null) return;
         registry.put(typeKey, factory);
     }
@@ -50,7 +51,7 @@ public final class Registry<K, V> {
     /**
      * Devuelve la factory registrada para la clave indicada o null.
      */
-    public java.util.function.Supplier<? extends V> getFactory(String typeKey) {
+    public Supplier<? extends V> getFactory(String typeKey) {
         if (typeKey == null) return null;
         return registry.get(typeKey);
     }
@@ -59,7 +60,7 @@ public final class Registry<K, V> {
      * Crea (mediante la factory) una instancia plantilla para el tipo identificado por typeKey.
      */
     public V createTemplate(String typeKey) {
-        java.util.function.Supplier<? extends V> f = getFactory(typeKey);
+        Supplier<? extends V> f = getFactory(typeKey);
         if (f == null) return null;
         return f.get();
     }
@@ -74,7 +75,7 @@ public final class Registry<K, V> {
     /**
      * Itera sobre las factories registradas.
      */
-    public void forEachFactory(Consumer<? super java.util.function.Supplier<? extends V>> action) {
+    public void forEachFactory(Consumer<? super Supplier<? extends V>> action) {
         registry.values().forEach(action);
     }
 
@@ -165,7 +166,6 @@ public final class Registry<K, V> {
         registerInstance(String.class, valueType, key, instance);
     }
 
-    @SuppressWarnings("unchecked")
     public static <K2, V2> V2 getInstance(Class<K2> keyType, Class<V2> valueType, K2 key) {
         if (keyType == null || valueType == null || key == null) return null;
         Registry<K2, V2> r = getRegistry(keyType, valueType);
@@ -190,7 +190,6 @@ public final class Registry<K, V> {
         unregisterInstance(String.class, valueType, key);
     }
 
-    @SuppressWarnings("unchecked")
     public static <K2, V2> Map<K2, V2> allInstances(Class<K2> keyType, Class<V2> valueType) {
         Registry<K2, V2> r = getRegistry(keyType, valueType);
         if (r == null) return Collections.emptyMap();

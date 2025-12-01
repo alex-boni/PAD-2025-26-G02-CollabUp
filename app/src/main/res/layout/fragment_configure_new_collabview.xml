@@ -81,11 +81,11 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/assigned_views_title"
-                    android:textAlignment="center"
-                    android:textSize="20sp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/assigned_items_title"
+                    android:textAlignment="center"
+                    android:textSize="20sp" />
 
                 <LinearLayout
                     android:id="@+id/collabitems_list"

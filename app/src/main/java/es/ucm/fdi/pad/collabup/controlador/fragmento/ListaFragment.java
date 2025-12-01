@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import es.ucm.fdi.pad.collabup.R;
-import es.ucm.fdi.pad.collabup.modelo.collabView.ListaAdapter;
+import es.ucm.fdi.pad.collabup.modelo.adapters.ListaAdapter;
 
 public class ListaFragment extends Fragment {
     private RecyclerView.Adapter<?> adapter;

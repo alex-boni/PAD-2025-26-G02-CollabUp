@@ -9,6 +9,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.Collections;
 import java.util.Set;
 
+/**
+ * Implementacion de AbtractCollabView para utilizar el DAO estaticamente
+ */
 public class CollabViewStatic extends AbstractCollabView {
 
     public CollabViewStatic() {
@@ -32,11 +35,6 @@ public class CollabViewStatic extends AbstractCollabView {
 
     @Override
     protected View getPrevisualizacion(Context context) {
-        return null;
-    }
-
-    @Override
-    protected Fragment getFragmentAjustes() {
         return null;
     }
 

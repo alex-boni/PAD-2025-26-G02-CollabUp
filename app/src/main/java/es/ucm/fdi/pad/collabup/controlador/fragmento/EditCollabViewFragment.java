@@ -36,10 +36,6 @@ import es.ucm.fdi.pad.collabup.modelo.collabView.Registry;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
-/**
- * Fragment para editar un CollabView. Reusa la UI de configuración pero actúa de forma independiente
- * respecto a `ConfigurarNuevoCollabViewFragment` (no hay enlace entre ambas clases).
- */
 public class EditCollabViewFragment extends Fragment {
 
     private static final String ARG_COLLAB_ID = "COLLAB_ID";
