@@ -34,7 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:text="¡Hola,"
+                android:text="@string/welcome_message_simple"
                 android:textAppearance="?attr/textAppearanceTitleLarge"
                 android:textColor="?android:textColorSecondary"
                 app:layout_constraintStart_toEndOf="@id/imgProfileHome"
@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                android:text="Usuario!"
+                android:text="@string/default_username_placeholder"
                 android:textAppearance="?attr/textAppearanceHeadlineSmall"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -88,7 +88,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Resumen de hoy"
+                        android:text="@string/summary_today_title"
                         android:textAppearance="?attr/textAppearanceLabelLarge"
                         android:textColor="?attr/colorOnPrimaryContainer"
                         android:alpha="0.7"/>
@@ -97,7 +97,7 @@
                         android:id="@+id/tvSummaryText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="No tienes tareas urgentes"
+                        android:text="@string/summary_no_urgent_tasks"
                         android:textAppearance="?attr/textAppearanceBodyLarge"
                         android:textColor="?attr/colorOnPrimaryContainer"
                         android:textStyle="bold" />
@@ -111,7 +111,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginBottom="12dp"
-            android:text="Acciones Rápidas"
+            android:text="@string/quick_actions_title"
             android:textAppearance="?attr/textAppearanceTitleMedium"
             android:textStyle="bold" />
 
@@ -130,7 +130,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
                 app:icon="@drawable/ic_add"
-                android:text="Nuevo\nCollab"
+                android:text="@string/new_collab_button_multiline"
                 android:maxLines="2"
                 android:gravity="center"
                 app:iconGravity="textStart" />
@@ -143,7 +143,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
                 app:icon="@android:drawable/ic_menu_my_calendar"
-                android:text="Ver\nCalendario"
+                android:text="@string/view_calendar_button_multiline"
                 android:maxLines="2"
                 android:gravity="center"
                 app:iconGravity="textStart" />
@@ -162,7 +162,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Destacados"
+                android:text="@string/featured_title"
                 android:textAppearance="?attr/textAppearanceTitleMedium"
                 android:textStyle="bold" />
 
@@ -170,7 +170,7 @@
                 android:id="@+id/tvViewAll"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ver todos"
+                android:text="@string/view_all_link"
                 android:textColor="?attr/colorPrimary"
                 android:clickable="true"
                 android:focusable="true"/>

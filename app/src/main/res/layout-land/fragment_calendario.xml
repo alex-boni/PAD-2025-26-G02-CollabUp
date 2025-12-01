@@ -41,7 +41,7 @@
                     android:id="@+id/subtituloCalendario"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Selecciona un día"
+                    android:text="@string/select_day"
                     android:textSize="14sp"
                     android:textColor="@color/gray_300"
                     android:layout_gravity="center_horizontal"

@@ -1,26 +1,31 @@
-<?xml version="1.0" encoding="utf-8"?><!-- Layout para el fragment: pestañas para ajustes y lista de items, y botón fijo al final (versión para editar) -->
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="8dp">
+    android:background="?android:colorBackground"
+    android:orientation="vertical">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayoutConfigureCollabView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurface"
+        app:tabIndicatorColor="?attr/colorPrimary"
+        app:tabSelectedTextColor="?attr/colorPrimary"
+        app:tabTextColor="?android:textColorSecondary" />
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
             android:id="@+id/settings_tab"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipToPadding="true"
-            android:fillViewport="true">
+            android:fillViewport="true"
+            android:padding="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -31,77 +36,89 @@
                     android:id="@+id/labelNombre"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp"
                     android:text="@string/edit_collabview_name_label"
-                    android:textAlignment="center"
-                    android:textSize="18sp" />
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="?attr/colorOnSurface" />
 
-                <EditText
-                    android:id="@+id/editTextNombre"
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:autofillHints=""
-                    android:ems="10"
                     android:hint="@string/name_label"
-                    android:inputType="text" />
+                    app:boxBackgroundMode="outline"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextNombre"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapSentences" />
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView
                     android:id="@+id/ajustes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
-                    android:layout_marginBottom="1dp"
+                    android:layout_marginBottom="8dp"
                     android:text="@string/label_settings"
-                    android:textAlignment="center"
-                    android:textSize="20sp" />
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="?attr/colorPrimary" />
 
-                <LinearLayout
-                    android:id="@+id/ajustes_list"
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="8dp" />
+                    app:cardBackgroundColor="?attr/colorSurfaceContainerLow"
+                    app:cardCornerRadius="8dp"
+                    app:strokeWidth="0dp">
 
+                    <LinearLayout
+                        android:id="@+id/ajustes_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="8dp" />
+                </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
-        </ScrollView>
+        </androidx.core.widget.NestedScrollView>
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
             android:id="@+id/items_tab"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:padding="16dp"
             android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="8dp">
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:text="@string/assigned_items_title"
-                    android:textAlignment="center"
-                    android:textSize="20sp" />
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center"
+                    android:text="@string/assigned_views_title"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="?attr/colorOnSurface" />
 
                 <LinearLayout
                     android:id="@+id/collabitems_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical" />
-
             </LinearLayout>
-        </ScrollView>
-
+        </androidx.core.widget.NestedScrollView>
     </FrameLayout>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_save_collabview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_save" />
+        android:layout_margin="16dp"
+        android:paddingVertical="12dp"
+        android:text="@string/button_save"
+        android:textSize="16sp" />
 
 </LinearLayout>
