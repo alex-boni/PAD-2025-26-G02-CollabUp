@@ -30,6 +30,11 @@ import es.ucm.fdi.pad.collabup.modelo.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
+/**
+ * Implementación base de CollabView con funcionalidad común.
+ * Delega en las subclases solo la creación de vistas y adapters específicos, y
+ * los settings que cada una quiera definir.
+ */
 public abstract class AbstractCollabView implements CollabView {
 
     private String collabId; //id del collab al que pertenece
@@ -345,12 +350,6 @@ public abstract class AbstractCollabView implements CollabView {
     public Fragment getInCollabFragment() {
         return null;
     }
-
-    public Fragment getEditSettingsFragment() {
-        return getFragmentAjustes();
-    }
-
-    protected abstract Fragment getFragmentAjustes();
 
     /**
      * Obtiene el valor de un setting de forma eficiente por su id en O(1).

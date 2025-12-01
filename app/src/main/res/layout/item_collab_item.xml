@@ -15,7 +15,7 @@
             android:id="@+id/txtNombreItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nombre del item"
+            android:text="@string/collab_item_name_hint"
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginBottom="4dp" />
@@ -24,7 +24,7 @@
             android:id="@+id/txtDescripcionItem"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Descripción..."
+            android:text="@string/label_description"
             android:textSize="14sp" />
 
     </LinearLayout>

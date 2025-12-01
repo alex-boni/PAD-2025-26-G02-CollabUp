@@ -92,7 +92,7 @@ public class ConfigurarNuevoCollabViewFragment extends Fragment {
         View itemsTab = view.findViewById(R.id.items_tab);
         if (tabLayout != null && settingsTab != null && itemsTab != null) {
             tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.label_settings)));
-            tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.assigned_views_title)));
+            tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.assigned_items_title)));
             settingsTab.setVisibility(View.VISIBLE);
             itemsTab.setVisibility(View.GONE);
             tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {

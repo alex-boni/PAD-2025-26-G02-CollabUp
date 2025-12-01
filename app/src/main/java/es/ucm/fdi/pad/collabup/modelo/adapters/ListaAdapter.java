@@ -1,4 +1,4 @@
-package es.ucm.fdi.pad.collabup.modelo.collabView;
+package es.ucm.fdi.pad.collabup.modelo.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +14,7 @@ import es.ucm.fdi.pad.collabup.R;
 import es.ucm.fdi.pad.collabup.modelo.CollabItem;
 
 /**
- * Adaptador específico para la vista de tipo "Lista" de CollabView..
+ * Adaptador específico para la CollabView Lista
  */
 public class ListaAdapter extends RecyclerView.Adapter<ListaAdapter.ViewHolder> {
 
@@ -25,9 +25,8 @@ public class ListaAdapter extends RecyclerView.Adapter<ListaAdapter.ViewHolder> 
     private List<CollabItem> items;
     private OnItemClickListener listener;
 
-    public ListaAdapter(List<CollabItem> items, OnItemClickListener listener) {
+    public ListaAdapter(List<CollabItem> items) {
         this.items = items;
-        this.listener = listener;
     }
 
     public void setItems(List<CollabItem> newItems) {

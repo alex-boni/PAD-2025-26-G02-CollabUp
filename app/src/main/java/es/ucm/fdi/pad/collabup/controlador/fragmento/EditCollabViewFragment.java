@@ -36,10 +36,6 @@ import es.ucm.fdi.pad.collabup.modelo.collabView.Registry;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnDataLoadedCallback;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
-/**
- * Fragment para editar un CollabView. Reusa la UI de configuración pero actúa de forma independiente
- * respecto a `ConfigurarNuevoCollabViewFragment` (no hay enlace entre ambas clases).
- */
 public class EditCollabViewFragment extends Fragment {
 
     private static final String ARG_COLLAB_ID = "COLLAB_ID";
@@ -117,7 +113,7 @@ public class EditCollabViewFragment extends Fragment {
         View itemsTab = view.findViewById(R.id.items_tab);
         if (tabLayout != null && settingsTab != null && itemsTab != null) {
             tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.label_settings)));
-            tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.assigned_views_title)));
+            tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.assigned_items_title)));
             settingsTab.setVisibility(View.VISIBLE);
             itemsTab.setVisibility(View.GONE);
             tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {

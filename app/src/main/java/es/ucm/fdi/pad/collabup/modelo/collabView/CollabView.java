@@ -13,28 +13,19 @@ import es.ucm.fdi.pad.collabup.modelo.CollabItem;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.DAO;
 import es.ucm.fdi.pad.collabup.modelo.interfaz.OnOperationCallback;
 
-//Interfaz collabViews
+/**
+ * Interfaz que define la representacion de una vista dentro de un Collab.
+ */
 public interface CollabView extends DAO<CollabView> {
 
     String getUid();
 
     void setUid(String uid);
 
-    /**
-     * Obtiene el id del Collab al que pertenece.
-     *
-     * @return el id del Collab al que pertenece
-     */
-
     String getCollabId();
 
     void setCollabId(String collabId);
 
-    /**
-     * Obtiene el nombre del CollabView.
-     *
-     * @return el nombre del CollabView
-     */
     String getName();
 
     void setName(String name);
@@ -42,8 +33,9 @@ public interface CollabView extends DAO<CollabView> {
     List<CollabItem> getItems();
 
     /**
-     * Devuelve una nueva instancia estática de un CollabView.
-     * para invocar metodos pseudo-estaticos
+     * Devuelve una nueva instancia estática de un CollabView
+     * para invocar metodos pseudo-estaticos dependientes de la subclase
+     * pero sin tener estado.
      * Este método DEBE ser implementado en cada subclase.
      *
      * @return una nueva instancia de la CollabView
@@ -69,6 +61,12 @@ public interface CollabView extends DAO<CollabView> {
      */
     void populate(CollabItem item, OnOperationCallback callback);
 
+    /**
+     * Elimina el CollabItem de la CollabView.
+     *
+     * @param item     el CollabItem a eliminar
+     * @param callback
+     */
     void remove(CollabItem item, OnOperationCallback callback);
 
     /**
@@ -104,6 +102,11 @@ public interface CollabView extends DAO<CollabView> {
      */
     Set<CollabViewSetting> getStaticCreationSettings();
 
+    /**
+     * Obtiene los ajustes actuales de la instancia de CollabView.
+     *
+     * @return un mapa de pares clave-valor que representan los ajustes actuales
+     */
     Map<CollabViewSetting, Object> getSettings();
 
 

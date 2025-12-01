@@ -69,11 +69,6 @@ public class Calendario extends AbstractCollabView {
     }
 
     @Override
-    protected Fragment getFragmentAjustes() {
-        return null;
-    }
-
-    @Override
     public Set<CollabViewSetting> getStaticCreationSettings() {
         return Set.of(new CollabViewSetting("calendario_dia_inicio_semana", CollabViewSetting.CollabViewSettingsType.LISTA_OPCIONES, "Dia de inicio de semana", true, List.of("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")));
     }

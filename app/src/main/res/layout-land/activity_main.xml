@@ -2,28 +2,22 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="32dp"
-    tools:context=".controlador.MainActivity"
-    android:fitsSystemWindows="true">
+    android:padding="24dp"
+    tools:context=".controlador.MainActivity">
 
-    <!-- Guideline para dividir la pantalla, en este caso al 45% -->
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.45" />
-
-    <!-- Panel Izquierdo: Marca -->
+    <!-- IZQUIERDA: Logo y Título -->
     <ImageView
         android:id="@+id/imgIcono"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="@string/app_name"
         android:src="@drawable/logo"
         app:layout_constraintBottom_toTopOf="@+id/txtCollaUp"
-        app:layout_constraintEnd_toStartOf="@id/guideline_vertical"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed" />
@@ -32,43 +26,66 @@
         android:id="@+id/txtCollaUp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:text="@string/app_name"
-        android:textSize="35sp"
         android:textColor="?attr/colorOnSurface"
+        android:textSize="40sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/imgIcono"
-        app:layout_constraintStart_toStartOf="@+id/imgIcono"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imgIcono" />
 
+    <!-- GUÍA VERTICAL AL 50% -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
 
-    <!-- Panel Derecho: Acciones -->
-    <Button
-        android:id="@+id/btnIrLogin"
-        style="@style/Widget.Material3.Button"
+    <!-- DERECHA: Botones -->
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingVertical="12dp"
-        android:text="Login"
-        android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@id/btnIrSingup"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/guideline_vertical"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
-
-    <Button
-        android:id="@+id/btnIrSingup"
-        style="@style/Widget.Material3.Button.OutlinedButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:paddingVertical="12dp"
-        android:text="Signup"
-        android:textSize="18sp"
+        android:orientation="vertical"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/guideline_vertical"
-        app:layout_constraintTop_toBottomOf="@id/btnIrLogin" />
+        app:layout_constraintStart_toEndOf="@+id/guideline"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/btnIrLogin"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:text="@string/login_button"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btnIrSingup"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/signup_button"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/or" />
+
+        <Button
+            android:id="@+id/btnGoogleMain"
+            android:layout_width="240dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#DB4437"
+            android:text="@string/google_login"
+            android:textColor="#FFFFFF" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

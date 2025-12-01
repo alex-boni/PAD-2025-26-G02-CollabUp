@@ -12,7 +12,20 @@
           "package_name": "es.ucm.fdi.pad.collabup"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "788128503639-mg0ksdeqok8u8asl2odbncn5ustj4rcf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "es.ucm.fdi.pad.collabup",
+            "certificate_hash": "a7d1e6254664ae7b620f5c3eb86e71f52b2e6b65"
+          }
+        },
+        {
+          "client_id": "788128503639-9k95955av6br9rt45bh8katkeot4qfh6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBKhRmYB9Sp_NBCLX8YirS2bao6bcbGVqY"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "788128503639-9k95955av6br9rt45bh8katkeot4qfh6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
