@@ -294,7 +294,6 @@ public class CollabItemViewListFragment extends Fragment {
 
             if (currentTab == 0) {
                 // Estamos en "Collab Views"
-                Toast.makeText(getContext(), "Crear nuevo Collab View", Toast.LENGTH_SHORT).show();
                 if (collabId != null) {
                     Intent intent = new Intent(getActivity(), AddCollabViewActivity.class);
 
@@ -304,7 +303,6 @@ public class CollabItemViewListFragment extends Fragment {
                 }
             } else {
                 // Estamos en "Collab Items"
-                Toast.makeText(getContext(), "Crear nuevo Collab Item", Toast.LENGTH_SHORT).show();
                 if (collabId != null) {
                     Fragment createItemFragment = CreateCollabItemFragment.newInstance(collabId, null);
                     getParentFragmentManager().beginTransaction()
