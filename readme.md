@@ -107,9 +107,9 @@ Proyecto desarrollado por el **Grupo 02 de la Asignatura de PAD UCM 2025-2026**:
 
 ## 🏗️ Futuras mejoras
 
-- Integración con calendarios externos (Google Calendar).  
+- Llamadas dentro de collabs.  
 - Soporte para chat dentro de cada grupo.   
-- Modo oscuro y personalización de interfaz.  
+- Más personalización para nuestras collab views.  
 
 ---
 
