@@ -123,7 +123,7 @@
     <string name="featured_title">Destacados</string>
     <string name="view_all_link">Ver todos</string>Merge Resources
     <string name="owner">Dueño</string>
-    <string name="select_day">Selecciona un día</string>
+    <string name="select_day">Selecciona un día para ver tus CollabItems asignados para ese día</string>
     <string name="or">o</string>
     <string name="google_login">Continuar con Google</string>
 
