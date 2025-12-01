@@ -35,9 +35,7 @@ public class Lista extends AbstractCollabView {
 
     @Override
     protected RecyclerView.Adapter<?> obtenerAdapter() {
-        return new ListaAdapter(getListaCollabItems(), item -> {
-            // TODO Click en item
-        });
+        return new ListaAdapter(getListaCollabItems());
     }
 
     @Override

@@ -25,9 +25,8 @@ public class ListaAdapter extends RecyclerView.Adapter<ListaAdapter.ViewHolder> 
     private List<CollabItem> items;
     private OnItemClickListener listener;
 
-    public ListaAdapter(List<CollabItem> items, OnItemClickListener listener) {
+    public ListaAdapter(List<CollabItem> items) {
         this.items = items;
-        this.listener = listener;
     }
 
     public void setItems(List<CollabItem> newItems) {
