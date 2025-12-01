@@ -1,4 +1,4 @@
-# 📱 CollabUp
+# <img src="https://github.com/alex-boni/PAD-2025-26-G02-CollabUp/blob/main/app/src/main/ic_logo-playstore.png?raw=true" alt="Texto alternativo" height="40" /> CollabUp
 
 Es una aplicación móvil desarrollada en **Java** para Android, que nace de una necesidad cotidiana: la complejidad de coordinar agendas y tareas dentro de grupos sociales, ya sean amigos, familiares o compañeros de piso.
 La aplicación es una herramienta de gestión social que permite la organización simultánea y colaborativa. A diferencia de las herramientas de gestión de proyectos profesionales, CollabUp se centra en **Collabs**: espacios compartidos que pueden representar desde una lista de la compra común hasta la planificación de un viaje o una quedada de fin de semana. 
