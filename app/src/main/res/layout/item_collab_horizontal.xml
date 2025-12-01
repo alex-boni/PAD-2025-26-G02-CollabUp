@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="Nombre del Collab"
+                android:text="@string/hint_collab_name_required"
                 android:textAppearance="?attr/textAppearanceTitleMedium"
                 android:textStyle="bold" />
 
@@ -50,7 +50,7 @@
                 android:layout_marginTop="4dp"
                 android:ellipsize="end"
                 android:maxLines="2"
-                android:text="Descripción corta del collab..."
+                android:text="@string/collab_item_desc_hint"
                 android:textAppearance="?attr/textAppearanceBodySmall"
                 android:textColor="?android:textColorSecondary" />
 
@@ -61,8 +61,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
                 android:layout_marginTop="12dp"
-                android:text="Owner"
-                android:textSize="10sp" />
+                android:text="@string/owner"
+                android:textSize="11sp" />
 
         </LinearLayout>
     </LinearLayout>

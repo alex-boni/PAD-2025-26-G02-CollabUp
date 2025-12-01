@@ -15,10 +15,10 @@
         android:id="@+id/tituloCalendario"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Mi Calendario general"
+        android:text="@string/my_calendar"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:textColor="@color/black"
+        android:textColor="?attr/colorOnSurface"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="4dp"
         android:paddingTop="48dp" />

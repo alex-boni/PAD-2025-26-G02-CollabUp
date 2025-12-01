@@ -55,7 +55,7 @@
     <string name="info_required_fields">* Campos obligatorios</string>
     <string name="button_cancel">Cancelar</string>
     <string name="button_create_collab">Crear Collab</string>
-    <string name="welcome_message_simple">¡Hola!</string>
+    <string name="welcome_message_simple">¡Hola</string>
     <string name="desc_friends_button">Ver amigos</string>
     <string name="active_collabs_title">Tus Collabs Activos</string>
     <string name="friends_button">Amigos</string>
@@ -114,4 +114,18 @@
     <string name="empty_list_message_no_add">No hay items</string>
     <string name="assigned_items_title">CollabItems asignados</string>
     <string name="default_web_client_id">0</string>
+    <string name="default_username_placeholder">Usuario!</string>
+    <string name="summary_today_title">Resumen de hoy</string>
+    <string name="summary_no_urgent_tasks">No tienes tareas urgentes</string>
+    <string name="quick_actions_title">Acciones Rápidas</string>
+    <string name="new_collab_button_multiline">Nuevo\nCollab</string>
+    <string name="view_calendar_button_multiline">Ver\nCalendario</string>
+    <string name="featured_title">Destacados</string>
+    <string name="view_all_link">Ver todos</string>Merge Resources
+    <string name="owner">Dueño</string>
+    <string name="select_day">Selecciona un día</string>
+    <string name="or">o</string>
+    <string name="google_login">Continuar con Google</string>
+
+
 </resources>

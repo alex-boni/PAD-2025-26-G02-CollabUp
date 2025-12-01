@@ -55,7 +55,7 @@
     <string name="info_required_fields">* Required fields</string>
     <string name="button_cancel">Cancel</string>
     <string name="button_create_collab">Create Collab</string>
-    <string name="welcome_message_simple">Hello!</string>
+    <string name="welcome_message_simple">Hello</string>
     <string name="desc_friends_button">View friends</string>
     <string name="active_collabs_title">Your Active Collabs</string>
     <string name="friends_button">Friends</string>
@@ -113,4 +113,17 @@
     <string name="label_name">Name</string>
     <string name="empty_list_message_no_add">No items</string>
     <string name="assigned_items_title">Assigned CollabItems</string>
+    <string name="default_username_placeholder">User!</string>
+    <string name="summary_today_title">Today\'s Summary</string>
+    <string name="summary_no_urgent_tasks">You have no urgent tasks</string>
+    <string name="quick_actions_title">Quick Actions</string>
+    <string name="new_collab_button_multiline">New\nCollab</string>
+    <string name="view_calendar_button_multiline">See\nCalendar</string>
+    <string name="featured_title">Featured</string>
+    <string name="view_all_link">View All</string>
+    <string name="owner">0wner</string>
+    <string name="select_day">Select a day</string>
+    <string name="or">or</string>
+    <string name="google_login">Continue with Google</string>
+
 </resources>
