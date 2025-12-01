@@ -112,4 +112,5 @@
     <string name="edit_collabview_name_label">Edit name</string>
     <string name="label_name">Name</string>
     <string name="empty_list_message_no_add">No items</string>
+    <string name="assigned_items_title">Assigned CollabItems</string>
 </resources>
